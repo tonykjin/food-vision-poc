@@ -125,7 +125,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Mutation spot-check: unknown→0, ignored serving basis, and unresolved→complete were each caught by a test.
   - Both live mock APIs return schema-1.0 results that validate.
 
-**Prompt 12: POC-04 shared image preparation** ([#4](https://github.com/tonykjin/food-vision-poc/issues/4)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-04-image-prep`. Not committed.
+**Prompt 12: POC-04 shared image preparation** ([#4](https://github.com/tonykjin/food-vision-poc/issues/4)). Status: **merged and closed** (2026-10-02) via [PR #20](https://github.com/tonykjin/food-vision-poc/pull/20). CI run 37096010263 passed: 127 tests.
 - **`imaging/prepare.py`:**
   - Validation: decodes by content (JPEG/PNG/WebP only); byte limit; pixel limit checked from the header before decoding; corrupt input gives a typed error.
   - Output: EXIF orientation applied; alpha flattened; resized to the longest-edge limit with aspect ratio kept and no crop or upscale; re-encoded from raw pixels so no EXIF/GPS/ICC survives.
@@ -144,6 +144,23 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - OneDrive locked `.venv` package metadata during `uv add`; used `uv add --no-sync`, then `uv sync` on retry.
   - A Python edit wrote one file as cp1252; it was converted back to UTF-8 and checked with `iconv` across all files.
 
+**Prompt 13: POC-05 Measurement Kit** ([#5](https://github.com/tonykjin/food-vision-poc/issues/5)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-05-measurement`. Not committed.
+- **`measurement/` package (no Streamlit):**
+  - `clock` (system plus manual test clock; monotonic ns and UTC)
+  - `events` (payload-free Span/Attempt/Blocked/Scan records; UTC enforced; `client_total_ms` always None)
+  - `spans.ScanRecorder` (parent spans, per-stage sums kept separate from wall time, budget authorization, one ScanRecord per scan)
+  - `retry` (≤1 transient retry per logical request, Retry-After within the deadline, per-attempt timeout capped by remaining time, no stored provider text)
+  - `budget`; `costs` (versioned PriceTable with no built-in prices; unknown stays unknown)
+  - `storage_policy` (per-source/class/purpose; pending fatsecret keeps only payload-free metadata and IDs; no written grants recorded)
+  - `sinks` (in memory)
+- **Config:** `MAX_EXTERNAL_ATTEMPTS_PER_SCAN` and `MAX_SCAN_COST_USD` (optional, empty = no cap) are now common. App A is fixed at 0 model calls.
+- **APIs:** both record every scan (failed uploads and 501 included) in `app.state.telemetry`; result metrics come from the ScanRecord.
+- **Verified:**
+  - `ruff check` passed; `pytest`: 169 passed.
+  - Mutation spot-check: persisting restricted content, retrying auth, unknown cost counted as 0, and wall time summed from spans were each caught.
+  - Live: both mock APIs returned recorder metrics.
+- **Not done:** durable telemetry sink (POC-06), browser click-to-render timing (still "unavailable"), real price table (needs current pricing on the day a budget is set).
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -156,7 +173,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 12: POC-04 shared image preparation** ([#4](https://github.com/tonykjin/food-vision-poc/issues/4)). POC-05 (#5) and POC-06 (#6) are also unblocked by #3.
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 13: POC-05 Measurement Kit** ([#5](https://github.com/tonykjin/food-vision-poc/issues/5)); POC-06 (#6) is also ready.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

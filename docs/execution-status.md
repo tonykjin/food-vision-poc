@@ -144,7 +144,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - OneDrive locked `.venv` package metadata during `uv add`; used `uv add --no-sync`, then `uv sync` on retry.
   - A Python edit wrote one file as cp1252; it was converted back to UTF-8 and checked with `iconv` across all files.
 
-**Prompt 13: POC-05 Measurement Kit** ([#5](https://github.com/tonykjin/food-vision-poc/issues/5)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-05-measurement`. Not committed.
+**Prompt 13: POC-05 Measurement Kit** ([#5](https://github.com/tonykjin/food-vision-poc/issues/5)). Status: **merged and closed** (2026-10-02) via [PR #21](https://github.com/tonykjin/food-vision-poc/pull/21), merge commit `686e49e`. CI passed: 169 tests.
 - **`measurement/` package (no Streamlit):**
   - `clock` (system plus manual test clock; monotonic ns and UTC)
   - `events` (payload-free Span/Attempt/Blocked/Scan records; UTC enforced; `client_total_ms` always None)
@@ -161,9 +161,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Live: both mock APIs returned recorder metrics.
 - **Not done:** durable telemetry sink (POC-06), browser click-to-render timing (still "unavailable"), real price table (needs current pricing on the day a budget is set).
 
-**POC-05 publishing:** committed locally as `ce83aaf` on `feat/poc-05-measurement`. Not pushed: the user hadn't approved publishing when Prompt 14 arrived. POC-06 is stacked on it.
-
-**Prompt 14: POC-06 database and private image storage** ([#6](https://github.com/tonykjin/food-vision-poc/issues/6)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-06-db-storage` (stacked on POC-05). Not committed.
+**Prompt 14: POC-06 database and private image storage** ([#6](https://github.com/tonykjin/food-vision-poc/issues/6)). Status: **merged and closed** (2026-10-02) via [PR #22](https://github.com/tonykjin/food-vision-poc/pull/22), merge commit `2c57506`. CI passed with the Postgres service: 191 tests, none skipped.
 - **Schema:**
   - `data/models.py` covers the plan §5 tables in `food_catalog` / `telemetry` / `benchmark`, with FKs, unique and check constraints (basis consistency, non-negative or NULL nutrients, split and grade enums, calibration never on test), cascade/restrict/set-null deletion, indexes and an `is_synthetic` flag.
   - No bytea columns.
@@ -182,6 +180,26 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - `uv run alembic upgrade head` on the Compose DB is at `0001 (head)`.
 - **Synthetic data:** all test rows are synthetic and flagged. They aren't evidence of recognition accuracy.
 
+**Prompt 15: POC-07 USDA catalog import and retrieval** ([#7](https://github.com/tonykjin/food-vision-poc/issues/7)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-07-usda-catalog`. Not committed. Details are in `docs/catalog.md`.
+- **Subset** (`catalog/usda-subset-v1.json`): Foundation 2026-04-30 and SR Legacy 2018-04 JSON downloads (SHA-256 recorded), plus 4 documented Branded FDC IDs via the API. Core nutrients use a documented ID precedence.
+- **Migration `0002`:** nutrient IDs, portion units, category, parsed preparation state, publication and retrieval metadata, generated tsvector with a GIN index.
+- **Importer** (`foodvision import-usda`, `import-usda-api`, `catalog-report`):
+  - Idempotent on re-runs.
+  - Null entries skipped; negative values rejected, never clamped.
+  - Portions only with a gram weight from the data; an ml branded serving gets no grams.
+  - Real local import: 363 Foundation, 7,793 SR Legacy, 4 Branded (1 API request, 1 attempt). Re-runs replaced and inserted 0.
+- **Tools** (`matching/retrieval.py`):
+  - Full-text search with a preparation filter and separate branded and generic pools; ≤5 candidates; typed no-match.
+  - Ranking keys: commodity-first, head noun, nutrient completeness.
+- **Verified:**
+  - `ruff check` passed. `pytest` with DB: 230 passed; without DB: 193 passed, 37 skipped.
+  - Mutation spot-check: no prep filter, no relaxed threshold, branded mixed in, and negatives kept were each caught.
+  - Gap report: 21 of 22 pilot probes matched; "chicken tikka masala" has no match.
+- **Fixed along the way:**
+  - A POC-05 test that was flaky ("412" could appear in random hex IDs).
+  - The 0002 check constraint naming (`op.f`). The local dev DB constraint was renamed to match.
+- **Known limits:** lexical top-1 isn't always the plainest record (olive oil, salmon). A correct generic record is in the top 5; POC-10 selection decides.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -194,7 +212,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 13: POC-05 Measurement Kit** ([#5](https://github.com/tonykjin/food-vision-poc/issues/5)); POC-06 (#6) is also ready.
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 15: POC-07 USDA catalog import and retrieval** ([#7](https://github.com/tonykjin/food-vision-poc/issues/7)).
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

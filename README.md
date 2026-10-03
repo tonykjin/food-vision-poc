@@ -85,6 +85,10 @@ $env:TEST_DATABASE_URL = "postgresql+psycopg://foodvision:<compose password>@127
 uv run pytest tests/db
 ```
 
+### USDA catalog (POC-07)
+
+See [`docs/catalog.md`](docs/catalog.md) for the documented FDC subset, the import commands (`foodvision import-usda`, `import-usda-api`, `catalog-report`), retrieval rules and known gaps.
+
 ### Human UI checks (each app)
 
 1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
@@ -111,7 +115,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
-| `foodvision import-usda` | POC-07 (#7) |
 | Live `A_native` analysis | POC-08 (#8) |
 | Live `B_grounded` analysis | POC-09/POC-10 (#9, #10) |
 | `apps/compare_ui.py` | POC-13 (#13) |

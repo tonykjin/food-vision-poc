@@ -1,0 +1,1258 @@
+{
+ "SRLegacyFoods": [
+  {
+   "foodClass": "FinalFood",
+   "description": "Rice, white, long-grain, regular, raw, enriched",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1395695,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 23,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 0.66
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395696,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 80.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395697,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 365
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395721,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 70,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 7.13
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395755,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 1530.0
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 3.82,
+     "fatValue": 8.37,
+     "carbohydrateValue": 4.16
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 5.95
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 20044,
+   "fdcId": 168877,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Cereal Grains and Pasta"
+   },
+   "foodPortions": [
+    {
+     "id": 83927,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup",
+     "gramWeight": 185.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Rice, white, long-grain, regular, enriched, cooked",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1395773,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 544
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395817,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 20,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 2.69
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395841,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 6,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 0.28
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395842,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 28.2
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1395843,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 130
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 3.82,
+     "fatValue": 8.37,
+     "carbohydrateValue": 4.16
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 5.95
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 20045,
+   "fdcId": 168878,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Cereal Grains and Pasta"
+   },
+   "foodPortions": [
+    {
+     "id": 83928,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup",
+     "gramWeight": 158.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Rice, white, long-grain, precooked or instant, enriched, dry",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1463310,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 1,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "amount": 0.94
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463343,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 1,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "amount": 7.82
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463378,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 82.3
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463379,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 380
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463383,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 1590.0
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 3.82,
+     "fatValue": 8.37,
+     "carbohydrateValue": 4.16
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 5.95
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 20048,
+   "fdcId": 169709,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Cereal Grains and Pasta"
+   },
+   "foodPortions": [
+    {
+     "id": 85383,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup",
+     "gramWeight": 95.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Rice, white, long-grain, precooked or instant, enriched, prepared",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1463419,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 3,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 2.2,
+     "min": 2.15,
+     "amount": 2.18
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463434,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 3,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 0.57,
+     "min": 0.38,
+     "amount": 0.5
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463488,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 518
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463490,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 26.8
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1463491,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 124
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 3.82,
+     "fatValue": 8.37,
+     "carbohydrateValue": 4.16
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 5.95
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 20049,
+   "fdcId": 169710,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Cereal Grains and Pasta"
+   },
+   "foodPortions": [
+    {
+     "id": 85384,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup",
+     "gramWeight": 165.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1578065,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 6,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 3.45,
+     "min": 1.86,
+     "amount": 2.62
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1578066,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 120
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1578090,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 501
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1578105,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 6,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 23.4,
+     "min": 21.9,
+     "amount": 22.5
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1578117,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "Z",
+      "description": "Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)",
+      "foodNutrientSource": {
+       "id": 5,
+       "code": "7",
+       "description": "Assumed zero"
+      }
+     },
+     "amount": 0.0
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 4.27,
+     "fatValue": 9.02,
+     "carbohydrateValue": 3.87
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 6.25
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 5062,
+   "fdcId": 171077,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Poultry Products"
+   },
+   "foodPortions": [
+    {
+     "id": 87919,
+     "value": 4.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "oz",
+     "gramWeight": 113.0,
+     "sequenceNumber": 1,
+     "amount": 4.0
+    },
+    {
+     "id": 87921,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "package",
+     "gramWeight": 926.0,
+     "sequenceNumber": 3,
+     "amount": 1.0
+    },
+    {
+     "id": 87920,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "piece",
+     "gramWeight": 272.0,
+     "sequenceNumber": 2,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1613013,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 690
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1613018,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 16,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 3.57
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1613019,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "Z",
+      "description": "Assumed zero (Insignificant amount or not naturally occurring in a food, such as fiber in meat)",
+      "foodNutrientSource": {
+       "id": 5,
+       "code": "7",
+       "description": "Assumed zero"
+      }
+     },
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1613020,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 165
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1613048,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 16,
+     "foodNutrientDerivation": {
+      "foodNutrientSource": {}
+     },
+     "amount": 31.0
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 4.27,
+     "fatValue": 9.02,
+     "carbohydrateValue": 3.87
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 6.25
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 5064,
+   "fdcId": 171477,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Poultry Products"
+   },
+   "foodPortions": [
+    {
+     "id": 88817,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup, chopped or diced",
+     "gramWeight": 140.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    },
+    {
+     "id": 88818,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "unit (yield from 1 lb ready-to-cook chicken)",
+     "gramWeight": 52.0,
+     "sequenceNumber": 2,
+     "amount": 1.0
+    },
+    {
+     "id": 88819,
+     "value": 0.5,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "breast, bone and skin removed",
+     "gramWeight": 86.0,
+     "sequenceNumber": 3,
+     "amount": 0.5
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Fast Foods, Fried Chicken, Breast, meat only, skin and breading removed",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1516676,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 638
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1516686,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 12,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 31.2,
+     "min": 25.6,
+     "amount": 27.9
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1516714,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 12,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 6.03,
+     "min": 3.65,
+     "amount": 4.54
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1516715,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1516716,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 153
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [],
+   "isHistoricalReference": false,
+   "ndbNumber": 21464,
+   "fdcId": 170356,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Fast Foods"
+   },
+   "foodPortions": [
+    {
+     "id": 86483,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "breast without skin",
+     "gramWeight": 142.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    },
+    {
+     "id": 86484,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "breast bone and skin removed",
+     "gramWeight": 107.0,
+     "sequenceNumber": 2,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Oil, olive, salad or cooking",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 1607766,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "O",
+      "description": "Other procedure used from imputing",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 100
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1607767,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1607768,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 884
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1607794,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "dataPoints": 4,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 0.0,
+     "min": 0.0,
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 1607796,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "dataPoints": 0,
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 3700.0
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "fatValue": 8.84
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 0.0
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 4053,
+   "fdcId": 171413,
+   "dataType": "SR Legacy",
+   "foodCategory": {
+    "description": "Fats and Oils"
+   },
+   "foodPortions": [
+    {
+     "id": 88667,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "tablespoon",
+     "gramWeight": 13.5,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    },
+    {
+     "id": 88669,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "tsp",
+     "gramWeight": 4.5,
+     "sequenceNumber": 3,
+     "amount": 1.0
+    },
+    {
+     "id": 88668,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 9999,
+      "name": "undetermined",
+      "abbreviation": "undetermined"
+     },
+     "modifier": "cup",
+     "gramWeight": 216.0,
+     "sequenceNumber": 2,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  }
+ ]
+}

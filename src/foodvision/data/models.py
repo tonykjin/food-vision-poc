@@ -15,9 +15,12 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    Computed,
+    Date,
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     MetaData,
     Numeric,
@@ -27,7 +30,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 CATALOG, TELEMETRY, BENCHMARK = "food_catalog", "telemetry", "benchmark"
 SCHEMAS = (CATALOG, TELEMETRY, BENCHMARK)
@@ -67,6 +70,20 @@ food_records = Table(
     Column("preparation", Text),
     Column("brand", Text),
     Column("region", Text),
+    Column("category", Text),
+    # uncooked (raw/dry/uncooked), cooked, not_stated, ambiguous: parsed from the FDC name
+    Column("preparation_state", Text, nullable=False, server_default="not_stated"),
+    Column("published_date", Date),
+    Column("retrieved_at", DateTime(timezone=True)),
+    Column(
+        "search_vector",
+        TSVECTOR,
+        Computed(
+            "to_tsvector('english', coalesce(name, '') || ' ' || coalesce(category, '') "
+            "|| ' ' || coalesce(brand, ''))",
+            persisted=True,
+        ),
+    ),
     Column("basis_kind", Text, nullable=False),
     Column("basis_quantity", Numeric, nullable=False),
     Column("basis_unit", Text, nullable=False),
@@ -83,6 +100,11 @@ food_records = Table(
         name="basis_consistent",
     ),
     CheckConstraint("density_g_per_ml IS NULL OR density_g_per_ml > 0", name="density_positive"),
+    CheckConstraint(
+        "preparation_state IN ('uncooked', 'cooked', 'not_stated', 'ambiguous')",
+        name="preparation_state",
+    ),
+    Index("ix_food_records_search_vector", "search_vector", postgresql_using="gin"),
     schema=CATALOG,
 )
 
@@ -99,6 +121,8 @@ food_nutrients = Table(
     Column("nutrient", Text, nullable=False),
     Column("amount", Numeric),  # NULL = unknown, never 0
     Column("unit", Text, nullable=False),
+    Column("source_nutrient_id", Integer),  # e.g. FDC nutrient id 2048, 1003
+    Column("source_nutrient_name", Text),
     UniqueConstraint("food_id", "nutrient"),
     CheckConstraint("amount IS NULL OR amount >= 0", name="amount_non_negative"),
     schema=CATALOG,
@@ -116,7 +140,10 @@ food_portions = Table(
     ),
     Column("portion_name", Text, nullable=False),
     Column("quantity", Numeric),
-    Column("gram_weight", Numeric, nullable=False),
+    Column("measure_unit", Text),
+    Column("modifier", Text),
+    Column("gram_weight", Numeric, nullable=False),  # only from source data, never inferred
+    Column("portion_source", Text, nullable=False, server_default="source_data"),
     UniqueConstraint("food_id", "portion_name"),
     CheckConstraint("gram_weight > 0", name="gram_weight_positive"),
     schema=CATALOG,

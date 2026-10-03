@@ -11,7 +11,9 @@ Handoff record for Claude Code sessions. GitHub Issues stay the source of truth 
 
 **Prompt 03: install missing prerequisites.** Prompt 03 **passed** (2026-10-02).
 
-**Prompt 04: local repository and document skeleton.** Status: **complete** (2026-10-02). It used the existing repo (no `git init`) and made a local bootstrap commit, not pushed. Next is Prompt 05.
+**Prompt 04: local repository and document skeleton.** Prompt 04 **complete**: commit `cb2b92c`, local only, not pushed.
+
+**Prompt 05: CLAUDE.md and permission settings.** Status: **complete** (2026-10-02). Not committed yet; it goes out with Prompt 06. Next is Prompt 06.
 
 ## Completed steps
 
@@ -27,6 +29,7 @@ Handoff record for Claude Code sessions. GitHub Issues stay the source of truth 
 | Prompt 03 re-run (same session) | Nothing installed: every tool already present. Re-checked paths. | All 6 executables resolve (git, gh, python, uv, docker, claude). Docker Desktop process isn't running, `docker version` still can't reach the engine, and `wsl -l -v` shows no `docker-desktop` distro yet. |
 | Prompt 03, part 3 | You enabled NX in the BIOS (hypervisor event 44 fixed), launched Docker Desktop and accepted its agreement. Claude verified the engine. | `HypervisorPresent=True`. Docker server 29.8.1 (linux/amd64). `wsl -l -v` shows `docker-desktop` v2 Running. `hello-world` exited 0. Compose v5.5.1. |
 | Prompt 04 | Repo already existed at the project root, so no `git init` and no parent repo. Added `README.md`, `.gitignore`, `.env.example` (empty values, plan §6 names) and committed the Prompt 01–04 docs. No remote changes, no push. | `git check-ignore`: `.env`, `.env.*.local`, `secrets/`, images, `/data/`, `/work/`, logs, `/reports/` and `.venv/` are ignored. `.env.example`, docs, `migrations/`, `pyproject.toml`, `uv.lock` and `src/foodvision/data/` stay trackable. The staged list was checked for credentials and images. |
+| Prompt 05 | Created `CLAUDE.md` (about 50 lines, links to the plan), `.claude/settings.json` (Read and Edit deny rules anchored at the project root for env, secrets and key files; `disableBypassPermissionsMode`) and `docs/credential-handling.md` (boolean-only presence checks, known limits). Rule syntax was checked against https://code.claude.com/docs/en/permissions. | Live test: Read of `.env.agent.local` and `secrets/x.json` was denied. Bash `touch` of protected names was denied. Read of `.env.example` succeeded. |
 
 ## Pass/fail evidence: Prompt 02
 
@@ -69,7 +72,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-**Prompt 05: write CLAUDE.md and project permission settings.** Protect `.env.provider.local`, `.env.agent.local` and the secrets directory. Leave `.env.example` readable. Write `docs/credential-handling.md`. After that, Prompt 06 reconciles with the existing `origin` and pushes the local commits.
+**Prompt 06: publish the private GitHub repository.** Reconcile with the existing `origin` (`tonykjin/food-vision-poc`). Commit the Prompt 05 files, then push `main` (one local commit ahead, plus Prompt 05). Check branch protection and secret scanning as far as the GitHub plan allows. `/context` in the current session (2026-10-02) listed no memory files, because `CLAUDE.md` was created mid-session and only loads at startup. **Still to do:** start a fresh `claude` from the project root and run `/context`. It should list `CLAUDE.md` and the imported `docs/project-plan.md`.
 
 ## Issues / PRs
 

@@ -37,7 +37,7 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 | Pilot region | `US` | User decision 2026-10-02. Fits fatsecret Basic/Premier Free (US data only). |
 | Language | `en` | Plan baseline; follows from the US region and not separately confirmed |
 | Initial runtime vision provider | Anthropic (Claude API) | User created a Console API key 2026-10-02 |
-| Runtime vision model ID | PENDING | Must be confirmed with a real capability smoke test |
+| Runtime vision model ID | `claude-opus-5-5` (default, configurable via `VISION_MODEL`); effort `medium` | Live smoke 2026-10-03 succeeded (1 call, 12.9 s, ≈ $0.028). Not a quality evaluation. |
 | Comparison providers (later) | OpenAI, then DeepSeek | Plan baseline; added only after the core comparison works (POC-14) |
 | Pipeline mode default | `grounded` | Plan baseline |
 | Baseline image size | 512 px longest side | Plan baseline (§8 A2) |

@@ -63,3 +63,17 @@ def test_provider_app_starts_without_any_model_key(tmp_path):
     health = json.loads(result.stdout.strip().splitlines()[-1])
     assert health["app"] == "provider" and health["ready"] is True
     assert health["pipeline_id"] == "A_native"
+
+
+def test_provider_app_never_loads_anthropic_or_agent_code(tmp_path):
+    probe = PROBE.replace('("foodvision", "streamlit")', '("foodvision", "streamlit", "anthropic")')
+    result = subprocess.run(
+        [sys.executable, "-c", probe.format(module="foodvision.api.provider_app")],
+        capture_output=True,
+        text=True,
+        cwd=tmp_path,
+        check=True,
+    )
+    modules = json.loads(result.stdout)
+    assert not [m for m in modules if m.startswith("anthropic")]
+    assert not [m for m in modules if "claude_vision" in m or "agent_recognition" in m]

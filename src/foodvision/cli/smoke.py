@@ -85,3 +85,83 @@ def smoke_fatsecret(image_path: str, confirmed: bool) -> int:
     print(f"  server_total_ms    {record.server_total_ms:.0f}")
     print("Nothing was stored. Record these results by hand in docs/provider-readiness.md.")
     return 0 if result.status.value != "failed" else 1
+
+
+# One model call, no retries.
+VISION_SMOKE_BUDGET = BudgetPolicy(
+    deadline_s=120, max_model_calls=1, max_attempts=1, max_retries_per_request=0
+)
+
+
+def smoke_vision(image_path: str, confirmed: bool) -> int:
+    """Opt-in live App B check: one image, exactly one model request, payload-free output."""
+    settings = load_settings(AppKind.AGENT)
+    if not settings.enable_live_api_tests:
+        print(
+            "Refusing: set ENABLE_LIVE_API_TESTS=true (shell or .env.agent.local) "
+            "to allow one live vision request."
+        )
+        return 2
+    if not confirmed:
+        print("Refusing: pass --confirm-one-request (one model request, no retries).")
+        return 2
+    if settings.anthropic_api_key is None:
+        print("Refusing: ANTHROPIC_API_KEY missing (foodvision doctor --app agent).")
+        return 2
+    try:
+        prepared = prepare_image(Path(image_path).read_bytes(), BASELINE)
+    except (OSError, ImagePreparationError) as exc:
+        print(f"Image rejected before any request: {type(exc).__name__}")
+        return 2
+
+    from foodvision.pipelines.agent_recognition import RecognitionOnlyPipeline
+    from foodvision.providers.claude_vision import ClaudeVisionProvider, VisionConfig
+
+    scan_id = uuid.uuid4().hex
+    recorder = ScanRecorder(scan_id, "B_recognition_only", budget=VISION_SMOKE_BUDGET)
+    config = VisionConfig(
+        model=settings.vision_model,
+        effort=settings.vision_effort,
+        max_tokens=settings.vision_max_tokens,
+        refusal_fallback=settings.vision_refusal_fallback,
+    )
+    pipeline = RecognitionOnlyPipeline(ClaudeVisionProvider(settings.anthropic_api_key, config))
+    context = AnalysisContext(
+        scan_id=scan_id,
+        original_sha256=prepared.original_sha256,
+        processed_sha256=prepared.processed_sha256,
+        preprocessing_version=prepared.transform_version,
+        pipeline_id="B_recognition_only",
+    )
+    result = pipeline.analyze(prepared, context, recorder)
+    record = recorder.finish(
+        ScanStatus(result.status.value), result.error.code if result.error else None
+    )
+    prov = result.model_provenance
+    items = result.items
+    print("vision live smoke (payload-free summary)")
+    print(f"  status             {result.status.value}")
+    print(f"  error              {result.error.message if result.error else '-'}")
+    if prov is not None:
+        print(f"  model requested    {prov.model_requested}")
+        print(f"  model served       {prov.model_served} (fallback: {prov.fallback_served})")
+        print(f"  stop_reason        {prov.stop_reason}")
+        print(f"  prompt             {prov.prompt_version} sha256 {prov.prompt_sha256[:12]}")
+        print(f"  sdk                anthropic {prov.sdk_version}")
+    print(f"  items              {len(items)}")
+    print(f"  preparation stated {sum(i.preparation is not None for i in items)}/{len(items)}")
+    print(f"  brand present      {sum(i.visible_brand is not None for i in items)}/{len(items)}")
+    print(f"  with alternatives  {sum(bool(i.alternatives) for i in items)}/{len(items)}")
+    composite = sum(any("composite" in r for r in i.uncertainty_reasons) for i in items)
+    print(f"  composite dishes   {composite}")
+    for attempt in record.attempt_records:
+        tokens = attempt.usage
+        cost = attempt.cost.amount_usd
+        print(
+            f"  attempt            {attempt.operation} {attempt.outcome.value} "
+            f"{attempt.duration_ms:.0f} ms; tokens in/out "
+            f"{tokens.input_tokens if tokens else '-'}/{tokens.output_tokens if tokens else '-'}; "
+            f"est. cost {'unknown' if cost is None else f'${cost:.4f}'}"
+        )
+    print("Nothing was stored. No food names or portion values were printed.")
+    return 0 if result.status.value != "failed" else 1

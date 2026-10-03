@@ -23,7 +23,7 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 PIPELINE_IDS: dict[AppKind, dict[str, str]] = {
     AppKind.PROVIDER: {"mock": "A_mock", "live": "A_native"},
-    AppKind.AGENT: {"mock": "B_mock", "live": "B_grounded"},
+    AppKind.AGENT: {"mock": "B_mock", "live": "B_recognition_only"},
 }
 
 LIVE_ISSUE: dict[AppKind, str] = {
@@ -45,7 +45,21 @@ def _live_pipeline(kind: AppKind, settings: AppSettings):
 
         client = FatsecretClient(settings.fatsecret_client_id, settings.fatsecret_client_secret)
         return ProviderNativePipeline(client), None
-    return None, None
+    if settings.anthropic_api_key is None:
+        return None, "ANTHROPIC_API_KEY is not configured (foodvision doctor --app agent)"
+    from foodvision.pipelines.agent_recognition import RecognitionOnlyPipeline
+    from foodvision.providers.claude_vision import ClaudeVisionProvider, VisionConfig
+
+    provider = ClaudeVisionProvider(
+        settings.anthropic_api_key,
+        VisionConfig(
+            model=settings.vision_model,
+            effort=settings.vision_effort,
+            max_tokens=settings.vision_max_tokens,
+            refusal_fallback=settings.vision_refusal_fallback,
+        ),
+    )
+    return RecognitionOnlyPipeline(provider), None
 
 
 def create_app(
@@ -88,7 +102,7 @@ def create_app(
             "app": kind.value,
             "mode": mode,
             "pipeline_id": pipeline_id,
-            "live_pipeline_implemented": kind is AppKind.PROVIDER,
+            "live_pipeline_implemented": True,
             "ready": pipeline is not None,
             "version": __version__,
             "schema_version": SCHEMA_VERSION,

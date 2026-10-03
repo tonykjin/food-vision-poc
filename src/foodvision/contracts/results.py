@@ -80,6 +80,15 @@ class Nutrients(Strict):
         return [key for key in NUTRIENT_KEYS if getattr(self, key) is None]
 
 
+class PortionScenarios(Strict):
+    """Low/base/high gram ASSUMPTIONS from the image. Not a statistical interval."""
+
+    low_g: Positive
+    base_g: Positive
+    high_g: Positive
+    label: str = "assumption range, not a confidence interval"
+
+
 class ResultItem(Strict):
     name: str = Field(min_length=1)
     preparation: str | None = None
@@ -91,6 +100,10 @@ class ResultItem(Strict):
     serving_id: str | None = None
     nutrients: Nutrients = Field(default_factory=Nutrients)
     uncertainty_reasons: list[str] = Field(default_factory=list)
+    portion_scenarios: PortionScenarios | None = None
+    alternatives: list[str] = Field(default_factory=list)
+    evidence: str | None = None
+    visible_brand: str | None = None
 
     @model_validator(mode="after")
     def _resolved_needs_source_and_portion(self) -> Self:
@@ -150,6 +163,21 @@ class InputProvenance(Strict):
     processed_height_px: int = Field(gt=0)
 
 
+class ModelProvenance(Strict):
+    """Which model and prompt produced a model-based result. Recorded, never shown as accuracy."""
+
+    provider: str
+    model_requested: str
+    model_served: str
+    fallback_served: bool
+    prompt_version: str
+    prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    sdk_version: str
+    effort: str | None = None
+    stop_reason: str | None = None
+    request_id: str | None = None
+
+
 class Metrics(Strict):
     server_total_ms: NonNegative | None = None
     external_attempts: int = Field(default=0, ge=0)
@@ -170,6 +198,7 @@ class AnalysisResult(Strict):
     warnings: list[str] = Field(default_factory=list)
     error: ErrorDetail | None = None
     input: InputProvenance | None = None
+    model_provenance: ModelProvenance | None = None
     metrics: Metrics = Field(default_factory=Metrics)
 
     @model_validator(mode="after")

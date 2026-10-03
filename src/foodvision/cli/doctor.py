@@ -14,13 +14,13 @@ from foodvision.config import ENV_FILES, FOREIGN_SECRETS, AppKind, load_settings
 
 REQUIRED_FOR_LIVE: dict[AppKind, tuple[str, ...]] = {
     AppKind.PROVIDER: ("FATSECRET_CLIENT_ID", "FATSECRET_CLIENT_SECRET"),
-    AppKind.AGENT: ("ANTHROPIC_API_KEY", "VISION_MODEL"),
+    AppKind.AGENT: ("ANTHROPIC_API_KEY",),
 }
 OPTIONAL: tuple[str, ...] = ("USDA_API_KEY", "DATABASE_URL")
 
 LIVE_STATUS: dict[AppKind, str] = {
     AppKind.PROVIDER: "fatsecret A_native (adapter-verified; live unverified)",
-    AppKind.AGENT: "not implemented yet (POC-09/POC-10, #9 #10)",
+    AppKind.AGENT: "Claude vision, recognition only (adapter-verified; matching in POC-10)",
 }
 
 
@@ -48,6 +48,8 @@ def run_doctor(
     out(f"mode                {'MOCK (synthetic)' if settings.mock_mode else 'live'}")
     out(f"live pipeline       {LIVE_STATUS[kind]}")
     out(f"live API tests      {'enabled' if settings.enable_live_api_tests else 'disabled'}")
+    if kind is AppKind.AGENT:
+        out(f"vision model        {settings.vision_model} (effort {settings.vision_effort})")
     out("")
     out("required for live mode:")
     for name in REQUIRED_FOR_LIVE[kind]:

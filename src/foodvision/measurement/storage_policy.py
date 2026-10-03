@@ -112,6 +112,10 @@ _ITEM_FIELDS: dict[str, DataClass] = {
     "portion_g": DataClass.RESTRICTED_CONTENT,
     "nutrients": DataClass.RESTRICTED_CONTENT,
     "uncertainty_reasons": DataClass.RESTRICTED_CONTENT,
+    "portion_scenarios": DataClass.RESTRICTED_CONTENT,
+    "alternatives": DataClass.RESTRICTED_CONTENT,
+    "evidence": DataClass.RESTRICTED_CONTENT,
+    "visible_brand": DataClass.RESTRICTED_CONTENT,
 }
 _RESULT_FIELDS: dict[str, DataClass] = {
     "schema_version": DataClass.PAYLOAD_FREE_METADATA,
@@ -123,6 +127,7 @@ _RESULT_FIELDS: dict[str, DataClass] = {
     "nutrition_basis": DataClass.PAYLOAD_FREE_METADATA,
     "input": DataClass.PAYLOAD_FREE_METADATA,
     "metrics": DataClass.PAYLOAD_FREE_METADATA,
+    "model_provenance": DataClass.PAYLOAD_FREE_METADATA,
     "warnings": DataClass.RESTRICTED_CONTENT,
     "confidence": DataClass.DERIVED_METRIC,
 }

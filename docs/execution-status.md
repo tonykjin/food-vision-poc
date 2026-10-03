@@ -224,6 +224,23 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - Branch `fix/fatsecret-token-diagnostics` now keeps the RFC 6749 OAuth error code and HTTP status (payload-free) and classifies token 4xx as `authentication`.
 - Run 2: **HTTP 400 `invalid_scope`**. The key apparently lacks the `image-recognition` scope (add-on not enabled). Live App A stays blocked on vendor access. **The user contacted fatsecret about upgrading the plan (2026-10-03).**
 
+**Prompt 17: POC-09 first model adapter and App B recognition** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)). Status: **implemented, adapter-verified, live smoke passed** (2026-10-03) on branch `feat/poc-09-vision-adapter`. Not committed. Details are in `docs/app-b-vision.md`.
+- **Adapter:** `providers/claude_vision.py` on the official `anthropic` 1.11.0 SDK (SDK retries off).
+  - Model `claude-opus-5-5` (configurable), effort `medium`, `output_config.format` JSON schema.
+  - Server-side refusal fallback on, with the served model recorded.
+  - Checks `stop_reason` before content; strict server-side validation (`recognition/hypotheses.py`).
+- **Prompt:** `prompts/recognize-food-v1.md`, hashed after LF normalization.
+- **Contract (additive, schema 1.0):** `ResultItem.portion_scenarios` (labeled assumptions), `alternatives`, `evidence`, `visible_brand`; `AnalysisResult.model_provenance`.
+- **Measurement:** failed attempts may carry billed usage, so refusals and truncations are costed.
+- **App B live:** `B_recognition_only`. Items are unresolved, nutrients unknown, labeled partial; no food → abstained.
+- **`foodvision smoke-vision`:** opt-in, one call.
+- **Verified:**
+  - `ruff check` passed; `pytest` (no DB): 269 passed, 37 skipped.
+  - Mutation spot-check: refusal ignored, validation skipped, and SDK retries on were each caught.
+  - Real `agent_app` started live with only the Anthropic key: `/health` ready.
+  - **One live call** (user-authorized smoke): `end_turn`, `claude-opus-5-5`, no fallback, 5 items valid, 12.9 s, 1,871/1,038 tokens, ≈ $0.028.
+- **Not measured:** recognition quality (needs reference meals). Refusal, fallback and truncation weren't triggered live. Latency (12.9 s for the recognition call alone) is close to the provisional 15 s p95 target.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

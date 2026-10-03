@@ -41,3 +41,12 @@ def test_agent_env_file_does_not_enable_provider_smoke(tmp_path, monkeypatch, ca
     (tmp_path / ".env.agent.local").write_text("ENABLE_LIVE_API_TESTS=true\n")
     assert main(["smoke-fatsecret", "--image", "x.jpg", "--confirm-one-request"]) == 2
     assert "ENABLE_LIVE_API_TESTS" in capsys.readouterr().out
+
+
+def test_vision_smoke_refuses_without_opt_in_and_budget_is_one_call(monkeypatch, capsys):
+    from foodvision.cli.smoke import VISION_SMOKE_BUDGET
+
+    monkeypatch.delenv("ENABLE_LIVE_API_TESTS", raising=False)
+    assert main(["smoke-vision", "--image", "x.jpg", "--confirm-one-request"]) == 2
+    assert "ENABLE_LIVE_API_TESTS" in capsys.readouterr().out
+    assert VISION_SMOKE_BUDGET.max_model_calls == 1 and VISION_SMOKE_BUDGET.max_attempts == 1

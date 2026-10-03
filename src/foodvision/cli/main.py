@@ -1,7 +1,7 @@
 """`foodvision` command-line entry point.
 
 Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`,
-`smoke-fatsecret`. Other plan §6/§14 commands (validate-manifest, benchmark, report,
+`smoke-fatsecret`, `smoke-vision`. Other plan §6/§14 commands (validate-manifest, benchmark, report,
 calibrate) arrive with their issues.
 """
 
@@ -37,6 +37,10 @@ def main(argv: list[str] | None = None) -> int:
     smoke.add_argument("--image", required=True, help="Path to an owned test image")
     smoke.add_argument("--confirm-one-request", action="store_true")
 
+    vision = sub.add_parser("smoke-vision", help="Opt-in live check: one image, one model request")
+    vision.add_argument("--image", required=True, help="Path to an owned test image")
+    vision.add_argument("--confirm-one-request", action="store_true")
+
     args = parser.parse_args(argv)
     if args.command == "doctor":
         from foodvision.cli.doctor import run_doctor
@@ -54,6 +58,10 @@ def main(argv: list[str] | None = None) -> int:
         from foodvision.cli.smoke import smoke_fatsecret
 
         return smoke_fatsecret(args.image, args.confirm_one_request)
+    if args.command == "smoke-vision":
+        from foodvision.cli.smoke import smoke_vision
+
+        return smoke_vision(args.image, args.confirm_one_request)
     if args.command == "catalog-report":
         from foodvision.catalog.commands import catalog_report
 

@@ -76,7 +76,12 @@ class AgentSettings(CommonSettings):
 
     anthropic_api_key: SecretStr | None = None
     vision_provider: str = "anthropic"
-    vision_model: str | None = None
+    # Default model per the official models overview (2026-10-02); configurable.
+    vision_model: str = "claude-opus-5-5"
+    vision_effort: str = "medium"
+    vision_max_tokens: int = Field(default=16000, gt=0)
+    # Server-side refusal fallback; a fallback-served answer is recorded in provenance.
+    vision_refusal_fallback: bool = True
     pipeline_mode: str = "grounded"
     max_model_calls_per_scan: int = Field(default=2, ge=0)
 

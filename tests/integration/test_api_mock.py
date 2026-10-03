@@ -4,7 +4,6 @@ from tests.conftest import synthetic_image
 
 from foodvision.api.factory import MAX_UPLOAD_BYTES, create_app
 from foodvision.config import AgentSettings, AppKind, ProviderSettings
-from foodvision.contracts.errors import ErrorResponse
 from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult
 from foodvision.pipelines.mock import MOCK_WARNING
 
@@ -23,7 +22,7 @@ def test_health_reports_app_and_mode(kind):
     assert body["status"] == "ok"
     assert body["app"] == kind.value
     assert body["mode"] == "mock"
-    assert body["live_pipeline_implemented"] is (kind is AppKind.PROVIDER)
+    assert body["live_pipeline_implemented"] is True
     assert body["ready"] is True
 
 
@@ -48,18 +47,6 @@ def test_mock_result_is_labeled_and_has_no_invented_nutrients(kind, pipeline_id)
         assert item["food_source"] == "mock"
         assert all(value is None for value in item["nutrients"].values())
     assert body["metrics"]["server_total_ms"] >= 0
-
-
-def test_agent_live_mode_returns_typed_not_implemented():
-    kind = AppKind.AGENT
-    response = client(kind, mock=False).post(
-        "/v1/analyze", files={"image": ("meal.jpg", FAKE_IMAGE, "image/jpeg")}
-    )
-    assert response.status_code == 501
-    body = response.json()
-    assert body["code"] == "not_implemented"
-    assert body["is_mock"] is False
-    ErrorResponse.model_validate(body)
 
 
 @pytest.mark.parametrize("kind", list(AppKind))
@@ -147,15 +134,9 @@ def test_every_scan_is_recorded_including_failures(kind):
     assert failure.client_total_ms is None
 
 
-def test_live_mode_not_implemented_is_recorded_as_failed():
-    app_client = client(AppKind.AGENT, mock=False)
-    app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
-    (record,) = app_client.app.state.telemetry.records
-    assert record.status == "failed" and record.error_code == "not_implemented"
-
-
-def test_provider_live_mode_without_credentials_is_typed_503():
-    app_client = client(AppKind.PROVIDER, mock=False)
+@pytest.mark.parametrize("kind", list(AppKind))
+def test_live_mode_without_credentials_is_typed_503(kind):
+    app_client = client(kind, mock=False)
     assert app_client.get("/health").json()["ready"] is False
     response = app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
     assert response.status_code == 503

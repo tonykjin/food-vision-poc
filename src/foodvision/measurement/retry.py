@@ -62,12 +62,17 @@ class AttemptError(Exception):
         *,
         http_status: int | None = None,
         retry_after_s: float | None = None,
+        usage: ProviderUsage | None = None,
+        provider_model: str | None = None,
     ) -> None:
         super().__init__(outcome.value)
         self.outcome = outcome
         self.http_status = http_status
         self.retry_after_s = retry_after_s
         self.code = ERROR_CODES[outcome]
+        # Set when the provider billed the attempt anyway (e.g. a refusal or truncation).
+        self.usage = usage
+        self.provider_model = provider_model
 
 
 @dataclass
@@ -86,13 +91,18 @@ def _status_class(status: int | None) -> str | None:
 
 
 def _attempt_cost(
-    spec: CallSpec, outcome: AttemptOutcome, result: CallResult | None, prices: PriceTable | None
+    spec: CallSpec,
+    result: CallResult | None,
+    error: "AttemptError | None",
+    prices: PriceTable | None,
 ) -> CostEstimate:
     if result is not None and result.reported_cost is not None:
         return result.reported_cost
-    if outcome is AttemptOutcome.SUCCESS and prices is not None and result is not None:
-        return prices.estimate(spec.provider, result.provider_model or spec.model, result.usage)
-    return CostEstimate.unknown()  # failed or unpriced attempts: cost unknown, not zero
+    usage = result.usage if result is not None else (error.usage if error else None)
+    model = result.provider_model if result else (error.provider_model if error else None)
+    if prices is not None and usage is not None:
+        return prices.estimate(spec.provider, model or spec.model, usage)
+    return CostEstimate.unknown()  # no usage reported, or unpriced: unknown, not zero
 
 
 def call_with_retries(
@@ -148,9 +158,13 @@ def call_with_retries(
                     http_status_class=_status_class(http_status),
                     retry_reason=retry_reason,
                     retry_after_s=retry_after,
-                    usage=result.usage if result is not None else None,
-                    provider_model=(result.provider_model if result else None) or spec.model,
-                    cost=_attempt_cost(spec, outcome, result, prices),
+                    usage=result.usage if result is not None else (error.usage if error else None),
+                    provider_model=(
+                        (result.provider_model if result else None)
+                        or (error.provider_model if error else None)
+                        or spec.model
+                    ),
+                    cost=_attempt_cost(spec, result, error, prices),
                 )
             )
             if error is None:

@@ -222,7 +222,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 **fatsecret live smoke (2026-10-03 UTC):** two runs, each a single token request; no image was sent and nothing stored.
 - Run 1 showed only "4xx". The client then kept no diagnostic.
 - Branch `fix/fatsecret-token-diagnostics` now keeps the RFC 6749 OAuth error code and HTTP status (payload-free) and classifies token 4xx as `authentication`.
-- Run 2: **HTTP 400 `invalid_scope`**. The key apparently lacks the `image-recognition` scope (add-on not enabled). Live App A stays blocked on vendor access.
+- Run 2: **HTTP 400 `invalid_scope`**. The key apparently lacks the `image-recognition` scope (add-on not enabled). Live App A stays blocked on vendor access. **The user contacted fatsecret about upgrading the plan (2026-10-03).**
 
 ## Blockers
 

@@ -62,7 +62,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - The private GitHub repo and its first commit (docs only) were created **before** Prompts 04 and 06. When those prompts run, they should **reconcile with the existing repo and remote**: no `git init`, no new repo, no second remote. See `docs/decisions/0001-adopt-plan-baseline.md`.
 - The first commit contains only the two source docs. Prompt 04 added `README.md`, `.gitignore` and `.env.example` in a local commit. `CLAUDE.md` comes in Prompt 05.
 
-**Prompt 07: provider-access checklist.** Status: **complete** (2026-10-02), not committed.
+**Prompt 07: provider-access checklist.** Status: **complete** (2026-10-02). Commit `79217aa`, pushed to `origin/main`.
 - Fetched the official fatsecret (image v2, OAuth, editions, terms), USDA (API guide, downloads, key signup) and Anthropic (vision, structured outputs, models, API overview) docs on 2026-10-02.
 - Created `docs/provider-readiness.md` and `docs/vendor-questions-fatsecret.md`. The draft was **not sent**.
 - Findings:
@@ -73,7 +73,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - The repo sits under OneDrive, which is a secret-sync risk.
 - No accounts were created, no messages sent, no keys handled.
 
-**Prompt 08: record nonsecret answers and permissions.** Status: **complete** (2026-10-02), not committed.
+**Prompt 08: record nonsecret answers and permissions.** Status: **complete** (2026-10-02). Commit `79217aa`, pushed to `origin/main`.
 - Final boolean check (user ran `scripts/check-env-presence.sh`): all five variables are set, `ANTHROPIC_API_KEY` is in the agent file only, and it's not set in the shell.
 - API billing is prepaid Console credits with auto-reload (user-reported).
 - No live call has been made, so validity is unverified until Prompt 19.
@@ -83,6 +83,12 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **User decisions (2026-10-02):** all role owners are Tony Jin (`tonykjin`), the pilot region is US, there's no dollar budget cap (per-scan call limits and the live opt-in still apply), and the repo stays under OneDrive (risk accepted).
 - **Credential presence (user-run boolean check, 2026-10-02):** `FATSECRET_CLIENT_ID`, `FATSECRET_CLIENT_SECRET` and `USDA_API_KEY` are set. `ANTHROPIC_API_KEY` is **missing** from `.env.agent.local`; the user is re-saving it. Presence isn't validity, and fatsecret add-on access and rights stay unconfirmed.
 - **Still PENDING (non-blocking):** GitHub owner long-term confirmation and cofounder invites. No paid calls were made.
+
+**Prompt 09: GitHub backlog.** Status: **complete locally** (2026-10-02), on branch `chore/backlog-docs`, not committed or pushed yet.
+- The repo had no issues, project labels or milestones beforehand, so nothing was duplicated.
+- Created 9 labels, the 4 plan §15 milestones and issues #1–#16, all assigned to `tonykjin`. The real numbers were confirmed from the returned URLs and match the POC IDs. Dependencies link to the real issue numbers.
+- Added `docs/github-issue-map.md`, `docs/verification-matrix.md`, `.github/ISSUE_TEMPLATE/task.md` and `config.yml`, and `.github/pull_request_template.md`.
+- Blocked or partial: #1 (vendor/partial), #8 (live), #12 (real meals), #15 (data). No issue was closed.
 
 ## Blockers
 
@@ -96,10 +102,11 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-**Prompt 09** (GitHub backlog), when the user pastes it. Independent build work (Prompt 10 onward: scaffolding, contracts, USDA import from a downloaded dataset) doesn't depend on vendor access.
+1. **Section 9 review/publish/merge cycle for the `chore/backlog-docs` branch** (playbook: required before Prompt 10). It needs the user's publish and merge prompts, because pushing the branch and opening the PR aren't authorized by Prompt 09.
+2. **Prompt 10: POC-02 scaffolding and CI** ([#2](https://github.com/tonykjin/food-vision-poc/issues/2)), the first ready implementation task. Build work doesn't depend on vendor access.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 
 ## Issues / PRs
 
-None yet. The issue backlog is created in Prompt 09, and its map goes in `docs/github-issue-map.md`.
+16 issues (#1–#16), 4 milestones and 9 project labels were created 2026-10-02. The map is in `docs/github-issue-map.md`. Open with an external blocker: #1 (partial), #8, #12, #15. No PRs yet.

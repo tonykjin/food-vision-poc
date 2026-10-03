@@ -58,6 +58,8 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 | Spending alerts configured | PENDING | Plan Step 1 |
 | How Claude Code dev usage vs runtime API is billed | Claude Code: user's Max plan. App B runtime: pay-as-you-go Console API credits, default workspace. | User-reported 2026-10-02. Keep `ANTHROPIC_API_KEY` out of shell and user env vars, or Claude Code bills to the API key. |
 
+| Live smoke checks | **Authorized as needed** (user, 2026-10-02) | Opt-in via `ENABLE_LIVE_API_TESTS=true` in the app's local env file. Every run still needs `--confirm-one-request` and is capped at 1 token + 1 provider request, no retries, payload-free output. CI pins it to `false`. |
+
 ## Providers and accounts
 
 Details are in `docs/provider-readiness.md` (Prompt 07, docs accessed 2026-10-02). The vendor question draft is in `docs/vendor-questions-fatsecret.md` (not sent).

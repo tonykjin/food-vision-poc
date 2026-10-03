@@ -19,7 +19,7 @@ REQUIRED_FOR_LIVE: dict[AppKind, tuple[str, ...]] = {
 OPTIONAL: tuple[str, ...] = ("USDA_API_KEY", "DATABASE_URL")
 
 LIVE_STATUS: dict[AppKind, str] = {
-    AppKind.PROVIDER: "not implemented yet (POC-08, #8)",
+    AppKind.PROVIDER: "fatsecret A_native (adapter-verified; live unverified)",
     AppKind.AGENT: "not implemented yet (POC-09/POC-10, #9 #10)",
 }
 
@@ -47,6 +47,7 @@ def run_doctor(
     out(f"env file            {path} ({'found' if path.is_file() else 'absent'})")
     out(f"mode                {'MOCK (synthetic)' if settings.mock_mode else 'live'}")
     out(f"live pipeline       {LIVE_STATUS[kind]}")
+    out(f"live API tests      {'enabled' if settings.enable_live_api_tests else 'disabled'}")
     out("")
     out("required for live mode:")
     for name in REQUIRED_FOR_LIVE[kind]:

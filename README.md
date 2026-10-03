@@ -48,6 +48,43 @@ Without `MOCK_MODE=true`, `/v1/analyze` returns 501 until POC-08 (A) or POC-09/P
 
 Local Postgres listens on `127.0.0.1:5432` (user/db `foodvision`). The default password is a local-only dev value in `infra/compose.yml`. Put your `DATABASE_URL` in the app's local env file, not in Git.
 
+### Database (POC-06)
+
+Three schemas with enforced access:
+
+| Schema | Holds | `fv_inference` | `fv_evaluator` |
+|---|---|---|---|
+| `food_catalog` | Nutrition records | read | read |
+| `telemetry` | Image metadata, runs, events, policy-filtered results | write | read |
+| `benchmark` | Samples, hidden reference labels, metrics | **no access** | read/write |
+
+Migrate with the owner role, set only in your shell:
+
+```powershell
+$env:MIGRATION_DATABASE_URL = "postgresql+psycopg://foodvision:<compose password>@127.0.0.1:5432/foodvision"
+uv run alembic upgrade head
+```
+
+Create login users per environment. Never use the owner URL in an app. In `psql`, `\password` prompts so the secret stays out of shell history:
+
+```sql
+CREATE ROLE app_a_inference LOGIN IN ROLE fv_inference;  \password app_a_inference
+CREATE ROLE evaluator_1     LOGIN IN ROLE fv_evaluator;  \password evaluator_1
+```
+
+- Put the inference URL in the app's `DATABASE_URL`.
+- Put the evaluator URL only in the evaluator's environment.
+- `foodvision doctor` flags `EVALUATOR_DATABASE_URL` or `MIGRATION_DATABASE_URL` if they appear in an app's env file.
+
+Images are stored as files, one per image ID, outside Git: either outside the repo or under the ignored `data/`. Postgres keeps only the key, hashes, consent basis and retention deadline. Deletion removes the file and keeps a tombstone row.
+
+Database tests create and drop a throwaway database. They need an admin URL to a local or disposable server, and they skip without one:
+
+```powershell
+$env:TEST_DATABASE_URL = "postgresql+psycopg://foodvision:<compose password>@127.0.0.1:5432/foodvision"
+uv run pytest tests/db
+```
+
 ### Human UI checks (each app)
 
 1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
@@ -74,7 +111,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
-| `uv run alembic upgrade head` | POC-06 (#6) |
 | `foodvision import-usda` | POC-07 (#7) |
 | Live `A_native` analysis | POC-08 (#8) |
 | Live `B_grounded` analysis | POC-09/POC-10 (#9, #10) |

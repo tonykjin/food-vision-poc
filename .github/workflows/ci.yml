@@ -12,8 +12,23 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     # No provider secrets: tests must pass without keys, and no paid calls run here.
+    # Postgres is a disposable CI-only service with dummy local credentials.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci-dummy-password
+          POSTGRES_DB: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d ci"
+          --health-interval 5s --health-timeout 3s --health-retries 10
     env:
       ENABLE_LIVE_API_TESTS: "false"
+      TEST_DATABASE_URL: postgresql+psycopg://ci:ci-dummy-password@localhost:5432/ci
+      REQUIRE_DB_TESTS: "true"
     steps:
       - uses: actions/checkout@v7
 
@@ -27,5 +42,10 @@ jobs:
       - name: Lint
         run: uv run ruff check .
 
-      - name: Test
+      - name: Migrate empty database (plan command)
+        env:
+          MIGRATION_DATABASE_URL: postgresql+psycopg://ci:ci-dummy-password@localhost:5432/ci
+        run: uv run alembic upgrade head
+
+      - name: Test (includes disposable-database migration and access tests)
         run: uv run pytest

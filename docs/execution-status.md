@@ -161,6 +161,27 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Live: both mock APIs returned recorder metrics.
 - **Not done:** durable telemetry sink (POC-06), browser click-to-render timing (still "unavailable"), real price table (needs current pricing on the day a budget is set).
 
+**POC-05 publishing:** committed locally as `ce83aaf` on `feat/poc-05-measurement`. Not pushed: the user hadn't approved publishing when Prompt 14 arrived. POC-06 is stacked on it.
+
+**Prompt 14: POC-06 database and private image storage** ([#6](https://github.com/tonykjin/food-vision-poc/issues/6)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-06-db-storage` (stacked on POC-05). Not committed.
+- **Schema:**
+  - `data/models.py` covers the plan §5 tables in `food_catalog` / `telemetry` / `benchmark`, with FKs, unique and check constraints (basis consistency, non-negative or NULL nutrients, split and grade enums, calibration never on test), cascade/restrict/set-null deletion, indexes and an `is_synthetic` flag.
+  - No bytea columns.
+- **Migration:** Alembic migration `0001` creates the schemas, the NOLOGIN group roles `fv_inference` (no privileges at all on `benchmark`) and `fv_evaluator`, and the grants. PUBLIC is revoked. `MIGRATION_DATABASE_URL` is owner-only.
+- **Code:**
+  - `data/access.assert_inference_isolation` queries real privileges.
+  - `data/object_store.py`: one file per image ID outside Git, consent and retention metadata, deletion with tombstone, `purge_expired`.
+  - `data/repositories.py`: scan records, policy-filtered results, metric writes refused for pending fatsecret.
+  - `doctor` now also flags `MIGRATION_DATABASE_URL` in app env files.
+- **CI:** disposable `postgres:17` service with dummy credentials. `REQUIRE_DB_TESTS=true` makes DB tests fail rather than skip. Runs `alembic upgrade head`.
+- **Verified locally** (disposable DBs on Compose Postgres 17):
+  - `ruff check` passed. `pytest` with DB: 191 passed. Without DB: 173 passed, 18 skipped.
+  - Empty → head → base → head round trip; migration matches models (`compare_metadata` empty).
+  - A real `fv_inference` LOGIN user is denied `SELECT` on `benchmark.*` (InsufficientPrivilege), `SET ROLE fv_evaluator`, catalog inserts and image deletes.
+  - Mutation: granting benchmark to inference fails 5 access tests.
+  - `uv run alembic upgrade head` on the Compose DB is at `0001 (head)`.
+- **Synthetic data:** all test rows are synthetic and flagged. They aren't evidence of recognition accuracy.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

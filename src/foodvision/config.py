@@ -28,11 +28,13 @@ FOREIGN_SECRETS: dict[AppKind, tuple[str, ...]] = {
         "OPENAI_API_KEY",
         "DEEPSEEK_API_KEY",
         "EVALUATOR_DATABASE_URL",
+        "MIGRATION_DATABASE_URL",
     ),
     AppKind.AGENT: (
         "FATSECRET_CLIENT_ID",
         "FATSECRET_CLIENT_SECRET",
         "EVALUATOR_DATABASE_URL",
+        "MIGRATION_DATABASE_URL",
     ),
 }
 

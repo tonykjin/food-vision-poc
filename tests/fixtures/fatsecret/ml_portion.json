@@ -1,0 +1,14 @@
+{
+  "food_response": [
+    {
+      "food_id": 9000004,
+      "food_entry_name": "SYNTHETIC drink",
+      "eaten": {
+        "metric_description": "ml",
+        "total_metric_amount": "240.00",
+        "total_nutritional_content": {"calories": "100", "carbohydrate": "20", "protein": "1", "fat": "0"}
+      },
+      "suggested_serving": {"serving_id": 8000004, "number_of_units": "1.00"}
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 """`foodvision` command-line entry point.
 
-Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`. Other plan
-§6/§14 commands (validate-manifest, benchmark, report, calibrate) arrive with their issues.
+Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`,
+`smoke-fatsecret`. Other plan §6/§14 commands (validate-manifest, benchmark, report,
+calibrate) arrive with their issues.
 """
 
 import argparse
@@ -30,6 +31,12 @@ def main(argv: list[str] | None = None) -> int:
     report = sub.add_parser("catalog-report", help="Catalog counts, gaps and probe searches")
     report.add_argument("--probes", default=None)
 
+    smoke = sub.add_parser(
+        "smoke-fatsecret", help="Opt-in live check: one image, <= 1 token + 1 image request"
+    )
+    smoke.add_argument("--image", required=True, help="Path to an owned test image")
+    smoke.add_argument("--confirm-one-request", action="store_true")
+
     args = parser.parse_args(argv)
     if args.command == "doctor":
         from foodvision.cli.doctor import run_doctor
@@ -43,6 +50,10 @@ def main(argv: list[str] | None = None) -> int:
         from foodvision.catalog.commands import import_usda_api
 
         return import_usda_api(args.fdc_ids, args.subset)
+    if args.command == "smoke-fatsecret":
+        from foodvision.cli.smoke import smoke_fatsecret
+
+        return smoke_fatsecret(args.image, args.confirm_one_request)
     if args.command == "catalog-report":
         from foodvision.catalog.commands import catalog_report
 

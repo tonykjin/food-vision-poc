@@ -49,6 +49,8 @@ Rules:
 - Live validation (a real authenticated call) happens only in explicit opt-in smoke tests (`ENABLE_LIVE_API_TESTS=true`) and reports pass or fail, not response bodies that contain tokens.
 - Claude never runs commands that print env-file contents or environment values (`cat .env*`, `Get-Content .env*`, `printenv`, `Get-ChildItem env:`, `gh auth token`), even for troubleshooting. Use the boolean check instead.
 
+**Since POC-02:** `uv run foodvision doctor --app provider|agent` implements this contract and is tested so it never prints a value. It also fails (exit 1) if the other app's secrets or `EVALUATOR_DATABASE_URL` are present. Claude may run it. `scripts/check-env-presence.sh` remains as a dependency-free fallback.
+
 **Observed 2026-10-02:** Claude's PowerShell sandbox blocks even `Test-Path` on `.env.agent.local`. Until `foodvision doctor` exists, the user runs boolean presence checks with the `!` prefix, and Claude reads only the `set`/`missing` output. **`!` runs Git Bash, not PowerShell,** so use this form:
 
 ```bash

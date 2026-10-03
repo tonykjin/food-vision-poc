@@ -13,7 +13,9 @@ Handoff record for Claude Code sessions. GitHub Issues stay the source of truth 
 
 **Prompt 04: local repository and document skeleton.** Prompt 04 **complete**: commit `cb2b92c`, local only, not pushed.
 
-**Prompt 05: CLAUDE.md and permission settings.** Status: **complete** (2026-10-02). Not committed yet; it goes out with Prompt 06. Next is Prompt 06.
+**Prompt 05: CLAUDE.md and permission settings.** Status: **complete** (2026-10-02). Committed as `602a22a`.
+
+**Prompt 06, push only (you asked to commit and push):** `main` was pushed to `origin` (`8339643..602a22a`). `gh repo view` shows PRIVATE, default branch `main`. The rest of Prompt 06 is still to do: branch protection, secret scanning, inviting collaborators.
 
 ## Completed steps
 

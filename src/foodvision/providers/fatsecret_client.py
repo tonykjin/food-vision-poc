@@ -57,13 +57,55 @@ class FatsecretAttemptError(AttemptError):
         *,
         code: ErrorCode | None = None,
         provider_code: int | None = None,
+        oauth_error: str | None = None,
         http_status: int | None = None,
         retry_after_s: float | None = None,
     ) -> None:
         super().__init__(outcome, http_status=http_status, retry_after_s=retry_after_s)
         self.provider_code = provider_code
+        self.oauth_error = oauth_error
         if code is not None:
             self.code = code
+
+    def detail(self) -> str:
+        """Payload-free diagnostic: outcome, HTTP status and standard codes only."""
+        parts = [self.outcome.value]
+        if self.http_status is not None:
+            parts.append(f"HTTP {self.http_status}")
+        if self.provider_code is not None:
+            parts.append(f"fatsecret code {self.provider_code}")
+        if self.oauth_error is not None:
+            parts.append(f"oauth {self.oauth_error}")
+        return ", ".join(parts)
+
+
+# RFC 6749 §5.2 token error codes: a fixed vocabulary, safe to keep (no payload, no secrets).
+OAUTH_ERRORS = frozenset(
+    {
+        "invalid_request",
+        "invalid_client",
+        "invalid_grant",
+        "unauthorized_client",
+        "unsupported_grant_type",
+        "invalid_scope",
+    }
+)
+
+
+def _token_failure(response: httpx.Response) -> FatsecretAttemptError | None:
+    """Token endpoint errors. A 4xx here is an authentication problem, not a bad request."""
+    if response.status_code < 400:
+        return None
+    if response.status_code == 429 or response.status_code >= 500:
+        return _from_http(response.status_code, response.headers)
+    payload = _json_or_none(response)
+    code = payload.get("error") if isinstance(payload, dict) else None
+    return FatsecretAttemptError(
+        AttemptOutcome.AUTH_ERROR,
+        code=ErrorCode.AUTHENTICATION,
+        oauth_error=code if code in OAUTH_ERRORS else None,
+        http_status=response.status_code,
+    )
 
 
 def _from_http(status: int, headers: httpx.Headers) -> FatsecretAttemptError | None:
@@ -153,7 +195,7 @@ class FatsecretClient:
                 raise TimeoutError from None
             except httpx.TransportError:
                 raise FatsecretAttemptError(AttemptOutcome.TRANSPORT_ERROR) from None
-            failure = _from_http(response.status_code, response.headers)
+            failure = _token_failure(response)
             if failure is not None:
                 raise failure
             payload = _json_or_none(response)

@@ -219,6 +219,11 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 
 **Live smoke opt-in (2026-10-02):** the user authorized live checks as needed. `ENABLE_LIVE_API_TESTS` can now come from the app's env file (it was shell-only before). `--confirm-one-request` is still required per run, `doctor` shows the state, and CI stays `false`. Branch `chore/live-test-opt-in`.
 
+**fatsecret live smoke (2026-10-03 UTC):** two runs, each a single token request; no image was sent and nothing stored.
+- Run 1 showed only "4xx". The client then kept no diagnostic.
+- Branch `fix/fatsecret-token-diagnostics` now keeps the RFC 6749 OAuth error code and HTTP status (payload-free) and classifies token 4xx as `authentication`.
+- Run 2: **HTTP 400 `invalid_scope`**. The key apparently lacks the `image-recognition` scope (add-on not enabled). Live App A stays blocked on vendor access. **The user contacted fatsecret about upgrading the plan (2026-10-03).**
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -226,7 +231,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 Known future blockers, recorded in `docs/project-settings.md`:
 
 - Role owners and reviewers are PENDING. Prompt 09 assignments need them.
-- fatsecret image add-on access and storage rights are PENDING. They block POC-01/08 live work only.
+- fatsecret: the live token request returned `invalid_scope` for `image-recognition` (2026-10-03), so the image add-on isn't enabled for this key. Storage rights are pending. This blocks POC-01/08 live work only.
 - Runtime model and test budget are PENDING. They block Prompt 19 and paid runs.
 
 ## Next task

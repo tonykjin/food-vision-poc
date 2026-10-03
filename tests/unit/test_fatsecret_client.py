@@ -168,11 +168,25 @@ def test_non_json_success_is_invalid_schema():
     assert info.value.code is ErrorCode.INVALID_SCHEMA
 
 
-def test_token_endpoint_rejection_is_authentication():
-    client, _, clock = make([], tokens=[httpx.Response(400, json={"error": "invalid_client"})])
+@pytest.mark.parametrize(
+    ("response", "oauth_error"),
+    [
+        (httpx.Response(400, json={"error": "invalid_client"}), "invalid_client"),
+        (httpx.Response(400, json={"error": "invalid_scope"}), "invalid_scope"),
+        (httpx.Response(401, json={"error": "SENTINEL free text"}), None),  # not in RFC set
+        (httpx.Response(403, text="<html>SENTINEL</html>"), None),
+    ],
+)
+def test_token_endpoint_rejection_is_authentication_with_standard_code(response, oauth_error):
+    client, fake, clock = make([], tokens=[response])
+    rec = recorder(clock)
     with pytest.raises(FatsecretAttemptError) as info:
-        client.recognize(b"{}", recorder(clock))
-    assert info.value.outcome is AttemptOutcome.CLIENT_ERROR
+        client.recognize(b"{}", rec)
+    assert info.value.outcome is AttemptOutcome.AUTH_ERROR
+    assert info.value.code is ErrorCode.AUTHENTICATION
+    assert info.value.oauth_error == oauth_error
+    assert "SENTINEL" not in info.value.detail()
+    assert fake.calls(IMAGE_URL) == [] and len(rec.attempts) == 1  # auth is never retried
 
 
 def test_secrets_tokens_and_provider_text_never_reach_records_or_errors():

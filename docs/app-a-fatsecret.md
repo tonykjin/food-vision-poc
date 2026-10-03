@@ -60,8 +60,8 @@ Docs checked 2026-10-02:
 | Error codes 11/12/13/14/20/21/22/211, HTTP 429/5xx, transport, timeout, non-JSON | **Adapter-verified** |
 | Payload-free telemetry; policy filter; no provider text in errors | **Adapter-verified** |
 | App A starts live with only fatsecret credentials, no model key, no B code | **Verified** locally 2026-10-02 (`/health` only, no request made) |
-| Real token issuance for our client ID, from this machine's IP | **Live-unverified** |
-| `image-recognition` scope and add-on enabled on our account | **Live-unverified** |
+| Real token issuance for our client ID, from this machine's IP | **Live: rejected.** Token endpoint returned HTTP 400 `invalid_scope` (2026-10-03 UTC) |
+| `image-recognition` scope and add-on enabled on our account | **Live: apparently not.** `invalid_scope` for `image-recognition`; enable the add-on, then re-run the smoke test |
 | Real response field presence and value types | **Live-unverified** |
 | Whether label-only images return 211 in practice | **Live-unverified** |
 | Latency, quotas, real HTTP status for errors | **Live-unverified** |

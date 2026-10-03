@@ -206,10 +206,7 @@ class ProviderNativePipeline:
             return _failed(context, exc.code, f"Scan budget exhausted ({exc.reason}).")
         except AttemptError as exc:
             retryable = exc.code in (ErrorCode.TIMEOUT, ErrorCode.QUOTA)
-            provider_code = getattr(exc, "provider_code", None)
-            detail = f"{exc.outcome}" + (
-                f", fatsecret code {provider_code}" if provider_code else ""
-            )
+            detail = exc.detail() if hasattr(exc, "detail") else exc.outcome.value
             return _failed(context, exc.code, f"fatsecret request failed ({detail}).", retryable)
         with recorder.span(Stage.VALIDATION):
             return normalize_response(response, context)

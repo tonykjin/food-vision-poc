@@ -36,3 +36,13 @@ def test_unreachable_api_is_reported(monkeypatch):
     page = AppTest.from_file(str(APPS / "provider_ui.py")).run()
     assert not page.exception
     assert any("API not reachable" in e.value for e in page.error)
+
+
+def test_fatsecret_attribution_shown_for_live_provider(monkeypatch):
+    health = {"status": "ok", "app": "provider", "mode": "live", "pipeline_id": "A_native"}
+    monkeypatch.setattr(httpx, "get", lambda *a, **k: FakeResponse(health))
+    page = AppTest.from_file(str(APPS / "provider_ui.py")).run()
+    assert any(
+        '<a href="https://platform.fatsecret.com">Powered by fatsecret Platform API</a>' in m.value
+        for m in page.markdown
+    )

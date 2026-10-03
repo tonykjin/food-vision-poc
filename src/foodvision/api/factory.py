@@ -16,6 +16,7 @@ from foodvision.measurement.budget import BudgetPolicy
 from foodvision.measurement.events import ScanStatus, Stage
 from foodvision.measurement.sinks import InMemorySink
 from foodvision.measurement.spans import ScanRecorder
+from foodvision.pipelines.base import Pipeline
 from foodvision.pipelines.mock import MockPipeline
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -31,11 +32,34 @@ LIVE_ISSUE: dict[AppKind, str] = {
 }
 
 
-def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
+def _live_pipeline(kind: AppKind, settings: AppSettings):
+    """Return (pipeline, reason it is unavailable). Imports stay app-specific."""
+    if kind is AppKind.PROVIDER:
+        if settings.fatsecret_client_id is None or settings.fatsecret_client_secret is None:
+            return (
+                None,
+                "fatsecret credentials are not configured (foodvision doctor --app provider)",
+            )
+        from foodvision.pipelines.provider_native import ProviderNativePipeline
+        from foodvision.providers.fatsecret_client import FatsecretClient
+
+        client = FatsecretClient(settings.fatsecret_client_id, settings.fatsecret_client_secret)
+        return ProviderNativePipeline(client), None
+    return None, None
+
+
+def create_app(
+    kind: AppKind, settings: AppSettings | None = None, pipeline: Pipeline | None = None
+) -> FastAPI:
     settings = settings if settings is not None else load_settings(kind)
     mode = "mock" if settings.mock_mode else "live"
     pipeline_id = PIPELINE_IDS[kind][mode]
-    pipeline = MockPipeline(pipeline_id) if settings.mock_mode else None
+    unavailable_reason = None
+    if pipeline is None:
+        if settings.mock_mode:
+            pipeline = MockPipeline(pipeline_id)
+        else:
+            pipeline, unavailable_reason = _live_pipeline(kind, settings)
 
     app = FastAPI(title=f"Food Vision {kind.value} API", version=__version__)
     app.state.telemetry = InMemorySink()
@@ -64,7 +88,8 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
             "app": kind.value,
             "mode": mode,
             "pipeline_id": pipeline_id,
-            "live_pipeline_implemented": False,
+            "live_pipeline_implemented": kind is AppKind.PROVIDER,
+            "ready": pipeline is not None,
             "version": __version__,
             "schema_version": SCHEMA_VERSION,
         }
@@ -76,6 +101,7 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
             400: {"model": ErrorResponse},
             413: {"model": ErrorResponse},
             501: {"model": ErrorResponse},
+            503: {"model": ErrorResponse},
         },
     )
     async def analyze(image: UploadFile = File(...)):  # noqa: B008
@@ -101,6 +127,8 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
                 prepared = prepare_image(data, BASELINE)
         except ImagePreparationError as exc:
             return fail(413 if exc.code is ErrorCode.IMAGE_TOO_LARGE else 400, exc.code, str(exc))
+        if pipeline is None and unavailable_reason is not None:
+            return fail(503, ErrorCode.AUTHENTICATION, unavailable_reason)
         if pipeline is None:
             return fail(
                 501,

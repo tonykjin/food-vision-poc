@@ -180,7 +180,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - `uv run alembic upgrade head` on the Compose DB is at `0001 (head)`.
 - **Synthetic data:** all test rows are synthetic and flagged. They aren't evidence of recognition accuracy.
 
-**Prompt 15: POC-07 USDA catalog import and retrieval** ([#7](https://github.com/tonykjin/food-vision-poc/issues/7)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-07-usda-catalog`. Not committed. Details are in `docs/catalog.md`.
+**Prompt 15: POC-07 USDA catalog import and retrieval** ([#7](https://github.com/tonykjin/food-vision-poc/issues/7)). Status: **merged and closed** (2026-10-02) via [PR #23](https://github.com/tonykjin/food-vision-poc/pull/23), merge commit `45fd7a6`. CI passed: 230 tests, none skipped. Details are in `docs/catalog.md`.
 - **Subset** (`catalog/usda-subset-v1.json`): Foundation 2026-04-30 and SR Legacy 2018-04 JSON downloads (SHA-256 recorded), plus 4 documented Branded FDC IDs via the API. Core nutrients use a documented ID precedence.
 - **Migration `0002`:** nutrient IDs, portion units, category, parsed preparation state, publication and retrieval metadata, generated tsvector with a GIN index.
 - **Importer** (`foodvision import-usda`, `import-usda-api`, `catalog-report`):
@@ -200,6 +200,23 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - The 0002 check constraint naming (`op.f`). The local dev DB constraint was renamed to match.
 - **Known limits:** lexical top-1 isn't always the plainest record (olive oil, salmon). A correct generic record is in the top 5; POC-10 selection decides.
 
+**Prompt 16: POC-08 fatsecret adapter and App A** ([#8](https://github.com/tonykjin/food-vision-poc/issues/8)). Status: **adapter implemented and verified with fake HTTP** (2026-10-02) on branch `feat/poc-08-fatsecret`. Not committed. **Live use is unverified.** Details are in `docs/app-a-fatsecret.md`.
+- **`providers/fatsecret_client.py`:**
+  - Token: reuse with a 5-minute margin, one refresh on code 13.
+  - Errors: JSON-body codes mapped to typed errors; provider text dropped.
+  - All attempts go through the Measurement Kit.
+- **`pipelines/provider_native.py`:**
+  - Eaten totals used as-is; per-serving scaled once only when totals are missing.
+  - Missing/invalid values become unknown; ml portions unresolved.
+  - 211 or no foods give `empty_recognition`.
+- **Wiring:** App A live mode is ready when credentials are set (503 `authentication` otherwise). The fatsecret code is imported only by App A. UI attribution snippet added.
+- **`foodvision smoke-fatsecret`:** opt-in (`ENABLE_LIVE_API_TESTS=true` plus `--confirm-one-request`), at most 1 token + 1 image request, payload-free output. **Not run.**
+- **Verified:**
+  - `ruff check` passed; `pytest` (no DB): 231 passed, 37 skipped.
+  - Mutation spot-check: double-scaling, no token reuse, 211 raised, and negatives kept were each caught.
+  - Real `provider_app` started live with real credentials and no model keys: `/health` ready, no agent/model modules loaded, no request made.
+- **Live-unverified:** token issuance from this IP, scope/add-on access, real response fields, 211 behavior, latency and quotas. The written rights answers are still pending, and the vendor draft is unsent.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -212,7 +229,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 15: POC-07 USDA catalog import and retrieval** ([#7](https://github.com/tonykjin/food-vision-poc/issues/7)).
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 16: POC-08 fatsecret adapter and App A** ([#8](https://github.com/tonykjin/food-vision-poc/issues/8)): code and mock tests only; live use is blocked on fatsecret access and rights. **Prompt 17: POC-09** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)) is also unblocked.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

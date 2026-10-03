@@ -1,0 +1,68 @@
+{
+  "food_response": [
+    {
+      "food_id": 9000001,
+      "food_entry_name": "SYNTHETIC item A",
+      "eaten": {
+        "food_name_singular": "SYNTHETIC item A",
+        "food_name_plural": "SYNTHETIC items A",
+        "singular_description": "serving",
+        "plural_description": "servings",
+        "units": "2.00",
+        "metric_description": "g",
+        "total_metric_amount": "150.00",
+        "per_unit_metric_amount": "75.00",
+        "total_nutritional_content": {
+          "calories": "300.00",
+          "carbohydrate": "40.00",
+          "protein": "10.00",
+          "fat": "8.00"
+        }
+      },
+      "suggested_serving": {
+        "serving_id": 8000001,
+        "serving_description": "1 serving",
+        "metric_serving_description": "75 g",
+        "metric_measure_amount": "75.000",
+        "number_of_units": "2.00"
+      },
+      "food": {
+        "food_id": "9000001",
+        "food_name": "SYNTHETIC item A",
+        "food_type": "Generic",
+        "servings": {
+          "serving": [
+            {
+              "serving_id": "8000001",
+              "serving_description": "1 serving",
+              "metric_serving_amount": "75.000",
+              "metric_serving_unit": "g",
+              "number_of_units": "1.000",
+              "measurement_description": "serving",
+              "calories": "150",
+              "carbohydrate": "20.00",
+              "protein": "5.00",
+              "fat": "4.00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "food_id": 9000002,
+      "food_entry_name": "SYNTHETIC item B",
+      "eaten": {
+        "units": "1.00",
+        "metric_description": "g",
+        "total_metric_amount": "50.00",
+        "total_nutritional_content": {
+          "calories": "120.00",
+          "carbohydrate": "15.00",
+          "protein": "",
+          "fat": "-1"
+        }
+      },
+      "suggested_serving": {"serving_id": 8000002, "number_of_units": "1.00"}
+    }
+  ]
+}

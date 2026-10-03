@@ -1,0 +1,24 @@
+{
+  "food_response": [
+    {
+      "food_id": 9000003,
+      "food_entry_name": "SYNTHETIC item C",
+      "suggested_serving": {"serving_id": 8000003, "number_of_units": "1.50"},
+      "food": {
+        "food_id": "9000003",
+        "servings": {
+          "serving": {
+            "serving_id": "8000003",
+            "metric_serving_amount": "40.000",
+            "metric_serving_unit": "g",
+            "number_of_units": "1.000",
+            "calories": "120",
+            "carbohydrate": "12.00",
+            "protein": "6.00",
+            "fat": "5.00"
+          }
+        }
+      }
+    }
+  ]
+}

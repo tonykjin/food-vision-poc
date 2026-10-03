@@ -21,6 +21,9 @@ DEFAULT_API_URLS = {
     AppKind.PROVIDER: "http://127.0.0.1:8001",
     AppKind.AGENT: "http://127.0.0.1:8002",
 }
+FATSECRET_ATTRIBUTION = (
+    '<a href="https://platform.fatsecret.com">Powered by fatsecret Platform API</a>'
+)
 NUTRIENT_LABELS = {
     "energy_kcal": "Energy",
     "protein_g": "Protein",
@@ -50,6 +53,9 @@ def render_page(kind: AppKind) -> None:
             "This is not a working provider integration and not a nutrition estimate."
         )
     st.caption(f"API {api_url} · app {health.get('app')} · pipeline {health.get('pipeline_id')}")
+    if health.get("pipeline_id") == "A_native":
+        # Required by fatsecret Terms §1.3; the snippet must not be modified.
+        st.markdown(FATSECRET_ATTRIBUTION, unsafe_allow_html=True)
 
     upload = st.file_uploader("Food photo", type=["jpg", "jpeg", "png", "webp"])
     if upload is None or not st.button("Analyze", type="primary"):

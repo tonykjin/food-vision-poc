@@ -23,7 +23,8 @@ def test_health_reports_app_and_mode(kind):
     assert body["status"] == "ok"
     assert body["app"] == kind.value
     assert body["mode"] == "mock"
-    assert body["live_pipeline_implemented"] is False
+    assert body["live_pipeline_implemented"] is (kind is AppKind.PROVIDER)
+    assert body["ready"] is True
 
 
 @pytest.mark.parametrize(
@@ -49,8 +50,8 @@ def test_mock_result_is_labeled_and_has_no_invented_nutrients(kind, pipeline_id)
     assert body["metrics"]["server_total_ms"] >= 0
 
 
-@pytest.mark.parametrize("kind", list(AppKind))
-def test_live_mode_returns_typed_not_implemented(kind):
+def test_agent_live_mode_returns_typed_not_implemented():
+    kind = AppKind.AGENT
     response = client(kind, mock=False).post(
         "/v1/analyze", files={"image": ("meal.jpg", FAKE_IMAGE, "image/jpeg")}
     )
@@ -147,7 +148,17 @@ def test_every_scan_is_recorded_including_failures(kind):
 
 
 def test_live_mode_not_implemented_is_recorded_as_failed():
-    app_client = client(AppKind.PROVIDER, mock=False)
+    app_client = client(AppKind.AGENT, mock=False)
     app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
     (record,) = app_client.app.state.telemetry.records
     assert record.status == "failed" and record.error_code == "not_implemented"
+
+
+def test_provider_live_mode_without_credentials_is_typed_503():
+    app_client = client(AppKind.PROVIDER, mock=False)
+    assert app_client.get("/health").json()["ready"] is False
+    response = app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
+    assert response.status_code == 503
+    assert response.json()["code"] == "authentication"
+    (record,) = app_client.app.state.telemetry.records
+    assert record.status == "failed" and record.error_code == "authentication"

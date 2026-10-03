@@ -49,6 +49,14 @@ Rules:
 - Live validation (a real authenticated call) happens only in explicit opt-in smoke tests (`ENABLE_LIVE_API_TESTS=true`) and reports pass or fail, not response bodies that contain tokens.
 - Claude never runs commands that print env-file contents or environment values (`cat .env*`, `Get-Content .env*`, `printenv`, `Get-ChildItem env:`, `gh auth token`), even for troubleshooting. Use the boolean check instead.
 
+**Observed 2026-10-02:** Claude's PowerShell sandbox blocks even `Test-Path` on `.env.agent.local`. Until `foodvision doctor` exists, the user runs boolean presence checks with the `!` prefix, and Claude reads only the `set`/`missing` output. **`!` runs Git Bash, not PowerShell,** so use this form:
+
+```bash
+for f in .env.provider.local .env.agent.local; do echo "== $f"; if [ -f "$f" ]; then while IFS='=' read -r n v || [ -n "$n" ]; do n=$(printf '%s' "$n" | tr -d '[:space:]'); [ -z "$n" ] && continue; if [ -n "$(printf '%s' "$v" | tr -d '[:space:]')" ]; then s=set; else s=missing; fi; printf '%-26s %s\n' "$n" "$s"; done < "$f"; else echo absent; fi; done; if [ -n "$ANTHROPIC_API_KEY" ]; then echo "shell ANTHROPIC_API_KEY: SET - remove it"; else echo "shell ANTHROPIC_API_KEY: not set"; fi
+```
+
+Typed directly into a PowerShell window (without `!`), the PowerShell form in `docs/provider-readiness.md` works instead.
+
 ## Remaining options (not enabled)
 
 - **Claude Code sandbox:** OS-level filesystem and network isolation for Bash (https://code.claude.com/docs/en/sandboxing). Consider it before provider keys are first stored locally (Prompt 07/19).

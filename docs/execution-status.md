@@ -13,7 +13,7 @@ Handoff record for Claude Code sessions. GitHub Issues stay the source of truth 
 
 **Prompt 04: local repository and document skeleton.** Prompt 04 **complete**: commit `cb2b92c`, local only, not pushed.
 
-**Prompt 05: CLAUDE.md and permission settings.** Status: **complete** (2026-10-02). Committed as `602a22a`.
+**Prompt 05: CLAUDE.md and permission settings.** Status: **complete** (2026-10-02). Committed as `602a22a`. Re-checked in a fresh session started from the project root (2026-10-02). `/context` lists 2 memory files: `CLAUDE.md` and the imported `docs/project-plan.md`. Read of `.env.agent.local` and `secrets/x.json` was denied, and Read of `.env.example` succeeded (the secret files were confirmed absent before the test). No changes were needed.
 
 **Prompt 06, push only (you asked to commit and push):** `main` was pushed to `origin` (`8339643..602a22a`). `gh repo view` shows PRIVATE, default branch `main`. The rest of Prompt 06 is still to do: branch protection, secret scanning, inviting collaborators.
 
@@ -62,6 +62,28 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - The private GitHub repo and its first commit (docs only) were created **before** Prompts 04 and 06. When those prompts run, they should **reconcile with the existing repo and remote**: no `git init`, no new repo, no second remote. See `docs/decisions/0001-adopt-plan-baseline.md`.
 - The first commit contains only the two source docs. Prompt 04 added `README.md`, `.gitignore` and `.env.example` in a local commit. `CLAUDE.md` comes in Prompt 05.
 
+**Prompt 07: provider-access checklist.** Status: **complete** (2026-10-02), not committed.
+- Fetched the official fatsecret (image v2, OAuth, editions, terms), USDA (API guide, downloads, key signup) and Anthropic (vision, structured outputs, models, API overview) docs on 2026-10-02.
+- Created `docs/provider-readiness.md` and `docs/vendor-questions-fatsecret.md`. The draft was **not sent**.
+- Findings:
+  - fatsecret Terms §1.5 requires removing non-storable content within 24 hours.
+  - fatsecret token requests need registered IPs.
+  - Basic and Premier Free cover US data only and require attribution.
+  - Whether the image add-on needs Premier is unclear (sources conflict).
+  - The repo sits under OneDrive, which is a secret-sync risk.
+- No accounts were created, no messages sent, no keys handled.
+
+**Prompt 08: record nonsecret answers and permissions.** Status: **complete** (2026-10-02), not committed.
+- Final boolean check (user ran `scripts/check-env-presence.sh`): all five variables are set, `ANTHROPIC_API_KEY` is in the agent file only, and it's not set in the shell.
+- API billing is prepaid Console credits with auto-reload (user-reported).
+- No live call has been made, so validity is unverified until Prompt 19.
+- No user edits to the settings files were found. The facts given in chat are recorded: Claude Code uses the Max plan, App B uses pay-as-you-go Console credits in the default workspace, and the user reports a key was created.
+- Added a permission-decisions log: fatsecret has **no written decision**, so persistence stays off. Also added a credential-presence table and the proceed/blocked task list to `docs/provider-readiness.md`.
+- **Credential presence is not verified:** Claude's sandbox blocks the file. The user needs to run the `!` boolean check.
+- **User decisions (2026-10-02):** all role owners are Tony Jin (`tonykjin`), the pilot region is US, there's no dollar budget cap (per-scan call limits and the live opt-in still apply), and the repo stays under OneDrive (risk accepted).
+- **Credential presence (user-run boolean check, 2026-10-02):** `FATSECRET_CLIENT_ID`, `FATSECRET_CLIENT_SECRET` and `USDA_API_KEY` are set. `ANTHROPIC_API_KEY` is **missing** from `.env.agent.local`; the user is re-saving it. Presence isn't validity, and fatsecret add-on access and rights stay unconfirmed.
+- **Still PENDING (non-blocking):** GitHub owner long-term confirmation and cofounder invites. No paid calls were made.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -74,7 +96,9 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-**Prompt 06: publish the private GitHub repository.** Reconcile with the existing `origin` (`tonykjin/food-vision-poc`). Commit the Prompt 05 files, then push `main` (one local commit ahead, plus Prompt 05). Check branch protection and secret scanning as far as the GitHub plan allows. `/context` in the current session (2026-10-02) listed no memory files, because `CLAUDE.md` was created mid-session and only loads at startup. **Still to do:** start a fresh `claude` from the project root and run `/context`. It should list `CLAUDE.md` and the imported `docs/project-plan.md`.
+**Prompt 09** (GitHub backlog), when the user pastes it. Independent build work (Prompt 10 onward: scaffolding, contracts, USDA import from a downloaded dataset) doesn't depend on vendor access.
+
+**Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 
 ## Issues / PRs
 

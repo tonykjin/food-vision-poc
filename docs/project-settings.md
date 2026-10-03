@@ -23,20 +23,20 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 
 | Role | Owner | Status |
 |---|---|---|
-| Product thresholds | PENDING | |
-| Technical implementation | PENDING | |
-| Reference-data review | PENDING | |
-| Vendor / access / spend | PENDING | |
-| PR reviewers | PENDING | Only known GitHub users get assigned |
+| Product thresholds | Tony Jin (`tonykjin`) | User decision 2026-10-02 |
+| Technical implementation | Tony Jin (`tonykjin`) | User decision 2026-10-02 |
+| Reference-data review | Tony Jin (`tonykjin`) | User decision 2026-10-02. Plan §11 asks for two reviewers on difficult identities and recipes. With one person, record those cases as single-reviewed. |
+| Vendor / access / spend | Tony Jin (`tonykjin`) | User decision 2026-10-02 |
+| PR reviewers | Tony Jin (`tonykjin`) | Sole reviewer, so review is self-review |
 | Cofounders to invite | PENDING | Don't invite guessed users |
 
 ## Scope and runtime
 
 | Setting | Value | Status |
 |---|---|---|
-| Pilot region | PENDING | Plan's starting assumption is `US` |
-| Language | PENDING | Plan's starting assumption is `en` |
-| Initial runtime vision provider | PENDING | Plan recommends Anthropic (Claude developer API) |
+| Pilot region | `US` | User decision 2026-10-02. Fits fatsecret Basic/Premier Free (US data only). |
+| Language | `en` | Plan baseline; follows from the US region and not separately confirmed |
+| Initial runtime vision provider | Anthropic (Claude API) | User created a Console API key 2026-10-02 |
 | Runtime vision model ID | PENDING | Must be confirmed with a real capability smoke test |
 | Comparison providers (later) | OpenAI, then DeepSeek | Plan baseline; added only after the core comparison works (POC-14) |
 | Pipeline mode default | `grounded` | Plan baseline |
@@ -52,21 +52,23 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 
 | Setting | Value | Status |
 |---|---|---|
-| Runtime smoke-test cap (Prompt 19) | PENDING | Needed before any paid request |
-| Development batch cap (Prompt 23) | PENDING | |
-| Per-scan cost cap | PENDING | |
+| Runtime smoke-test cap (Prompt 19) | No dollar cap | User decision 2026-10-02. Paid runs still need the explicit `ENABLE_LIVE_API_TESTS=true` opt-in. Real spend is limited only by the Console credit balance. |
+| Development batch cap (Prompt 23) | No dollar cap | User decision 2026-10-02. Estimate and report cost before each batch. |
+| Per-scan cost cap | No dollar cap | User decision 2026-10-02. Per-scan call limits still apply: `MAX_MODEL_CALLS_PER_SCAN=2`, `MAX_EXTERNAL_ATTEMPTS_PER_SCAN=8`, `MAX_SCAN_SECONDS=45`. |
 | Spending alerts configured | PENDING | Plan Step 1 |
-| How Claude Code dev usage vs runtime API is billed | PENDING | Plan Step 1. Track these separately. |
+| How Claude Code dev usage vs runtime API is billed | Claude Code: user's Max plan. App B runtime: pay-as-you-go Console API credits, default workspace. | User-reported 2026-10-02. Keep `ANTHROPIC_API_KEY` out of shell and user env vars, or Claude Code bills to the API key. |
 
 ## Providers and accounts
 
-Details move to `docs/provider-readiness.md` in Prompt 07.
+Details are in `docs/provider-readiness.md` (Prompt 07, docs accessed 2026-10-02). The vendor question draft is in `docs/vendor-questions-fatsecret.md` (not sent).
+
+- **Repo location: stays under OneDrive (user accepted the risk 2026-10-02).** Ignored local secret files, such as `.env.agent.local`, sync to OneDrive's cloud and linked devices. If OneDrive is ever compromised or shared, rotate the keys.
 
 | Provider | Access status | Notes |
 |---|---|---|
-| fatsecret image add-on | PENDING | Blocks live App A only. Storage/derived-metric rights unconfirmed. |
-| USDA FoodData Central API key | PENDING | Downloaded datasets don't need a key |
-| Runtime vision model account | PENDING | Separate from the Claude Code login |
+| fatsecret image add-on | Credentials present (2026-10-02); add-on, scope and IP registration unconfirmed | Blocks live App A only. Storage/derived-metric rights unconfirmed. |
+| USDA FoodData Central API key | Present (boolean check 2026-10-02); no live call yet | Downloaded datasets don't need a key |
+| Runtime vision model account | Key present in `.env.agent.local` (boolean check 2026-10-02); no live call yet | Separate from the Claude Code login (Max plan). Default workspace by user choice. |
 | Supabase | Not needed yet | Only for the shared hosted pilot |
 
 ## Infrastructure and deployment

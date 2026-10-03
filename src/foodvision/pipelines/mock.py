@@ -12,6 +12,7 @@ from foodvision.contracts.results import (
     ResultItem,
     ResultStatus,
 )
+from foodvision.imaging.prepare import PreparedImage
 
 MOCK_WARNING = (
     "MOCK MODE: synthetic result. No provider or model was called. "
@@ -25,7 +26,7 @@ class MockPipeline:
     def __init__(self, pipeline_id: str) -> None:
         self.pipeline_id = pipeline_id
 
-    def analyze(self, image_bytes: bytes, context: AnalysisContext) -> AnalysisResult:
+    def analyze(self, image: PreparedImage, context: AnalysisContext) -> AnalysisResult:
         return AnalysisResult(
             scan_id=context.scan_id,
             pipeline_id=self.pipeline_id,

@@ -140,6 +140,16 @@ class Confidence(Strict):
         return self
 
 
+class InputProvenance(Strict):
+    """Which exact image bytes the pipeline saw (plan §7 required internal fields)."""
+
+    original_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    processed_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preprocessing_version: str
+    processed_width_px: int = Field(gt=0)
+    processed_height_px: int = Field(gt=0)
+
+
 class Metrics(Strict):
     server_total_ms: NonNegative | None = None
     external_attempts: int = Field(default=0, ge=0)
@@ -159,6 +169,7 @@ class AnalysisResult(Strict):
     confidence: Confidence = Field(default_factory=Confidence)
     warnings: list[str] = Field(default_factory=list)
     error: ErrorDetail | None = None
+    input: InputProvenance | None = None
     metrics: Metrics = Field(default_factory=Metrics)
 
     @model_validator(mode="after")

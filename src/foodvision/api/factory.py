@@ -1,6 +1,5 @@
 """Shared FastAPI factory. Each app registers only its own pipeline and settings."""
 
-import hashlib
 import time
 import uuid
 
@@ -11,7 +10,9 @@ from foodvision import __version__
 from foodvision.config import AppKind, AppSettings, load_settings
 from foodvision.contracts.errors import ErrorCode, ErrorResponse
 from foodvision.contracts.requests import AnalysisContext
-from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult
+from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult, InputProvenance
+from foodvision.imaging.prepare import ImagePreparationError, prepare_image
+from foodvision.imaging.profiles import BASELINE
 from foodvision.pipelines.mock import MockPipeline
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -71,8 +72,6 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
         started = time.perf_counter_ns()
         scan_id = uuid.uuid4().hex
         data = await image.read(MAX_UPLOAD_BYTES + 1)
-        if not data:
-            return error(400, ErrorCode.INVALID_IMAGE, "Uploaded file is empty.", scan_id)
         if len(data) > MAX_UPLOAD_BYTES:
             return error(
                 413,
@@ -80,6 +79,11 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
                 f"Upload exceeds {MAX_UPLOAD_BYTES} bytes.",
                 scan_id,
             )
+        try:
+            prepared = prepare_image(data, BASELINE)
+        except ImagePreparationError as exc:
+            status = 413 if exc.code is ErrorCode.IMAGE_TOO_LARGE else 400
+            return error(status, exc.code, str(exc), scan_id)
         if pipeline is None:
             return error(
                 501,
@@ -90,12 +94,21 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
             )
         context = AnalysisContext(
             scan_id=scan_id,
-            original_sha256=hashlib.sha256(data).hexdigest(),
+            original_sha256=prepared.original_sha256,
+            processed_sha256=prepared.processed_sha256,
+            preprocessing_version=prepared.transform_version,
             pipeline_id=pipeline_id,
             region=settings.region,
             language=settings.language,
         )
-        result = pipeline.analyze(data, context)
+        result = pipeline.analyze(prepared, context)
+        result.input = InputProvenance(
+            original_sha256=prepared.original_sha256,
+            processed_sha256=prepared.processed_sha256,
+            preprocessing_version=prepared.transform_version,
+            processed_width_px=prepared.processed_size[0],
+            processed_height_px=prepared.processed_size[1],
+        )
         result.metrics.server_total_ms = (time.perf_counter_ns() - started) / 1_000_000
         return result
 

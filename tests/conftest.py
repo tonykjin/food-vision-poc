@@ -4,6 +4,7 @@ from foodvision.config import FOREIGN_SECRETS
 
 APP_VARIABLES = {
     "MOCK_MODE",
+    "ENABLE_LIVE_API_TESTS",
     "DATABASE_URL",
     "USDA_API_KEY",
     "FATSECRET_CLIENT_ID",

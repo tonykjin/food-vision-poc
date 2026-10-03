@@ -200,7 +200,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - The 0002 check constraint naming (`op.f`). The local dev DB constraint was renamed to match.
 - **Known limits:** lexical top-1 isn't always the plainest record (olive oil, salmon). A correct generic record is in the top 5; POC-10 selection decides.
 
-**Prompt 16: POC-08 fatsecret adapter and App A** ([#8](https://github.com/tonykjin/food-vision-poc/issues/8)). Status: **adapter implemented and verified with fake HTTP** (2026-10-02) on branch `feat/poc-08-fatsecret`. Not committed. **Live use is unverified.** Details are in `docs/app-a-fatsecret.md`.
+**Prompt 16: POC-08 fatsecret adapter and App A** ([#8](https://github.com/tonykjin/food-vision-poc/issues/8)). Status: **adapter merged** (2026-10-02) via [PR #24](https://github.com/tonykjin/food-vision-poc/pull/24), merge commit `efa8b26`. CI passed: 268 tests. **#8 stays open: live use is unverified.** Details are in `docs/app-a-fatsecret.md`.
 - **`providers/fatsecret_client.py`:**
   - Token: reuse with a 5-minute margin, one refresh on code 13.
   - Errors: JSON-body codes mapped to typed errors; provider text dropped.
@@ -217,6 +217,8 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Real `provider_app` started live with real credentials and no model keys: `/health` ready, no agent/model modules loaded, no request made.
 - **Live-unverified:** token issuance from this IP, scope/add-on access, real response fields, 211 behavior, latency and quotas. The written rights answers are still pending, and the vendor draft is unsent.
 
+**Live smoke opt-in (2026-10-02):** the user authorized live checks as needed. `ENABLE_LIVE_API_TESTS` can now come from the app's env file (it was shell-only before). `--confirm-one-request` is still required per run, `doctor` shows the state, and CI stays `false`. Branch `chore/live-test-opt-in`.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -229,7 +231,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 16: POC-08 fatsecret adapter and App A** ([#8](https://github.com/tonykjin/food-vision-poc/issues/8)): code and mock tests only; live use is blocked on fatsecret access and rights. **Prompt 17: POC-09** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)) is also unblocked.
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 17: POC-09 first model adapter and App B recognition** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

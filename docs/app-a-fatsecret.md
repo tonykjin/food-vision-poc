@@ -66,10 +66,11 @@ Docs checked 2026-10-02:
 | Whether label-only images return 211 in practice | **Live-unverified** |
 | Latency, quotas, real HTTP status for errors | **Live-unverified** |
 
-## Live smoke test (opt-in, not yet run)
+## Live smoke test (opt-in, authorized as needed, not yet run)
+
+Opt in once by adding `ENABLE_LIVE_API_TESTS=true` to `.env.provider.local`, or set it in the shell. The user authorized live checks "as needed" on 2026-10-02. `foodvision doctor --app provider` shows `live API tests enabled`.
 
 ```powershell
-$env:ENABLE_LIVE_API_TESTS = "true"
 uv run foodvision smoke-fatsecret --image <path to an owned food photo> --confirm-one-request
 ```
 

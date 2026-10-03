@@ -1,11 +1,11 @@
 """Opt-in live fatsecret smoke test: one owned image, at most one token + one image request.
 
-Never runs in CI. Requires ENABLE_LIVE_API_TESTS=true and --confirm-one-request. Prints a
+Never runs in CI. Requires ENABLE_LIVE_API_TESTS=true (shell or the app's env file) and
+--confirm-one-request on every run. Prints a
 payload-free summary only (status, codes, counts, field presence, timings): no food names,
 nutrient values, tokens or provider messages are printed or written anywhere.
 """
 
-import os
 import uuid
 from pathlib import Path
 
@@ -24,13 +24,16 @@ SMOKE_BUDGET = BudgetPolicy(
 
 
 def smoke_fatsecret(image_path: str, confirmed: bool) -> int:
-    if os.environ.get("ENABLE_LIVE_API_TESTS") != "true":
-        print("Refusing: set ENABLE_LIVE_API_TESTS=true to allow one live fatsecret request.")
+    settings = load_settings(AppKind.PROVIDER)
+    if not settings.enable_live_api_tests:
+        print(
+            "Refusing: set ENABLE_LIVE_API_TESTS=true (shell or .env.provider.local) "
+            "to allow one live fatsecret request."
+        )
         return 2
     if not confirmed:
         print("Refusing: pass --confirm-one-request (one token + one image request, no retries).")
         return 2
-    settings = load_settings(AppKind.PROVIDER)
     if settings.fatsecret_client_id is None or settings.fatsecret_client_secret is None:
         print("Refusing: FATSECRET_CLIENT_ID/SECRET missing (foodvision doctor --app provider).")
         return 2

@@ -51,6 +51,9 @@ class CommonSettings(BaseSettings):
     usda_api_key: SecretStr | None = None
     region: str = "US"
     language: str = "en"
+    # Opt-in for live smoke commands only (each run still needs --confirm-one-request).
+    # CI pins this to false.
+    enable_live_api_tests: bool = False
     max_scan_seconds: float = Field(default=45.0, gt=0)
     max_external_attempts_per_scan: int = Field(default=8, ge=0)
     # None = no dollar cap (user decision 2026-10-02); call/attempt/deadline limits still apply.

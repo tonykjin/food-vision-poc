@@ -65,6 +65,8 @@ def smoke_fatsecret(image_path: str, confirmed: bool) -> int:
     print("fatsecret live smoke (payload-free summary)")
     print(f"  status             {result.status.value}")
     print(f"  error_code         {result.error.code.value if result.error else '-'}")
+    if result.error:
+        print(f"  error_detail       {result.error.message}")  # our text: codes only
     resolved = sum(i.resolved for i in result.items)
     print(f"  items              {len(result.items)} ({resolved} resolved)")
     print(f"  food_id present    {all(i.food_id for i in result.items) if result.items else '-'}")

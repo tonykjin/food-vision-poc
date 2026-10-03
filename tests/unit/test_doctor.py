@@ -38,6 +38,7 @@ def test_process_environment_counts_as_set(tmp_path):
         (AppKind.PROVIDER, "ANTHROPIC_API_KEY"),
         (AppKind.PROVIDER, "EVALUATOR_DATABASE_URL"),
         (AppKind.AGENT, "FATSECRET_CLIENT_SECRET"),
+        (AppKind.AGENT, "MIGRATION_DATABASE_URL"),
     ],
 )
 def test_foreign_secret_in_env_file_fails(tmp_path, kind, foreign):

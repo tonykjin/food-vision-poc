@@ -1,0 +1,24 @@
+# Local development PostgreSQL only. Bound to 127.0.0.1; never expose publicly.
+# The default password is a local-only development value, not a deployment secret.
+# Override with POSTGRES_PASSWORD in your shell if you prefer.
+name: foodvision
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: foodvision
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-foodvision_local_dev}
+      POSTGRES_DB: foodvision
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodvision -d foodvision"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

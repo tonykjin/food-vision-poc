@@ -12,7 +12,77 @@ Stack: Python, FastAPI, Streamlit, Pydantic, PostgreSQL (Docker Compose locally)
 
 ## Status
 
-**Setup phase. There is no application code yet.** Development tools are installed and verified, including the Docker engine. Scaffolding starts at playbook Prompt 10. For live progress, see [`docs/execution-status.md`](docs/execution-status.md). Once GitHub Issues exist, they track engineering status.
+**Scaffold only (POC-02, #2).**
+- Both apps launch and serve health and analyze endpoints. Real analysis isn't implemented yet: live mode returns HTTP 501 `not_implemented`.
+- `MOCK_MODE=true` returns a **synthetic MOCK result** with all nutrients unknown (null). MOCK is not a provider integration and not a nutrition estimate.
+- Progress: [`docs/execution-status.md`](docs/execution-status.md) and [`docs/github-issue-map.md`](docs/github-issue-map.md).
+
+## Run locally (Windows PowerShell)
+
+Prerequisites: uv and Docker Desktop (see `docs/setup-readiness.md`). Run everything from the repo root.
+
+```powershell
+uv sync --frozen
+uv run foodvision doctor --app provider   # prints set/missing only, never values
+uv run foodvision doctor --app agent
+docker compose -f infra/compose.yml up -d postgres   # optional now; used from POC-06
+```
+
+Each app reads only its own ignored env file: App A reads `.env.provider.local` and App B reads `.env.agent.local`. Shell variables override file values.
+
+**App A (provider)**, in two terminals:
+
+```powershell
+$env:MOCK_MODE = "true"; uv run uvicorn foodvision.api.provider_app:app --host 127.0.0.1 --port 8001
+uv run streamlit run apps/provider_ui.py --server.port 8501
+```
+
+**App B (agent)**, in two terminals:
+
+```powershell
+$env:MOCK_MODE = "true"; uv run uvicorn foodvision.api.agent_app:app --host 127.0.0.1 --port 8002
+uv run streamlit run apps/agent_ui.py --server.port 8502
+```
+
+Without `MOCK_MODE=true`, `/v1/analyze` returns 501 until POC-08 (A) or POC-09/POC-10 (B) land. API docs: http://127.0.0.1:8001/docs and http://127.0.0.1:8002/docs.
+
+Local Postgres listens on `127.0.0.1:5432` (user/db `foodvision`). The default password is a local-only dev value in `infra/compose.yml`. Put your `DATABASE_URL` in the app's local env file, not in Git.
+
+### Human UI checks (each app)
+
+1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
+2. Upload a JPG/PNG/WebP you own and press **Analyze**. You should see:
+   - "MOCK result (synthetic)"
+   - Status `partial`
+   - The MOCK warnings
+   - Every total showing **unknown** (never 0)
+   - An item named "MOCK item (synthetic, not a recognized food)"
+   - `client_total_ms: unavailable`
+3. Stop the API and reload the page. It should show "API not reachable".
+4. Restart the API without `MOCK_MODE`, then analyze. It should show `not_implemented` with HTTP 501.
+
+### Checks
+
+```powershell
+uv run ruff check .
+uv run pytest
+```
+
+CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on every PR. It uses no provider secrets.
+
+### Not implemented yet
+
+| Command / entry point (plan §6, §14) | Arrives with |
+|---|---|
+| `uv run alembic upgrade head` | POC-06 (#6) |
+| `foodvision import-usda` | POC-07 (#7) |
+| Live `A_native` analysis | POC-08 (#8) |
+| Live `B_grounded` analysis | POC-09/POC-10 (#9, #10) |
+| `apps/compare_ui.py` | POC-13 (#13) |
+| `foodvision validate-manifest` | POC-12 (#12) |
+| `foodvision benchmark`, `foodvision report` | POC-13 (#13) |
+| `foodvision calibrate` | POC-15 (#15) |
+| `infra/Dockerfile` | POC-16 (#16) |
 
 ## Documents
 

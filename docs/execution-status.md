@@ -84,11 +84,28 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Credential presence (user-run boolean check, 2026-10-02):** `FATSECRET_CLIENT_ID`, `FATSECRET_CLIENT_SECRET` and `USDA_API_KEY` are set. `ANTHROPIC_API_KEY` is **missing** from `.env.agent.local`; the user is re-saving it. Presence isn't validity, and fatsecret add-on access and rights stay unconfirmed.
 - **Still PENDING (non-blocking):** GitHub owner long-term confirmation and cofounder invites. No paid calls were made.
 
-**Prompt 09: GitHub backlog.** Status: **complete locally** (2026-10-02), on branch `chore/backlog-docs`, not committed or pushed yet.
+**Prompt 09: GitHub backlog.** Status: **complete and merged** (2026-10-02). Commit `bf7c69b` went in via [PR #17](https://github.com/tonykjin/food-vision-poc/pull/17), merge commit `3255da5`. No CI checks existed yet. The merge was authorized by the sole reviewer `tonykjin` in the session.
 - The repo had no issues, project labels or milestones beforehand, so nothing was duplicated.
 - Created 9 labels, the 4 plan §15 milestones and issues #1–#16, all assigned to `tonykjin`. The real numbers were confirmed from the returned URLs and match the POC IDs. Dependencies link to the real issue numbers.
 - Added `docs/github-issue-map.md`, `docs/verification-matrix.md`, `.github/ISSUE_TEMPLATE/task.md` and `config.yml`, and `.github/pull_request_template.md`.
 - Blocked or partial: #1 (vendor/partial), #8 (live), #12 (real meals), #15 (data). No issue was closed.
+
+**Prompt 10: POC-02 scaffold and CI** ([#2](https://github.com/tonykjin/food-vision-poc/issues/2)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-02-scaffold`. Not committed or pushed. CI hasn't run yet (it first runs on the PR).
+- **Built:**
+  - uv project (Python 3.12, `uv.lock`; key versions: fastapi 0.142.2, streamlit 1.65.0, pydantic 2.13.5, sqlalchemy 2.1.3, alembic 1.20.0, httpx 0.28.1)
+  - per-app settings that read only their own env file
+  - placeholder result/error contracts (replaced in POC-03)
+  - MOCK pipeline (null nutrients, labeled)
+  - API factory plus `provider_app`/`agent_app` (`/health`, `/v1/analyze`)
+  - `foodvision doctor`
+  - shared Streamlit page plus `apps/provider_ui.py`/`agent_ui.py`
+  - `infra/compose.yml` (postgres:17)
+  - `.github/workflows/ci.yml`
+  - README launch instructions
+- **Verified:** `uv run ruff check .` passed. `uv run pytest`: 28 passed. `uv lock --check` and `uv sync --frozen` OK.
+- **Live servers:** both mock APIs ran separately (8001/8002): health 200, mock analyze 200 with `is_mock` and null nutrients, empty upload 400 `invalid_image`, no file 422. `MOCK_MODE=false` gave 501 `not_implemented`. Both UIs served (`/_stcore/health` ok).
+- **Other checks:** Compose Postgres 17.11 came up and was torn down. `doctor` on the real env files: A required set; B `ANTHROPIC_API_KEY` set, `VISION_MODEL` missing; isolation ok.
+- **Not verified:** browser click-through of the upload flow (human checks in README) and the GitHub Actions run.
 
 ## Blockers
 
@@ -102,8 +119,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-1. **Section 9 review/publish/merge cycle for the `chore/backlog-docs` branch** (playbook: required before Prompt 10). It needs the user's publish and merge prompts, because pushing the branch and opening the PR aren't authorized by Prompt 09.
-2. **Prompt 10: POC-02 scaffolding and CI** ([#2](https://github.com/tonykjin/food-vision-poc/issues/2)), the first ready implementation task. Build work doesn't depend on vendor access.
+Review, publish and merge POC-02 (Section 9 cycle; push and PR need the user's go-ahead). Then **Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)).
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

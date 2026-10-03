@@ -1,0 +1,70 @@
+# --- Secrets and runtime env files (keep .env.example tracked) ---
+.env
+.env.*
+!.env.example
+*.env
+!.env.example
+secrets/
+.secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+service-account*.json
+
+# --- Private images (never commit user or reference photos) ---
+/images/
+/private/
+/uploads/
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.heif
+*.webp
+!docs/**/*.png
+
+# --- Local databases and data ---
+/data/
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+/pgdata/
+/postgres-data/
+
+# --- Working files, logs, generated reports ---
+/work/
+/logs/
+*.log
+/reports/
+/outputs/
+benchmarks/runs/
+benchmarks/results/
+
+# --- Python / uv ---
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Claude Code personal settings (project settings stay tracked) ---
+.claude/settings.local.json
+
+# Deliberately tracked: .env.example, docs/, migrations/, pyproject.toml, uv.lock,
+# benchmarks/manifest.example.jsonl

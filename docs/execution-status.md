@@ -110,7 +110,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Other checks:** Compose Postgres 17.11 came up and was torn down. `doctor` on the real env files: A required set; B `ANTHROPIC_API_KEY` set, `VISION_MODEL` missing; isolation ok.
 - **Not verified:** browser click-through of the upload flow (human checks in README) and the GitHub Actions run.
 
-**Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-03-contracts`. Not committed.
+**Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)). Status: **merged and closed** (2026-10-02) via [PR #19](https://github.com/tonykjin/food-vision-poc/pull/19), merge commit `076b696`. CI run 37095462061 passed: 97 tests.
 - **Contracts:**
   - Schema 1.0 results: states, totals status, portion methods, food sources, confidence type with calibration-gated probability, and cross-field rules (partial can't claim complete totals; MOCK never complete; failed needs an error).
   - Request `AnalysisContext` (known weight only in the diagnostic mode).
@@ -125,6 +125,25 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Mutation spot-check: unknown→0, ignored serving basis, and unresolved→complete were each caught by a test.
   - Both live mock APIs return schema-1.0 results that validate.
 
+**Prompt 12: POC-04 shared image preparation** ([#4](https://github.com/tonykjin/food-vision-poc/issues/4)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-04-image-prep`. Not committed.
+- **`imaging/prepare.py`:**
+  - Validation: decodes by content (JPEG/PNG/WebP only); byte limit; pixel limit checked from the header before decoding; corrupt input gives a typed error.
+  - Output: EXIF orientation applied; alpha flattened; resized to the longest-edge limit with aspect ratio kept and no crop or upscale; re-encoded from raw pixels so no EXIF/GPS/ICC survives.
+  - Records original and processed SHA-256.
+- **`imaging/profiles.py`:** a versioned `baseline` (512 px) profile. The `b_hires_1024` experiment is a separate named profile, and its `transform_version` includes a settings hash and the Pillow version.
+- **`providers/fatsecret_limits.py`:**
+  - Measures the exact serialized JSON body.
+  - Limits re-checked 2026-10-02: `image_b64` ≤ 999,982 chars; whole body ≤ "1MB characters (1.048M)"; file ≤ 1.09 MB. A 90% safety margin applies.
+  - Oversize is rejected before any send.
+- **APIs:** both run uploads through the baseline profile (bad images get 400/413 even in live mode) and return `input` provenance. The schema stays 1.0 (additive optional field, no consumers yet).
+- **Verified:**
+  - `ruff check` passed; `pytest`: 127 passed.
+  - Mutation spot-check: no EXIF rotation, no margin, and upscaling were each caught.
+  - Live: the same 2000×1500 synthetic photo through both APIs gave an identical processed hash (512×384, same `prep-v1:baseline` version). Text uploaded as `.jpg` gave 400 `invalid_image`.
+- **Environment notes:**
+  - OneDrive locked `.venv` package metadata during `uv add`; used `uv add --no-sync`, then `uv sync` on retry.
+  - A Python edit wrote one file as cp1252; it was converted back to UTF-8 and checked with `iconv` across all files.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -137,7 +156,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)).
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 12: POC-04 shared image preparation** ([#4](https://github.com/tonykjin/food-vision-poc/issues/4)). POC-05 (#5) and POC-06 (#6) are also unblocked by #3.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

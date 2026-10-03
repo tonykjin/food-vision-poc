@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+from tests.conftest import synthetic_image
 
 from foodvision.api.factory import MAX_UPLOAD_BYTES, create_app
 from foodvision.config import AgentSettings, AppKind, ProviderSettings
@@ -8,7 +9,7 @@ from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult
 from foodvision.pipelines.mock import MOCK_WARNING
 
 SETTINGS = {AppKind.PROVIDER: ProviderSettings, AppKind.AGENT: AgentSettings}
-FAKE_IMAGE = b"synthetic-bytes-not-decoded-until-POC-04"
+FAKE_IMAGE = synthetic_image(size=(1600, 900))
 
 
 def client(kind: AppKind, mock: bool) -> TestClient:
@@ -104,3 +105,24 @@ def test_real_entry_point_modules_use_shared_models(module, monkeypatch):
         "/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")}
     )
     assert AnalysisResult.model_validate(response.json()).is_mock is True
+
+
+def test_both_apps_receive_the_same_processed_copy():
+    provenance = []
+    for kind in AppKind:
+        response = client(kind, mock=True).post(
+            "/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")}
+        )
+        provenance.append(response.json()["input"])
+    a, b = provenance
+    assert a == b
+    assert (a["processed_width_px"], a["processed_height_px"]) == (512, 288)
+
+
+@pytest.mark.parametrize("kind", list(AppKind))
+def test_undecodable_upload_rejected_even_in_live_mode(kind):
+    response = client(kind, mock=False).post(
+        "/v1/analyze", files={"image": ("x.jpg", b"not an image", "image/jpeg")}
+    )
+    assert response.status_code == 400
+    assert response.json()["code"] == "invalid_image"

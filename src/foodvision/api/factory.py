@@ -1,5 +1,6 @@
 """Shared FastAPI factory. Each app registers only its own pipeline and settings."""
 
+import hashlib
 import time
 import uuid
 
@@ -9,7 +10,8 @@ from fastapi.responses import JSONResponse
 from foodvision import __version__
 from foodvision.config import AppKind, AppSettings, load_settings
 from foodvision.contracts.errors import ErrorCode, ErrorResponse
-from foodvision.contracts.results import AnalysisResult
+from foodvision.contracts.requests import AnalysisContext
+from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult
 from foodvision.pipelines.mock import MockPipeline
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
@@ -35,6 +37,7 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
 
     def error(status: int, code: ErrorCode, message: str, scan_id: str) -> JSONResponse:
         body = ErrorResponse(
+            schema_version=SCHEMA_VERSION,
             code=code,
             message=message,
             scan_id=scan_id,
@@ -52,6 +55,7 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
             "pipeline_id": pipeline_id,
             "live_pipeline_implemented": False,
             "version": __version__,
+            "schema_version": SCHEMA_VERSION,
         }
 
     @app.post(
@@ -84,7 +88,14 @@ def create_app(kind: AppKind, settings: AppSettings | None = None) -> FastAPI:
                 "Set MOCK_MODE=true for a synthetic MOCK result.",
                 scan_id,
             )
-        result = pipeline.analyze(data, scan_id)
+        context = AnalysisContext(
+            scan_id=scan_id,
+            original_sha256=hashlib.sha256(data).hexdigest(),
+            pipeline_id=pipeline_id,
+            region=settings.region,
+            language=settings.language,
+        )
+        result = pipeline.analyze(data, context)
         result.metrics.server_total_ms = (time.perf_counter_ns() - started) / 1_000_000
         return result
 

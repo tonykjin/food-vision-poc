@@ -1,10 +1,17 @@
 """Synthetic MOCK pipeline for launching and testing the apps without providers.
 
-It calls no provider or model and is not a nutrition estimate. Nutrients stay None
-(unknown) so no invented values can be mistaken for real output.
+It calls no provider or model and is not a nutrition estimate. Its single item is
+unresolved, so nutrients stay None and totals are unavailable; the contract also
+forbids a MOCK result from ever being `complete`.
 """
 
-from foodvision.contracts.results import AnalysisResult, ResultItem, ResultStatus
+from foodvision.contracts.requests import AnalysisContext
+from foodvision.contracts.results import (
+    AnalysisResult,
+    FoodSource,
+    ResultItem,
+    ResultStatus,
+)
 
 MOCK_WARNING = (
     "MOCK MODE: synthetic result. No provider or model was called. "
@@ -18,15 +25,18 @@ class MockPipeline:
     def __init__(self, pipeline_id: str) -> None:
         self.pipeline_id = pipeline_id
 
-    def analyze(self, image_bytes: bytes, scan_id: str) -> AnalysisResult:
+    def analyze(self, image_bytes: bytes, context: AnalysisContext) -> AnalysisResult:
         return AnalysisResult(
-            scan_id=scan_id,
+            scan_id=context.scan_id,
             pipeline_id=self.pipeline_id,
+            configuration_id=f"{self.pipeline_id}-synthetic",
             is_mock=True,
             status=ResultStatus.PARTIAL,
             items=[
                 ResultItem(
                     name="MOCK item (synthetic, not a recognized food)",
+                    resolved=False,
+                    food_source=FoodSource.MOCK,
                     uncertainty_reasons=["MOCK: no recognition was performed"],
                 )
             ],

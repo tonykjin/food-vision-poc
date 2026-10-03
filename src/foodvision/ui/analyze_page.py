@@ -10,6 +10,7 @@ import httpx
 import streamlit as st
 
 from foodvision.config import AppKind
+from foodvision.nutrition.display import format_nutrient
 
 TITLES = {
     AppKind.PROVIDER: "App A: Provider POC (fatsecret)",
@@ -21,10 +22,10 @@ DEFAULT_API_URLS = {
     AppKind.AGENT: "http://127.0.0.1:8002",
 }
 NUTRIENT_LABELS = {
-    "energy_kcal": "Energy (kcal)",
-    "protein_g": "Protein (g)",
-    "carbohydrate_g": "Carbohydrate (g)",
-    "fat_g": "Fat (g)",
+    "energy_kcal": "Energy",
+    "protein_g": "Protein",
+    "carbohydrate_g": "Carbohydrate",
+    "fat_g": "Fat",
 }
 
 
@@ -78,14 +79,29 @@ def render_page(kind: AppKind) -> None:
     for warning in body.get("warnings", []):
         st.info(warning)
 
-    st.markdown("**Totals**")
-    totals = body.get("totals", {})
-    st.table({NUTRIENT_LABELS[k]: [_fmt(totals.get(k))] for k in NUTRIENT_LABELS})
+    totals = body["totals"]
+    st.markdown(f"**Totals ({totals['status']})**")
+    if totals["status"] != "complete":
+        st.warning(
+            f"Totals are {totals['status']}: {totals['excluded_items']} item(s) excluded; "
+            "unknown nutrients are not counted as zero."
+        )
+    st.table(
+        {
+            NUTRIENT_LABELS[k]: [format_nutrient(k, totals["nutrients"].get(k))]
+            for k in NUTRIENT_LABELS
+        }
+    )
 
     st.markdown("**Items**")
     for item in body.get("items", []):
         portion = item.get("portion_g")
-        st.write(f"- {item['name']} · portion: {'unknown' if portion is None else f'{portion} g'}")
+        state = "resolved" if item.get("resolved") else "unresolved"
+        st.write(
+            f"- {item['name']} · {state} · source: {item.get('food_source')} · "
+            f"portion: {'unknown' if portion is None else f'{portion:.0f} g'} "
+            f"({item.get('portion_method')})"
+        )
         for reason in item.get("uncertainty_reasons", []):
             st.caption(f"  {reason}")
 

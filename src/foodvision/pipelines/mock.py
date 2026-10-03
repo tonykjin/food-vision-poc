@@ -13,6 +13,8 @@ from foodvision.contracts.results import (
     ResultStatus,
 )
 from foodvision.imaging.prepare import PreparedImage
+from foodvision.measurement.events import Stage
+from foodvision.measurement.spans import ScanRecorder
 
 MOCK_WARNING = (
     "MOCK MODE: synthetic result. No provider or model was called. "
@@ -25,12 +27,19 @@ class MockPipeline:
 
     def __init__(self, pipeline_id: str) -> None:
         self.pipeline_id = pipeline_id
+        self.configuration_id = f"{pipeline_id}-synthetic"
 
-    def analyze(self, image: PreparedImage, context: AnalysisContext) -> AnalysisResult:
+    def analyze(
+        self, image: PreparedImage, context: AnalysisContext, recorder: ScanRecorder
+    ) -> AnalysisResult:
+        with recorder.span(Stage.MOCK):  # no external attempts: nothing is called
+            return self._result(context)
+
+    def _result(self, context: AnalysisContext) -> AnalysisResult:
         return AnalysisResult(
             scan_id=context.scan_id,
             pipeline_id=self.pipeline_id,
-            configuration_id=f"{self.pipeline_id}-synthetic",
+            configuration_id=self.configuration_id,
             is_mock=True,
             status=ResultStatus.PARTIAL,
             items=[

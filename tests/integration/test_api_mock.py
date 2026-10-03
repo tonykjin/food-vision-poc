@@ -126,3 +126,28 @@ def test_undecodable_upload_rejected_even_in_live_mode(kind):
     )
     assert response.status_code == 400
     assert response.json()["code"] == "invalid_image"
+
+
+@pytest.mark.parametrize("kind", list(AppKind))
+def test_every_scan_is_recorded_including_failures(kind):
+    app_client = client(kind, mock=True)
+    sink = app_client.app.state.telemetry
+    ok = app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
+    bad = app_client.post("/v1/analyze", files={"image": ("x.jpg", b"nope", "image/jpeg")})
+    assert bad.status_code == 400
+    success, failure = sink.records
+    assert success.scan_id == ok.json()["scan_id"]
+    assert success.status == "partial" and success.is_mock
+    assert {"image_prepare", "mock"} <= set(success.stage_ms)
+    assert success.attempts == 0 and success.estimated_cost_usd == 0.0
+    assert ok.json()["metrics"]["server_total_ms"] == success.server_total_ms
+    assert failure.scan_id == bad.json()["scan_id"]
+    assert failure.status == "failed" and failure.error_code == "invalid_image"
+    assert failure.client_total_ms is None
+
+
+def test_live_mode_not_implemented_is_recorded_as_failed():
+    app_client = client(AppKind.PROVIDER, mock=False)
+    app_client.post("/v1/analyze", files={"image": ("m.jpg", FAKE_IMAGE, "image/jpeg")})
+    (record,) = app_client.app.state.telemetry.records
+    assert record.status == "failed" and record.error_code == "not_implemented"

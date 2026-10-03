@@ -7,7 +7,7 @@ Secrets are SecretStr so repr/logs show '**********'. See docs/credential-handli
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -49,7 +49,10 @@ class CommonSettings(BaseSettings):
     usda_api_key: SecretStr | None = None
     region: str = "US"
     language: str = "en"
-    max_scan_seconds: float = 45.0
+    max_scan_seconds: float = Field(default=45.0, gt=0)
+    max_external_attempts_per_scan: int = Field(default=8, ge=0)
+    # None = no dollar cap (user decision 2026-10-02); call/attempt/deadline limits still apply.
+    max_scan_cost_usd: float | None = Field(default=None, ge=0)
 
 
 class ProviderSettings(CommonSettings):
@@ -59,6 +62,8 @@ class ProviderSettings(CommonSettings):
     fatsecret_client_secret: SecretStr | None = None
     persist_provider_outputs: bool = False
     provider_output_policy_version: str = "pending"
+    # App A has no LLM fallback (plan §8 A3): zero model calls.
+    max_model_calls_per_scan: int = Field(default=0, ge=0, le=0)
 
 
 class AgentSettings(CommonSettings):
@@ -68,8 +73,7 @@ class AgentSettings(CommonSettings):
     vision_provider: str = "anthropic"
     vision_model: str | None = None
     pipeline_mode: str = "grounded"
-    max_model_calls_per_scan: int = 2
-    max_external_attempts_per_scan: int = 8
+    max_model_calls_per_scan: int = Field(default=2, ge=0)
 
 
 AppSettings = ProviderSettings | AgentSettings

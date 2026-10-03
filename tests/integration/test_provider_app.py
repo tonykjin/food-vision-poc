@@ -63,14 +63,16 @@ def test_analyze_uses_shared_prep_contract_and_measurement():
 def test_telemetry_and_persisted_form_contain_no_restricted_content():
     client, _ = app_with([fixture("two_items.json")])
     result = AnalysisResult.model_validate(post(client).json())
-    record_json = client.app.state.telemetry.records[0].model_dump_json()
-    stored = json.dumps(
-        filter_result(result, DataSource.FATSECRET, StoragePolicy(), Purpose.PERSIST)
-    )
-    for restricted in ("SYNTHETIC item", "300", "150.0"):
-        assert restricted not in record_json
-        assert restricted not in stored
-    assert "9000001" in stored  # food_id is storable
+    record = client.app.state.telemetry.records[0]
+    stored = filter_result(result, DataSource.FATSECRET, StoragePolicy(), Purpose.PERSIST)
+    # Structural checks, not bare-number substrings (random IDs and timestamps contain digits).
+    assert "SYNTHETIC item" not in record.model_dump_json()
+    assert not {"items", "totals", "warnings"} & set(record.model_dump())
+    assert "SYNTHETIC item" not in json.dumps(stored)
+    for item in stored["items"]:
+        assert set(item) == {"resolved", "portion_method", "food_source", "food_id", "serving_id"}
+    assert "nutrients" not in stored["totals"]
+    assert stored["items"][0]["food_id"] == "9000001"  # food_id is storable
 
 
 def test_label_only_image_is_a_typed_failure():

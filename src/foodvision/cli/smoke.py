@@ -87,9 +87,13 @@ def smoke_fatsecret(image_path: str, confirmed: bool) -> int:
     return 0 if result.status.value != "failed" else 1
 
 
-# One model call, no retries.
+# Recognition-only: one model call. Grounded: recognition + at most one selection call.
+# No retries in either case.
 VISION_SMOKE_BUDGET = BudgetPolicy(
     deadline_s=120, max_model_calls=1, max_attempts=1, max_retries_per_request=0
+)
+GROUNDED_SMOKE_BUDGET = BudgetPolicy(
+    deadline_s=120, max_model_calls=2, max_attempts=2, max_retries_per_request=0
 )
 
 
@@ -118,20 +122,31 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
     from foodvision.providers.claude_vision import ClaudeVisionProvider, VisionConfig
 
     scan_id = uuid.uuid4().hex
-    recorder = ScanRecorder(scan_id, "B_recognition_only", budget=VISION_SMOKE_BUDGET)
+    grounded = settings.pipeline_mode == "grounded" and settings.database_url is not None
+    budget = GROUNDED_SMOKE_BUDGET if grounded else VISION_SMOKE_BUDGET
+    recorder = ScanRecorder(scan_id, "B_live_smoke", budget=budget)
     config = VisionConfig(
         model=settings.vision_model,
         effort=settings.vision_effort,
         max_tokens=settings.vision_max_tokens,
         refusal_fallback=settings.vision_refusal_fallback,
     )
-    pipeline = RecognitionOnlyPipeline(ClaudeVisionProvider(settings.anthropic_api_key, config))
+    vision = ClaudeVisionProvider(settings.anthropic_api_key, config)
+    if grounded:
+        from sqlalchemy import create_engine
+
+        from foodvision.pipelines.agent_grounded import GroundedPipeline
+
+        engine = create_engine(settings.database_url.get_secret_value())
+        pipeline = GroundedPipeline(vision, engine)
+    else:
+        pipeline = RecognitionOnlyPipeline(vision)
     context = AnalysisContext(
         scan_id=scan_id,
         original_sha256=prepared.original_sha256,
         processed_sha256=prepared.processed_sha256,
         preprocessing_version=prepared.transform_version,
-        pipeline_id="B_recognition_only",
+        pipeline_id=pipeline.pipeline_id,
     )
     result = pipeline.analyze(prepared, context, recorder)
     record = recorder.finish(
@@ -140,6 +155,7 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
     prov = result.model_provenance
     items = result.items
     print("vision live smoke (payload-free summary)")
+    print(f"  pipeline           {result.pipeline_id}")
     print(f"  status             {result.status.value}")
     print(f"  error              {result.error.message if result.error else '-'}")
     if prov is not None:
@@ -148,7 +164,29 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
         print(f"  stop_reason        {prov.stop_reason}")
         print(f"  prompt             {prov.prompt_version} sha256 {prov.prompt_sha256[:12]}")
         print(f"  sdk                anthropic {prov.sdk_version}")
-    print(f"  items              {len(items)}")
+    print(f"  items              {len(items)} ({sum(i.resolved for i in items)} grounded)")
+    print(f"  totals status      {result.totals.status.value}")
+    for key in ("energy_kcal", "protein_g", "carbohydrate_g", "fat_g"):
+        known = sum(getattr(i.nutrients, key) is not None for i in items)
+        print(f"  {key:<18} known for {known}/{len(items)} items")
+    print(f"  model calls        {record.model_calls}; blocked {record.blocked_attempts}")
+    # Reason categories only (fixed phrases from our code), never food names or values.
+    categories = {
+        "no catalog match": "no catalog match",
+        "selection no_match": "no candidate fits (no_match)",
+        "selection rejected": "not among the retrieved candidates",
+        "no selection returned": "no selection returned",
+        "not calculated": "not calculated:",
+        "over item limit": "item limit per scan",
+        "top candidate fallback": "top-ranked candidate used",
+        "chosen deterministically": "deterministic ranking",
+        "chosen by model": "chosen among candidates by the model",
+        "catalog lacks nutrient": "catalog lacks:",
+    }
+    for label, phrase in categories.items():
+        count = sum(any(phrase in r for r in i.uncertainty_reasons) for i in items)
+        if count:
+            print(f"  reason             {label}: {count}")
     print(f"  preparation stated {sum(i.preparation is not None for i in items)}/{len(items)}")
     print(f"  brand present      {sum(i.visible_brand is not None for i in items)}/{len(items)}")
     print(f"  with alternatives  {sum(bool(i.alternatives) for i in items)}/{len(items)}")

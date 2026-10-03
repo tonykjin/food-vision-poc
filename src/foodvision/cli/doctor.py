@@ -20,7 +20,7 @@ OPTIONAL: tuple[str, ...] = ("USDA_API_KEY", "DATABASE_URL")
 
 LIVE_STATUS: dict[AppKind, str] = {
     AppKind.PROVIDER: "fatsecret A_native (adapter-verified; live unverified)",
-    AppKind.AGENT: "Claude vision, recognition only (adapter-verified; matching in POC-10)",
+    AppKind.AGENT: "Claude vision + USDA grounding (B_grounded; needs DATABASE_URL)",
 }
 
 
@@ -50,6 +50,7 @@ def run_doctor(
     out(f"live API tests      {'enabled' if settings.enable_live_api_tests else 'disabled'}")
     if kind is AppKind.AGENT:
         out(f"vision model        {settings.vision_model} (effort {settings.vision_effort})")
+        out(f"pipeline mode       {settings.pipeline_mode}")
     out("")
     out("required for live mode:")
     for name in REQUIRED_FOR_LIVE[kind]:

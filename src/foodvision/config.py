@@ -6,6 +6,7 @@ Secrets are SecretStr so repr/logs show '**********'. See docs/credential-handli
 
 from enum import StrEnum
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -82,7 +83,11 @@ class AgentSettings(CommonSettings):
     vision_max_tokens: int = Field(default=16000, gt=0)
     # Server-side refusal fallback; a fallback-served answer is recorded in provenance.
     vision_refusal_fallback: bool = True
-    pipeline_mode: str = "grounded"
+    # grounded: recognize -> USDA retrieval -> selection -> calculation (needs DATABASE_URL,
+    # an fv_inference login). recognition_only: hypotheses without nutrients.
+    pipeline_mode: Literal["grounded", "recognition_only"] = "grounded"
+    # Optional comma-separated catalog source_versions to pin (frozen evaluations).
+    catalog_source_versions: str | None = None
     max_model_calls_per_scan: int = Field(default=2, ge=0)
 
 

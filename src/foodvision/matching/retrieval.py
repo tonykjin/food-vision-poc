@@ -63,6 +63,13 @@ class Candidate:
     source_version: str
     match_mode: str  # "strict" (all words) or "relaxed" (any word)
     rank: float
+    # Structural ranking keys, used to decide whether the top candidate is a clear winner.
+    prep_stated: bool = True
+    deprioritized: bool = False
+    head_coverage: float = 1.0
+    matched_words: int = 0
+    query_words: int = 0
+    known_nutrients: int = 0
 
 
 @dataclass(frozen=True)
@@ -127,7 +134,9 @@ hits AS (
          OR r.preparation_state IN (CAST(:prep AS text), 'not_stated'))
 )
 SELECT provider_food_id, name, data_type, category, brand, preparation_state,
-       source_version, rank
+       source_version, rank, matched, total, head_coverage, known_nutrients,
+       (category = ANY(CAST(:deprioritized AS text[]))) AS deprioritized,
+       (preparation_state = coalesce(CAST(:prep AS text), preparation_state)) AS prep_stated
 FROM hits
 WHERE matched * 2 >= total
 ORDER BY (preparation_state = coalesce(CAST(:prep AS text), preparation_state)) DESC,
@@ -199,6 +208,12 @@ class CatalogTools:
                             source_version=r.source_version,
                             match_mode=mode,
                             rank=float(r.rank),
+                            prep_stated=bool(r.prep_stated),
+                            deprioritized=bool(r.deprioritized),
+                            head_coverage=float(r.head_coverage),
+                            matched_words=int(r.matched),
+                            query_words=int(r.total),
+                            known_nutrients=int(r.known_nutrients),
                         )
                         for r in rows
                     ],

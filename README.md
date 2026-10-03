@@ -89,9 +89,9 @@ uv run pytest tests/db
 
 With `FATSECRET_CLIENT_ID`/`SECRET` in `.env.provider.local` and no `MOCK_MODE`, App A calls fatsecret image recognition (no LLM fallback). It's adapter-tested with fake HTTP only. Real behavior is **unverified** until the opt-in smoke test (`foodvision smoke-fatsecret`) runs. See [`docs/app-a-fatsecret.md`](docs/app-a-fatsecret.md).
 
-### App B live mode (POC-09)
+### App B live mode (POC-09/10)
 
-With `ANTHROPIC_API_KEY` in `.env.agent.local` and no `MOCK_MODE`, App B returns Claude vision **hypotheses only** (`B_recognition_only`): items are unresolved and nutrients unknown until POC-10. See [`docs/app-b-vision.md`](docs/app-b-vision.md).
+With `ANTHROPIC_API_KEY` and `DATABASE_URL` (an `fv_inference` login) in `.env.agent.local`, App B runs `B_grounded`: Claude recognition, USDA retrieval, selection of a retrieved ID or `no_match`, and nutrients calculated in code. `PIPELINE_MODE=recognition_only` returns hypotheses without nutrients. See [`docs/app-b-grounded.md`](docs/app-b-grounded.md) and [`docs/app-b-vision.md`](docs/app-b-vision.md).
 
 ### USDA catalog (POC-07)
 
@@ -123,7 +123,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
-| Live `B_grounded` analysis (USDA matching and nutrients) | POC-10 (#10) |
 | `apps/compare_ui.py` | POC-13 (#13) |
 | `foodvision validate-manifest` | POC-12 (#12) |
 | `foodvision benchmark`, `foodvision report` | POC-13 (#13) |

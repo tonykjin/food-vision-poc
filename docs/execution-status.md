@@ -224,7 +224,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - Branch `fix/fatsecret-token-diagnostics` now keeps the RFC 6749 OAuth error code and HTTP status (payload-free) and classifies token 4xx as `authentication`.
 - Run 2: **HTTP 400 `invalid_scope`**. The key apparently lacks the `image-recognition` scope (add-on not enabled). Live App A stays blocked on vendor access. **The user contacted fatsecret about upgrading the plan (2026-10-03).**
 
-**Prompt 17: POC-09 first model adapter and App B recognition** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)). Status: **implemented, adapter-verified, live smoke passed** (2026-10-03) on branch `feat/poc-09-vision-adapter`. Not committed. Details are in `docs/app-b-vision.md`.
+**Prompt 17: POC-09 first model adapter and App B recognition** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)). Status: **merged and closed** (2026-10-03) via [PR #27](https://github.com/tonykjin/food-vision-poc/pull/27), merge commit `746ee67`. CI passed: 306 tests. Refusal fallback kept on (default). Details are in `docs/app-b-vision.md`.
 - **Adapter:** `providers/claude_vision.py` on the official `anthropic` 1.11.0 SDK (SDK retries off).
   - Model `claude-opus-5-5` (configurable), effort `medium`, `output_config.format` JSON schema.
   - Server-side refusal fallback on, with the served model recorded.
@@ -241,6 +241,23 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - **One live call** (user-authorized smoke): `end_turn`, `claude-opus-5-5`, no fallback, 5 items valid, 12.9 s, 1,871/1,038 tokens, ≈ $0.028.
 - **Not measured:** recognition quality (needs reference meals). Refusal, fallback and truncation weren't triggered live. Latency (12.9 s for the recognition call alone) is close to the provisional 15 s p95 target.
 
+**Prompt 18: POC-10 bounded matching and grounded calculation** ([#10](https://github.com/tonykjin/food-vision-poc/issues/10)). Status: **implemented, verified, live smoke passed** (2026-10-03) on branch `feat/poc-10-grounded-matching`. Not committed. Details are in `docs/app-b-grounded.md`.
+- **Pipeline:** `pipelines/agent_grounded.py` (`B_grounded`, the default mode): recognize (call 1) → retrieve (preparation filter before ranking, brand pool, ≤5 items) → deterministic clear winner or one batched selection call (call 2, candidate IDs or `no_match` only) → calculate in code.
+- **Fallback:** if the call budget is exhausted, ambiguous items use the top candidate, labeled.
+- **Safety:** runtime isolation check on the database login; no tools offered to the model.
+- **Adapter:** refactored to one validated `_structured_call`, with a new `choose_matches`.
+- **Prompt:** `prompts/choose-food-match-v1.md`. Candidates now expose their structural ranking keys.
+- **Config:** `PIPELINE_MODE` (grounded / recognition_only), `CATALOG_SOURCE_VERSIONS`; grounded needs `DATABASE_URL` (an `fv_inference` login). `smoke-vision` follows the configured mode (≤ 2 calls).
+- **Verified:**
+  - `ruff check` passed. `pytest` with DB: 330 passed; without DB: 283 passed, 47 skipped.
+  - Grounded tests run as a real `fv_inference` login: invented ID, wrong preparation, clear winner skipping call 2, ml basis without density, missing nutrient giving partial totals, over-limit items, call-budget fallback, evaluator login refused.
+  - Mutation spot-check: any ID accepted, always-clear, and no isolation check were each caught.
+- **Live (2 user-authorized smoke runs with a temporary inference login):** 5 items each, 2 then 3 grounded. Unresolved items were the model's `no_match`, not fabrication. About 17–19 s and about $0.05 per scan.
+- **Open:**
+  - Latency is above the provisional 15 s p95.
+  - Run-to-run variation needs repeatability measurement.
+  - The user needs to create an `fv_inference` login and add `DATABASE_URL` to `.env.agent.local` for the live App B UI.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -253,7 +270,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 17: POC-09 first model adapter and App B recognition** ([#9](https://github.com/tonykjin/food-vision-poc/issues/9)). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 18: POC-10 bounded matching and grounded calculation** ([#10](https://github.com/tonykjin/food-vision-poc/issues/10)). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

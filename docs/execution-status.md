@@ -90,7 +90,10 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - Added `docs/github-issue-map.md`, `docs/verification-matrix.md`, `.github/ISSUE_TEMPLATE/task.md` and `config.yml`, and `.github/pull_request_template.md`.
 - Blocked or partial: #1 (vendor/partial), #8 (live), #12 (real meals), #15 (data). No issue was closed.
 
-**Prompt 10: POC-02 scaffold and CI** ([#2](https://github.com/tonykjin/food-vision-poc/issues/2)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-02-scaffold`. Not committed or pushed. CI hasn't run yet (it first runs on the PR).
+**Prompt 10: POC-02 scaffold and CI** ([#2](https://github.com/tonykjin/food-vision-poc/issues/2)). Status: **merged** (2026-10-02) via [PR #18](https://github.com/tonykjin/food-vision-poc/pull/18), merge commit `254d1f6`.
+- CI run 37094966374 passed: frozen install, Ruff, and 28 tests on ubuntu-latest.
+- The first CI run failed at setup because `setup-uv@v10` has no floating tag. Fixed by pinning `v10.2.0`.
+- Issue #2 stays **open** until the user does the README human UI checks. Evidence is commented on #2.
 - **Built:**
   - uv project (Python 3.12, `uv.lock`; key versions: fastapi 0.142.2, streamlit 1.65.0, pydantic 2.13.5, sqlalchemy 2.1.3, alembic 1.20.0, httpx 0.28.1)
   - per-app settings that read only their own env file
@@ -107,6 +110,21 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Other checks:** Compose Postgres 17.11 came up and was torn down. `doctor` on the real env files: A required set; B `ANTHROPIC_API_KEY` set, `VISION_MODEL` missing; isolation ok.
 - **Not verified:** browser click-through of the upload flow (human checks in README) and the GitHub Actions run.
 
+**Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)). Status: **implemented and verified locally** (2026-10-02) on branch `feat/poc-03-contracts`. Not committed.
+- **Contracts:**
+  - Schema 1.0 results: states, totals status, portion methods, food sources, confidence type with calibration-gated probability, and cross-field rules (partial can't claim complete totals; MOCK never complete; failed needs an error).
+  - Request `AnalysisContext` (known weight only in the diagnostic mode).
+  - Full plan §7 error codes.
+- **Arithmetic:**
+  - `nutrition/units.py` (4.184 kJ/kcal; ml↔g only with a density) and `nutrition/calculator.py` (per-100 g, per-100 ml and per-serving bases; nulls preserved; unresolved items excluded, not zero).
+  - `nutrition/display.py` handles display-only rounding.
+- **Selection:** `matching/selection.py` rejects IDs that aren't among the candidates (exact match).
+- **APIs:** both build an `AnalysisContext` (SHA-256 of the upload) and return the shared models.
+- **Verified:**
+  - `ruff check` passed; `pytest`: 97 passed.
+  - Mutation spot-check: unknown→0, ignored serving basis, and unresolved→complete were each caught by a test.
+  - Both live mock APIs return schema-1.0 results that validate.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -119,10 +137,12 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-Review, publish and merge POC-02 (Section 9 cycle; push and PR need the user's go-ahead). Then **Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)).
+User: run the README human UI checks for #2, then close it. Claude: **Prompt 11: POC-03 contracts and nutrition arithmetic** ([#3](https://github.com/tonykjin/food-vision-poc/issues/3)).
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 
 ## Issues / PRs
 
-16 issues (#1–#16), 4 milestones and 9 project labels were created 2026-10-02. The map is in `docs/github-issue-map.md`. Open with an external blocker: #1 (partial), #8, #12, #15. No PRs yet.
+16 issues (#1–#16), 4 milestones and 9 project labels were created 2026-10-02. The map is in `docs/github-issue-map.md`. Open with an external blocker: #1 (partial), #8, #12, #15.
+- PR #17 (backlog docs): merged.
+- PR #18 (POC-02): merged; #2 is open pending human UI checks.

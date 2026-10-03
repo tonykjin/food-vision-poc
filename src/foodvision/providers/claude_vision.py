@@ -15,6 +15,7 @@ server-side validation. No result is fabricated on any failure.
 
 import base64
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -160,41 +161,50 @@ class ClaudeVisionProvider:
             f"{PROMPT_VERSION}@{self.prompt_sha256[:12]}:{fallback}"
         )
 
-    def _request(self, image: PreparedImage, timeout_s: float) -> Any:
+    def _image_block(self, image: PreparedImage) -> dict[str, Any]:
+        return {  # image before text, per the vision guide
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": image.media_type,
+                "data": base64.standard_b64encode(image.data).decode("ascii"),
+            },
+        }
+
+    def _create(self, system: str, content: list, schema: dict, timeout_s: float) -> Any:
+        # Structured output only: no tools are offered, so the model cannot browse, run
+        # commands or reach any data beyond what this request contains.
         params: dict[str, Any] = {
             "model": self.config.model,
             "max_tokens": self.config.max_tokens,
-            "system": self.prompt,
+            "system": system,
             "output_config": {
                 "effort": self.config.effort,
-                "format": {"type": "json_schema", "schema": OUTPUT_SCHEMA},
+                "format": {"type": "json_schema", "schema": schema},
             },
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {  # image before text, per the vision guide
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": image.media_type,
-                                "data": base64.standard_b64encode(image.data).decode("ascii"),
-                            },
-                        },
-                        {"type": "text", "text": "Identify the visible foods."},
-                    ],
-                }
-            ],
+            "messages": [{"role": "user", "content": content}],
         }
         client = self._client.with_options(timeout=timeout_s, max_retries=0)
         if self.config.refusal_fallback:
             return client.beta.messages.create(betas=[FALLBACK_BETA], fallbacks="default", **params)
         return client.messages.create(**params)
 
-    def recognize(self, image: PreparedImage, recorder: ScanRecorder) -> RecognitionResponse:
+    def _structured_call(
+        self,
+        recorder: ScanRecorder,
+        *,
+        system: str,
+        content: list,
+        schema: dict,
+        validate: Callable[[Any], Any],
+        operation: str,
+        stage: Stage,
+    ) -> tuple[Any, Any]:
+        """One budgeted, instrumented model call returning (validated output, raw response)."""
+
         def send(timeout_s: float) -> CallResult:
             try:
-                response = self._request(image, timeout_s)
+                response = self._create(system, content, schema, timeout_s)
             except anthropic.APITimeoutError:
                 raise TimeoutError from None
             except anthropic.APIConnectionError:
@@ -220,8 +230,8 @@ class ClaudeVisionProvider:
                 )
             text = next((b.text for b in response.content if b.type == "text"), None)
             try:
-                output = RecognitionOutput.model_validate(json.loads(text or ""))
-            except (json.JSONDecodeError, ValidationError) as exc:
+                output = validate(json.loads(text or ""))
+            except (json.JSONDecodeError, ValidationError, ValueError) as exc:
                 kind = "not JSON" if isinstance(exc, json.JSONDecodeError) else "failed validation"
                 raise VisionAttemptError(
                     AttemptOutcome.CLIENT_ERROR,
@@ -235,23 +245,68 @@ class ClaudeVisionProvider:
 
         spec = CallSpec(
             provider=PROVIDER,
-            operation="messages.vision",
+            operation=operation,
             is_model_call=True,
             request_timeout_s=self.config.request_timeout_s,
-            stage=Stage.RECOGNITION,
+            stage=stage,
             model=self.config.model,
         )
-        output, response = call_with_retries(recorder, spec, send, prices=PRICES).value
-        return RecognitionResponse(
-            output=output,
+        return call_with_retries(recorder, spec, send, prices=PRICES).value
+
+    def _provenance(self, response: Any, prompt_version: str, prompt_sha256: str):
+        return dict(
             provider=PROVIDER,
             model_requested=self.config.model,
             model_served=getattr(response, "model", self.config.model),
             fallback_served=_fallback_served(response),
             stop_reason=response.stop_reason,
-            prompt_version=PROMPT_VERSION,
-            prompt_sha256=self.prompt_sha256,
+            prompt_version=prompt_version,
+            prompt_sha256=prompt_sha256,
             sdk_version=anthropic.__version__,
             effort=self.config.effort,
             request_id=getattr(response, "_request_id", None),
         )
+
+    def recognize(self, image: PreparedImage, recorder: ScanRecorder) -> RecognitionResponse:
+        """Model call 1: identify visible foods."""
+        output, response = self._structured_call(
+            recorder,
+            system=self.prompt,
+            content=[
+                self._image_block(image),
+                {"type": "text", "text": "Identify the visible foods."},
+            ],
+            schema=OUTPUT_SCHEMA,
+            validate=RecognitionOutput.model_validate,
+            operation="messages.vision",
+            stage=Stage.RECOGNITION,
+        )
+        return RecognitionResponse(
+            output=output, **self._provenance(response, PROMPT_VERSION, self.prompt_sha256)
+        )
+
+    def choose_matches(
+        self,
+        image: PreparedImage,
+        request_json: str,
+        schema: dict,
+        validate: Callable[[Any], Any],
+        prompt: tuple[str, str, str],
+        recorder: ScanRecorder,
+    ) -> tuple[Any, dict]:
+        """Model call 2: choose among retrieved candidates (or no_match) for ambiguous items.
+
+        `request_json` holds the items and candidate records; it is data, never instructions.
+        Returns (validated output, provenance fields).
+        """
+        version, text, sha256 = prompt
+        output, response = self._structured_call(
+            recorder,
+            system=text,
+            content=[self._image_block(image), {"type": "text", "text": request_json}],
+            schema=schema,
+            validate=validate,
+            operation="messages.select",
+            stage=Stage.SELECTION,
+        )
+        return output, self._provenance(response, version, sha256)

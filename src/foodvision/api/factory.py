@@ -23,7 +23,7 @@ MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 PIPELINE_IDS: dict[AppKind, dict[str, str]] = {
     AppKind.PROVIDER: {"mock": "A_mock", "live": "A_native"},
-    AppKind.AGENT: {"mock": "B_mock", "live": "B_recognition_only"},
+    AppKind.AGENT: {"mock": "B_mock", "live": "B_grounded"},
 }
 
 LIVE_ISSUE: dict[AppKind, str] = {
@@ -59,7 +59,24 @@ def _live_pipeline(kind: AppKind, settings: AppSettings):
             refusal_fallback=settings.vision_refusal_fallback,
         ),
     )
-    return RecognitionOnlyPipeline(provider), None
+    if settings.pipeline_mode == "recognition_only":
+        return RecognitionOnlyPipeline(provider), None
+    if settings.database_url is None:
+        return None, (
+            "DATABASE_URL (an fv_inference login) is not configured for grounded matching; "
+            "set it, or set PIPELINE_MODE=recognition_only"
+        )
+    from sqlalchemy import create_engine
+
+    from foodvision.pipelines.agent_grounded import GroundedPipeline
+
+    versions = settings.catalog_source_versions
+    engine = create_engine(settings.database_url.get_secret_value(), pool_pre_ping=True)
+    return GroundedPipeline(
+        provider,
+        engine,
+        source_versions=[v.strip() for v in versions.split(",") if v.strip()] if versions else None,
+    ), None
 
 
 def create_app(

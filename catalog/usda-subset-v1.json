@@ -1,0 +1,88 @@
+{
+  "subset_version": "usda-subset-v1",
+  "description": "Generic FoodData Central records for the US pilot: all Foundation Foods and SR Legacy foods from the official JSON downloads, plus a small explicit list of Branded records fetched by FDC ID through the API (the Branded download is 195 MB zipped / 3.1 GB). Only the four core nutrients are imported.",
+  "license": "FoodData Central data are public domain / CC0 1.0. Cite: U.S. Department of Agriculture, Agricultural Research Service. FoodData Central. fdc.nal.usda.gov.",
+  "documentation": [
+    "https://fdc.nal.usda.gov/download-datasets/",
+    "https://fdc.nal.usda.gov/api-guide/",
+    "https://fdc.nal.usda.gov/Foundation_Foods_Documentation/",
+    "https://fdc.nal.usda.gov/GBFPD_Documentation/"
+  ],
+  "downloads": [
+    {
+      "data_type": "Foundation",
+      "file": "FoodData_Central_foundation_food_json_2026-04-30.zip",
+      "url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_foundation_food_json_2026-04-30.zip",
+      "sha256": "186e988ec542e913f51ef62b86a47758e8cdd0d1dc3889e7b055581f3c09c77a",
+      "source_version": "fdc-foundation-2026-04-30",
+      "include": "all"
+    },
+    {
+      "data_type": "SR Legacy",
+      "file": "FoodData_Central_sr_legacy_food_json_2018-04.zip",
+      "url": "https://fdc.nal.usda.gov/fdc-datasets/FoodData_Central_sr_legacy_food_json_2018-04.zip",
+      "sha256": "0fe8ae486a2c8eb42cb96413f058deb51863a46c8fb8eeb4b1fb45006dd338ef",
+      "source_version": "fdc-sr-legacy-2018-04",
+      "include": "all"
+    }
+  ],
+  "branded_api_fdc_ids": [
+    {
+      "fdc_id": 2397108,
+      "label": "MINUTE white rice (dry), 46 g serving",
+      "why": "branded dry rice vs generic cooked/raw rice"
+    },
+    {
+      "fdc_id": 2059175,
+      "label": "FOOD LION white rice (dry), 45 g serving",
+      "why": "second branded rice; brand filter"
+    },
+    {
+      "fdc_id": 2092152,
+      "label": "TYSON chicken breast slice, 28 g serving",
+      "why": "branded vs generic chicken"
+    },
+    {
+      "fdc_id": 2385707,
+      "label": "LAND O LAKES whole milk, 240 ml serving",
+      "why": "ml serving: no gram portion without a density"
+    }
+  ],
+  "nutrients": {
+    "energy_kcal": {
+      "fdc_nutrient_ids": [
+        2048,
+        2047,
+        1008
+      ],
+      "note": "Foundation reports Atwater specific (2048) or general (2047) energy; ID 1008 is no longer shown for Foundation since Oct 2020 but remains for SR Legacy and Branded. kcal only; kJ (1062) is not used."
+    },
+    "protein_g": {
+      "fdc_nutrient_ids": [
+        1003
+      ]
+    },
+    "fat_g": {
+      "fdc_nutrient_ids": [
+        1004,
+        1085
+      ],
+      "note": "1004 Total lipid (fat); 1085 Total fat (NLEA) only if 1004 is absent."
+    },
+    "carbohydrate_g": {
+      "fdc_nutrient_ids": [
+        1005,
+        1050
+      ],
+      "note": "1005 Carbohydrate, by difference; 1050 by summation only if 1005 is absent or negative."
+    }
+  },
+  "negative_values": "A negative source amount (seen for carbohydrate by difference) is rejected, never clamped to 0: the next documented nutrient ID is used, else the value is stored as unknown (NULL). Counts appear in each import report.",
+  "basis": "Foundation and SR Legacy amounts are per 100 g edible portion. Branded amounts are per 100 g or per 100 ml as received from the data provider.",
+  "data_type_precedence": [
+    "Foundation",
+    "SR Legacy"
+  ],
+  "branded_policy": "Branded records are a separate pool: returned only when a visible brand is requested, never ranked against generic records.",
+  "branded_selection_note": "IDs chosen on 2026-10-02 from FDC search results (dataType=Branded, queries 'white rice', 'chicken breast', 'whole milk') to exercise branded handling; they are not a coverage claim."
+}

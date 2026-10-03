@@ -1,0 +1,707 @@
+{
+ "FoundationFoods": [
+  {
+   "foodClass": "FinalFood",
+   "description": "Rice, white, long grain, unenriched, raw",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 31222586,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 8,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 1.45,
+     "min": 0.72,
+     "median": 1.03,
+     "amount": 1.03
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 31222743,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 80.3
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 31222742,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "max": 8.33,
+     "min": 5.89,
+     "median": 6.75,
+     "amount": 7.04
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 31222744,
+     "nutrient": {
+      "id": 2047,
+      "number": "957",
+      "name": "Energy (Atwater General Factors)",
+      "rank": 280,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 359
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 31222745,
+     "nutrient": {
+      "id": 2048,
+      "number": "958",
+      "name": "Energy (Atwater Specific Factors)",
+      "rank": 290,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 370
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 3.82,
+     "nitrogenValue": 5.95,
+     "fatValue": 8.37,
+     "carbohydrateValue": 4.16
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 5.95
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 20444,
+   "foodCategory": {
+    "description": "Cereal Grains and Pasta"
+   },
+   "fdcId": 2512381,
+   "dataType": "Foundation",
+   "foodPortions": [
+    {
+     "id": 312591,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 1121,
+      "name": "RACC",
+      "abbreviation": "RACC"
+     },
+     "gramWeight": 45.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/20/2023"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Chicken, breast, boneless, skinless, raw",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 33295220,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 8,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 3.1,
+     "min": 1.31,
+     "median": 1.71,
+     "amount": 1.93
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 33295325,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "max": 23.4,
+     "min": 21.6,
+     "median": 22.5,
+     "amount": 22.5
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 33295326,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 33295327,
+     "nutrient": {
+      "id": 2047,
+      "number": "957",
+      "name": "Energy (Atwater General Factors)",
+      "rank": 280,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 106
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 33295328,
+     "nutrient": {
+      "id": 2048,
+      "number": "958",
+      "name": "Energy (Atwater Specific Factors)",
+      "rank": 290,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 112
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 6.25
+    },
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 4.27,
+     "nitrogenValue": 6.25,
+     "fatValue": 9.02,
+     "carbohydrateValue": 3.87
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 100304,
+   "foodCategory": {
+    "description": "Poultry Products"
+   },
+   "fdcId": 2646170,
+   "dataType": "Foundation",
+   "foodPortions": [
+    {
+     "id": 312730,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 1121,
+      "name": "RACC",
+      "abbreviation": "RACC"
+     },
+     "gramWeight": 114.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "10/26/2023"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Chicken, breast, meat and skin, raw",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 34678461,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 6,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 6.3,
+     "min": 3.47,
+     "median": 4.54,
+     "amount": 4.78
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 34678576,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "max": 22.0,
+     "min": 21.0,
+     "median": 21.3,
+     "amount": 21.4
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 34678577,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": -0.428
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 34678578,
+     "nutrient": {
+      "id": 2047,
+      "number": "957",
+      "name": "Energy (Atwater General Factors)",
+      "rank": 280,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 127
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 34678579,
+     "nutrient": {
+      "id": 2048,
+      "number": "958",
+      "name": "Energy (Atwater Specific Factors)",
+      "rank": 290,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 133
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 6.25
+    },
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 4.27,
+     "nitrogenValue": 6.25,
+     "fatValue": 9.02,
+     "carbohydrateValue": 3.87
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 100375,
+   "foodCategory": {
+    "description": "Poultry Products"
+   },
+   "fdcId": 2727569,
+   "dataType": "Foundation",
+   "foodPortions": [
+    {
+     "id": 312726,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 1121,
+      "name": "RACC",
+      "abbreviation": "RACC"
+     },
+     "gramWeight": 114.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/24/2025"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Chicken, broiler or fryers, breast, skinless, boneless, meat only, cooked, braised",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 2259524,
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "dataPoints": 6,
+     "foodNutrientDerivation": {
+      "code": "A",
+      "description": "Analytical",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "max": 3.99,
+     "min": 2.17,
+     "median": 3.26,
+     "amount": 3.24
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 2259525,
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 2259526,
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 166
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 2259565,
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "max": 32.9,
+     "min": 31.3,
+     "median": 32.1,
+     "amount": 32.1
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 2259567,
+     "nutrient": {
+      "id": 1062,
+      "number": "268",
+      "name": "Energy",
+      "rank": 400,
+      "unitName": "kJ"
+     },
+     "foodNutrientDerivation": {
+      "code": "NC",
+      "description": "Calculated",
+      "foodNutrientSource": {
+       "id": 2,
+       "code": "4",
+       "description": "Calculated or imputed"
+      }
+     },
+     "amount": 695
+    },
+    {
+     "type": "FoodNutrient",
+     "id": 2259605,
+     "nutrient": {
+      "id": 1085,
+      "number": "298",
+      "name": "Total fat (NLEA)",
+      "rank": 900,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "AS",
+      "description": "Summed",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "amount": 3.05
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [
+    {
+     "type": ".CalorieConversionFactor",
+     "proteinValue": 4.27,
+     "fatValue": 9.02,
+     "carbohydrateValue": 3.87
+    },
+    {
+     "type": ".ProteinConversionFactor",
+     "value": 6.25
+    }
+   ],
+   "isHistoricalReference": false,
+   "ndbNumber": 5746,
+   "foodCategory": {
+    "description": "Poultry Products"
+   },
+   "fdcId": 331960,
+   "dataType": "Foundation",
+   "foodPortions": [
+    {
+     "id": 121343,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 1043,
+      "name": "piece",
+      "abbreviation": "piece"
+     },
+     "gramWeight": 174.0,
+     "sequenceNumber": 1,
+     "amount": 1.0,
+     "minYearAcquired": 2012
+    },
+    {
+     "id": 312734,
+     "value": 1.0,
+     "measureUnit": {
+      "id": 1121,
+      "name": "RACC",
+      "abbreviation": "RACC"
+     },
+     "gramWeight": 114.0,
+     "sequenceNumber": 1,
+     "amount": 1.0
+    }
+   ],
+   "publicationDate": "4/1/2019"
+  },
+  {
+   "foodClass": "FinalFood",
+   "description": "Oil, olive, extra virgin",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "id": 8529163,
+     "nutrient": {
+      "id": 1085,
+      "number": "298",
+      "name": "Total fat (NLEA)",
+      "rank": 900,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "code": "AS",
+      "description": "Summed",
+      "foodNutrientSource": {
+       "id": 1,
+       "code": "1",
+       "description": "Analytical or derived from analytical"
+      }
+     },
+     "amount": 93.7
+    }
+   ],
+   "foodAttributes": [],
+   "nutrientConversionFactors": [],
+   "isHistoricalReference": false,
+   "ndbNumber": 4063,
+   "foodCategory": {
+    "description": "Fats and Oils"
+   },
+   "fdcId": 748608,
+   "dataType": "Foundation",
+   "foodPortions": [
+    {
+     "id": 192355,
+     "value": 100.0,
+     "measureUnit": {
+      "id": 1004,
+      "name": "milliliter",
+      "abbreviation": "ml"
+     },
+     "modifier": "",
+     "gramWeight": 90.7,
+     "sequenceNumber": 1,
+     "amount": 100.0,
+     "minYearAcquired": 2019
+    }
+   ],
+   "publicationDate": "12/16/2019"
+  },
+  null
+ ]
+}

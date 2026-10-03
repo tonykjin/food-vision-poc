@@ -1,0 +1,1129 @@
+{
+ "BrandedFoods": [
+  {
+   "discontinuedDate": "",
+   "foodComponents": [],
+   "foodAttributes": [
+    {
+     "id": 2749048,
+     "value": 4,
+     "name": "Nutrient Updated",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    },
+    {
+     "id": 2749049,
+     "value": 6,
+     "name": "Nutrient Removed",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    }
+   ],
+   "foodPortions": [],
+   "fdcId": 2397108,
+   "description": "WHITE RICE",
+   "publicationDate": "12/22/2022",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29525624,
+     "amount": 8.7
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29525626,
+     "amount": 82.61
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29525627,
+     "amount": 370.0
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 75,
+      "code": "LCCD",
+      "description": "Calculated from a daily value percentage per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29525625,
+     "amount": 0.0
+    }
+   ],
+   "dataType": "Branded",
+   "foodClass": "Branded",
+   "shortDescription": "",
+   "modifiedDate": "5/20/2020",
+   "availableDate": "5/20/2020",
+   "brandOwner": "Riviana Foods Inc.",
+   "brandName": "MINUTE",
+   "dataSource": "LI",
+   "brandedFoodCategory": "Rice",
+   "gtinUpc": "017400118006",
+   "householdServingFullText": "1/2 cup",
+   "ingredients": "PRECOOKED LONG GRAIN RICE.",
+   "marketCountry": "United States",
+   "servingSize": 46.0,
+   "servingSizeUnit": "g",
+   "packageWeight": "7 oz/198 g",
+   "foodUpdateLog": [
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 2397108,
+     "description": "WHITE RICE",
+     "publicationDate": "12/22/2022",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "shortDescription": "",
+     "modifiedDate": "5/20/2020",
+     "availableDate": "5/20/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "brandName": "MINUTE",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "7 oz/198 g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1937507,
+     "description": "WHITE RICE",
+     "publicationDate": "7/29/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "5/20/2020",
+     "availableDate": "5/20/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "brandName": "MINUTE",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "7 oz/198 g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1647309,
+     "description": "WHITE RICE",
+     "publicationDate": "3/19/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "5/20/2020",
+     "availableDate": "5/20/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "brandName": "MINUTE",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1355125,
+     "description": "WHITE RICE",
+     "publicationDate": "2/26/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "5/20/2020",
+     "availableDate": "5/20/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "brandName": "MINUTE",
+     "subbrandName": "",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "",
+     "notaSignificantSourceOf": ""
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1006447,
+     "description": "WHITE RICE",
+     "publicationDate": "6/26/2020",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "5/20/2020",
+     "availableDate": "5/20/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 870488,
+     "description": "LIGHT & FLUFFY WHITE RICE",
+     "publicationDate": "5/28/2020",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "4/8/2020",
+     "availableDate": "4/8/2020",
+     "brandOwner": "Riviana Foods Inc.",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "1/2 cup",
+     "ingredients": "PRECOOKED LONG GRAIN RICE.",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "modifiedDate": "1/19/2018",
+     "availableDate": "1/19/2018",
+     "brandOwner": "Riviana Foods Inc.",
+     "dataSource": "LI",
+     "gpcCategoryGroup": "Rice",
+     "gtinUpc": "017400118006",
+     "householdServingFullText": "0.5 cup",
+     "ingredients": "ENRICHED PRECOOKED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+     "marketCountry": "United States",
+     "servingSize": 46.0,
+     "servingSizeUnit": "g",
+     "fdcId": 558216,
+     "description": "WHITE RICE",
+     "publicationDate": "4/1/2019",
+     "workingFoodId": 45342410,
+     "dataType": "Branded",
+     "foodClass": "Branded"
+    }
+   ],
+   "labelNutrients": {
+    "fat": {
+     "value": 0.0
+    },
+    "saturatedFat": {
+     "value": 0.0
+    },
+    "transFat": {
+     "value": 0.0
+    },
+    "cholesterol": {
+     "value": 0.0
+    },
+    "sodium": {
+     "value": 0.0
+    },
+    "carbohydrates": {
+     "value": 38.0
+    },
+    "fiber": {
+     "value": 0.0
+    },
+    "sugars": {
+     "value": 0.0
+    },
+    "protein": {
+     "value": 4.0
+    },
+    "calcium": {
+     "value": 0.0
+    },
+    "iron": {
+     "value": 0.0
+    },
+    "potassium": {
+     "value": 0.0
+    },
+    "calories": {
+     "value": 170
+    }
+   }
+  },
+  {
+   "discontinuedDate": "",
+   "foodComponents": [],
+   "foodAttributes": [
+    {
+     "id": 2258227,
+     "value": 9,
+     "name": "Added Package Weight",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    }
+   ],
+   "foodPortions": [],
+   "fdcId": 2059175,
+   "description": "WHITE RICE",
+   "publicationDate": "10/28/2021",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 75,
+      "code": "LCCD",
+      "description": "Calculated from a daily value percentage per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25711075,
+     "amount": 0.0
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25711076,
+     "amount": 77.78
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25711074,
+     "amount": 6.67
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25711077,
+     "amount": 333.0
+    }
+   ],
+   "dataType": "Branded",
+   "foodClass": "Branded",
+   "modifiedDate": "10/24/2018",
+   "availableDate": "10/24/2018",
+   "brandOwner": "Food Town Stores Inc.",
+   "brandName": "FOOD LION",
+   "dataSource": "LI",
+   "brandedFoodCategory": "Rice",
+   "gtinUpc": "035826095510",
+   "householdServingFullText": "0.25 cup",
+   "ingredients": "ENRICHED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+   "marketCountry": "United States",
+   "servingSize": 45.0,
+   "servingSizeUnit": "g",
+   "packageWeight": "32 oz/2 lbs/908 g",
+   "foodUpdateLog": [
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 2059175,
+     "description": "WHITE RICE",
+     "publicationDate": "10/28/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "10/24/2018",
+     "availableDate": "10/24/2018",
+     "brandOwner": "Food Town Stores Inc.",
+     "brandName": "FOOD LION",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "035826095510",
+     "householdServingFullText": "0.25 cup",
+     "ingredients": "ENRICHED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+     "marketCountry": "United States",
+     "servingSize": 45.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "32 oz/2 lbs/908 g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1546034,
+     "description": "WHITE RICE",
+     "publicationDate": "3/19/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "10/24/2018",
+     "availableDate": "10/24/2018",
+     "brandOwner": "Food Town Stores Inc.",
+     "brandName": "FOOD LION",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "035826095510",
+     "householdServingFullText": "0.25 cup",
+     "ingredients": "ENRICHED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+     "marketCountry": "United States",
+     "servingSize": 45.0,
+     "servingSizeUnit": "g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1253967,
+     "description": "WHITE RICE",
+     "publicationDate": "2/26/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "10/24/2018",
+     "availableDate": "10/24/2018",
+     "brandOwner": "Food Town Stores Inc.",
+     "brandName": "FOOD LION",
+     "subbrandName": "",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Rice",
+     "gtinUpc": "035826095510",
+     "householdServingFullText": "0.25 cup",
+     "ingredients": "ENRICHED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+     "marketCountry": "United States",
+     "servingSize": 45.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "",
+     "notaSignificantSourceOf": ""
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "modifiedDate": "10/24/2018",
+     "availableDate": "10/24/2018",
+     "brandOwner": "Food Town Stores Inc.",
+     "dataSource": "LI",
+     "gpcCategoryGroup": "Rice",
+     "gtinUpc": "035826095510",
+     "householdServingFullText": "0.25 cup",
+     "ingredients": "ENRICHED LONG GRAIN RICE [RICE, NIACIN, IRON (FERRIC ORTHOPHOSPHATE), THIAMIN (THIAMIN MONONITRATE), FOLIC ACID].",
+     "marketCountry": "United States",
+     "servingSize": 45.0,
+     "servingSizeUnit": "g",
+     "fdcId": 448263,
+     "description": "WHITE RICE",
+     "publicationDate": "4/1/2019",
+     "workingFoodId": 45182121,
+     "dataType": "Branded",
+     "foodClass": "Branded"
+    }
+   ],
+   "labelNutrients": {
+    "fat": {
+     "value": 0.0
+    },
+    "saturatedFat": {
+     "value": 0.0
+    },
+    "transFat": {
+     "value": 0.0
+    },
+    "cholesterol": {
+     "value": 0.0
+    },
+    "sodium": {
+     "value": 0.0
+    },
+    "carbohydrates": {
+     "value": 35.0
+    },
+    "fiber": {
+     "value": 0.0
+    },
+    "sugars": {
+     "value": 0.0
+    },
+    "protein": {
+     "value": 3.0
+    },
+    "calcium": {
+     "value": 0.0
+    },
+    "iron": {
+     "value": 1.44
+    },
+    "calories": {
+     "value": 150
+    }
+   }
+  },
+  {
+   "discontinuedDate": "",
+   "foodComponents": [],
+   "foodAttributes": [
+    {
+     "id": 2295816,
+     "value": 9,
+     "name": "Added Package Weight",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    }
+   ],
+   "foodPortions": [],
+   "fdcId": 2092152,
+   "description": "CHICKEN BREAST",
+   "publicationDate": "10/28/2021",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25447749,
+     "amount": 8.93
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25447748,
+     "amount": 14.29
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25447750,
+     "amount": 3.57
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 25447751,
+     "amount": 143.0
+    }
+   ],
+   "dataType": "Branded",
+   "foodClass": "Branded",
+   "modifiedDate": "7/14/2017",
+   "availableDate": "7/14/2017",
+   "brandOwner": "Tyson Foods, Inc.",
+   "brandName": "TYSON",
+   "dataSource": "LI",
+   "brandedFoodCategory": "Pepperoni, Salami & Cold Cuts",
+   "gtinUpc": "023700038326",
+   "householdServingFullText": "1 SLICE",
+   "ingredients": "CHICKEN BREAST WITH RIB MEAT, WATER, CONTAINS 2% OR LESS OF: VINEGAR, MODIFIED FOOD STARCH, SALT, CARRAGEENAN, MALTODEXTRIN, SODIUM PHOSPHATES, ONION POWDER, YEAST EXTRACT, GARLIC POWDER, DRIED CHICKEN SKIN, DRIED CHICKEN, CHICKEN BROTH, SPICES EXTRACTIVES.",
+   "marketCountry": "United States",
+   "servingSize": 28.0,
+   "servingSizeUnit": "g",
+   "packageWeight": "14 oz/396.9 g",
+   "foodUpdateLog": [
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 2092152,
+     "description": "CHICKEN BREAST",
+     "publicationDate": "10/28/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "7/14/2017",
+     "availableDate": "7/14/2017",
+     "brandOwner": "Tyson Foods, Inc.",
+     "brandName": "TYSON",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Pepperoni, Salami & Cold Cuts",
+     "gtinUpc": "023700038326",
+     "householdServingFullText": "1 SLICE",
+     "ingredients": "CHICKEN BREAST WITH RIB MEAT, WATER, CONTAINS 2% OR LESS OF: VINEGAR, MODIFIED FOOD STARCH, SALT, CARRAGEENAN, MALTODEXTRIN, SODIUM PHOSPHATES, ONION POWDER, YEAST EXTRACT, GARLIC POWDER, DRIED CHICKEN SKIN, DRIED CHICKEN, CHICKEN BROTH, SPICES EXTRACTIVES.",
+     "marketCountry": "United States",
+     "servingSize": 28.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "14 oz/396.9 g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1601753,
+     "description": "CHICKEN BREAST",
+     "publicationDate": "3/19/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "7/14/2017",
+     "availableDate": "7/14/2017",
+     "brandOwner": "Tyson Foods, Inc.",
+     "brandName": "TYSON",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Pepperoni, Salami & Cold Cuts",
+     "gtinUpc": "023700038326",
+     "householdServingFullText": "1 SLICE",
+     "ingredients": "CHICKEN BREAST WITH RIB MEAT, WATER, CONTAINS 2% OR LESS OF: VINEGAR, MODIFIED FOOD STARCH, SALT, CARRAGEENAN, MALTODEXTRIN, SODIUM PHOSPHATES, ONION POWDER, YEAST EXTRACT, GARLIC POWDER, DRIED CHICKEN SKIN, DRIED CHICKEN, CHICKEN BROTH, SPICES EXTRACTIVES.",
+     "marketCountry": "United States",
+     "servingSize": 28.0,
+     "servingSizeUnit": "g"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1309639,
+     "description": "CHICKEN BREAST",
+     "publicationDate": "2/26/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "7/14/2017",
+     "availableDate": "7/14/2017",
+     "brandOwner": "Tyson Foods, Inc.",
+     "brandName": "TYSON",
+     "subbrandName": "",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Pepperoni, Salami & Cold Cuts",
+     "gtinUpc": "023700038326",
+     "householdServingFullText": "1 SLICE",
+     "ingredients": "CHICKEN BREAST WITH RIB MEAT, WATER, CONTAINS 2% OR LESS OF: VINEGAR, MODIFIED FOOD STARCH, SALT, CARRAGEENAN, MALTODEXTRIN, SODIUM PHOSPHATES, ONION POWDER, YEAST EXTRACT, GARLIC POWDER, DRIED CHICKEN SKIN, DRIED CHICKEN, CHICKEN BROTH, SPICES EXTRACTIVES.",
+     "marketCountry": "United States",
+     "servingSize": 28.0,
+     "servingSizeUnit": "g",
+     "packageWeight": "",
+     "notaSignificantSourceOf": ""
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "modifiedDate": "7/14/2017",
+     "availableDate": "7/14/2017",
+     "brandOwner": "Tyson Foods, Inc.",
+     "dataSource": "LI",
+     "gpcCategoryGroup": "Pepperoni, Salami & Cold Cuts",
+     "gtinUpc": "023700038326",
+     "householdServingFullText": "1 SLICE",
+     "ingredients": "CHICKEN BREAST WITH RIB MEAT, WATER, CONTAINS 2% OR LESS OF: VINEGAR, MODIFIED FOOD STARCH, SALT, CARRAGEENAN, MALTODEXTRIN, SODIUM PHOSPHATES, ONION POWDER, YEAST EXTRACT, GARLIC POWDER, DRIED CHICKEN SKIN, DRIED CHICKEN, CHICKEN BROTH, SPICES EXTRACTIVES.",
+     "marketCountry": "United States",
+     "servingSize": 28.0,
+     "servingSizeUnit": "g",
+     "fdcId": 511086,
+     "description": "CHICKEN BREAST",
+     "publicationDate": "4/1/2019",
+     "workingFoodId": 45262503,
+     "dataType": "Branded",
+     "foodClass": "Branded"
+    }
+   ],
+   "labelNutrients": {
+    "fat": {
+     "value": 2.5
+    },
+    "saturatedFat": {
+     "value": 0.501
+    },
+    "transFat": {
+     "value": 0.0
+    },
+    "cholesterol": {
+     "value": 15.1
+    },
+    "sodium": {
+     "value": 260
+    },
+    "carbohydrates": {
+     "value": 1.0
+    },
+    "fiber": {
+     "value": 0.0
+    },
+    "sugars": {
+     "value": 0.0
+    },
+    "protein": {
+     "value": 4.0
+    },
+    "calcium": {
+     "value": 0.0
+    },
+    "iron": {
+     "value": 0.361
+    },
+    "calories": {
+     "value": 40.0
+    }
+   }
+  },
+  {
+   "discontinuedDate": "",
+   "foodComponents": [],
+   "foodAttributes": [
+    {
+     "id": 2804421,
+     "value": 6,
+     "name": "Nutrient Removed",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    },
+    {
+     "id": 2804420,
+     "value": 4,
+     "name": "Nutrient Updated",
+     "foodAttributeType": {
+      "id": 998,
+      "name": "Update Log",
+      "description": "Changes that were made to this food"
+     }
+    }
+   ],
+   "foodPortions": [],
+   "fdcId": 2385707,
+   "description": "WHOLE MILK",
+   "publicationDate": "12/22/2022",
+   "foodNutrients": [
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1005,
+      "number": "205",
+      "name": "Carbohydrate, by difference",
+      "rank": 1110,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29366778,
+     "amount": 4.58
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1008,
+      "number": "208",
+      "name": "Energy",
+      "rank": 300,
+      "unitName": "kcal"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29366779,
+     "amount": 62.0
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1003,
+      "number": "203",
+      "name": "Protein",
+      "rank": 600,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29366776,
+     "amount": 3.33
+    },
+    {
+     "type": "FoodNutrient",
+     "nutrient": {
+      "id": 1004,
+      "number": "204",
+      "name": "Total lipid (fat)",
+      "rank": 800,
+      "unitName": "g"
+     },
+     "foodNutrientDerivation": {
+      "id": 70,
+      "code": "LCCS",
+      "description": "Calculated from value per serving size measure",
+      "foodNutrientSource": {
+       "id": 9,
+       "code": "12",
+       "description": "Manufacturer's analytical; partial documentation"
+      }
+     },
+     "id": 29366777,
+     "amount": 3.33
+    }
+   ],
+   "dataType": "Branded",
+   "foodClass": "Branded",
+   "shortDescription": "",
+   "modifiedDate": "12/19/2020",
+   "availableDate": "12/19/2020",
+   "brandOwner": "Prairie Farms Dairy, Inc.",
+   "brandName": "LAND O LAKES",
+   "dataSource": "LI",
+   "brandedFoodCategory": "Milk",
+   "gtinUpc": "072730213081",
+   "householdServingFullText": "1 cup",
+   "ingredients": "MILK, AND VITAMIN D3",
+   "marketCountry": "United States",
+   "servingSize": 240.0,
+   "servingSizeUnit": "ml",
+   "packageWeight": "1 Quart/946 mL",
+   "foodUpdateLog": [
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 2385707,
+     "description": "WHOLE MILK",
+     "publicationDate": "12/22/2022",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "shortDescription": "",
+     "modifiedDate": "12/19/2020",
+     "availableDate": "12/19/2020",
+     "brandOwner": "Prairie Farms Dairy, Inc.",
+     "brandName": "LAND O LAKES",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Milk",
+     "gtinUpc": "072730213081",
+     "householdServingFullText": "1 cup",
+     "ingredients": "MILK, AND VITAMIN D3",
+     "marketCountry": "United States",
+     "servingSize": 240.0,
+     "servingSizeUnit": "ml",
+     "packageWeight": "1 Quart/946 mL"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1991097,
+     "description": "WHOLE MILK",
+     "publicationDate": "7/29/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "12/19/2020",
+     "availableDate": "12/19/2020",
+     "brandOwner": "Prairie Farms Dairy, Inc.",
+     "brandName": "LAND O LAKES",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Milk",
+     "gtinUpc": "072730213081",
+     "householdServingFullText": "1 cup",
+     "ingredients": "MILK, AND VITAMIN D3",
+     "marketCountry": "United States",
+     "servingSize": 240.0,
+     "servingSizeUnit": "ml",
+     "packageWeight": "1 Quart/946 mL"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1742392,
+     "description": "WHOLE MILK",
+     "publicationDate": "3/19/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "12/19/2020",
+     "availableDate": "12/19/2020",
+     "brandOwner": "Prairie Farms Dairy, Inc.",
+     "brandName": "LAND O LAKES",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Milk",
+     "gtinUpc": "072730213081",
+     "householdServingFullText": "1 cup",
+     "ingredients": "MILK, AND VITAMIN D3",
+     "marketCountry": "United States",
+     "servingSize": 240.0,
+     "servingSizeUnit": "ml"
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "fdcId": 1450085,
+     "description": "WHOLE MILK",
+     "publicationDate": "2/26/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded",
+     "modifiedDate": "12/19/2020",
+     "availableDate": "12/19/2020",
+     "brandOwner": "Prairie Farms Dairy, Inc.",
+     "brandName": "LAND O LAKES",
+     "subbrandName": "",
+     "dataSource": "LI",
+     "brandedFoodCategory": "Milk",
+     "gtinUpc": "072730213081",
+     "householdServingFullText": "1 cup",
+     "ingredients": "MILK, AND VITAMIN D3",
+     "marketCountry": "United States",
+     "servingSize": 240.0,
+     "servingSizeUnit": "ml",
+     "packageWeight": "",
+     "notaSignificantSourceOf": ""
+    },
+    {
+     "discontinuedDate": "",
+     "foodAttributes": [],
+     "modifiedDate": "12/19/2020",
+     "availableDate": "12/19/2020",
+     "brandOwner": "Prairie Farms Dairy, Inc.",
+     "dataSource": "LI",
+     "gpcCategoryGroup": "Milk",
+     "gtinUpc": "072730213081",
+     "householdServingFullText": "1 cup",
+     "ingredients": "MILK, AND VITAMIN D3",
+     "marketCountry": "United States",
+     "servingSize": 240.0,
+     "servingSizeUnit": "ml",
+     "fdcId": 1161026,
+     "description": "WHOLE MILK",
+     "publicationDate": "1/28/2021",
+     "dataType": "Branded",
+     "foodClass": "Branded"
+    }
+   ],
+   "labelNutrients": {
+    "fat": {
+     "value": 7.99
+    },
+    "saturatedFat": {
+     "value": 4.99
+    },
+    "transFat": {
+     "value": 0.0
+    },
+    "cholesterol": {
+     "value": 36.0
+    },
+    "sodium": {
+     "value": 120
+    },
+    "carbohydrates": {
+     "value": 11.0
+    },
+    "fiber": {
+     "value": 0.0
+    },
+    "sugars": {
+     "value": 11.0
+    },
+    "protein": {
+     "value": 7.99
+    },
+    "calcium": {
+     "value": 199
+    },
+    "iron": {
+     "value": 0.0
+    },
+    "potassium": {
+     "value": 281
+    },
+    "calories": {
+     "value": 149
+    }
+   }
+  }
+ ]
+}

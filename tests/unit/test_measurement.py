@@ -254,13 +254,13 @@ def test_retry_not_attempted_when_retry_after_passes_deadline():
 def test_provider_error_text_is_never_stored():
     clock = ManualClock()
     rec = recorder(clock)
-    secret_body = "provider said: grilled salmon 412 kcal"
+    secret_body = "provider said: grilled salmon SENTINEL-BODY-7731 kcal"
     error = AttemptError(AttemptOutcome.CLIENT_ERROR, http_status=400)
     error.provider_body = secret_body  # even if an adapter attached it
     with pytest.raises(AttemptError):
         call_with_retries(rec, spec(), FakeTransport(clock, [(0.1, error)]))
     dumped = rec.finish(ScanStatus.FAILED, ErrorCode.PROVIDER_ERROR).model_dump_json()
-    assert "salmon" not in dumped and "412" not in dumped
+    assert "salmon" not in dumped and "SENTINEL-BODY-7731" not in dumped
 
 
 # --- Budgets --------------------------------------------------------------------------

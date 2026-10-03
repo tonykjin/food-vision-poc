@@ -1,0 +1,27 @@
+{
+  "description": "Common US pilot foods used to report catalog coverage gaps. A probe is a search, not a reference label: it says nothing about recognition accuracy.",
+  "probes": [
+    {"query": "white rice", "preparation": "cooked"},
+    {"query": "white rice", "preparation": "uncooked"},
+    {"query": "brown rice", "preparation": "cooked"},
+    {"query": "chicken breast", "preparation": "cooked"},
+    {"query": "chicken breast", "preparation": "uncooked"},
+    {"query": "ground beef", "preparation": "cooked"},
+    {"query": "salmon", "preparation": "cooked"},
+    {"query": "egg", "preparation": "cooked"},
+    {"query": "broccoli", "preparation": "cooked"},
+    {"query": "potato", "preparation": "cooked"},
+    {"query": "pasta", "preparation": "cooked"},
+    {"query": "black beans", "preparation": "cooked"},
+    {"query": "banana", "preparation": "uncooked"},
+    {"query": "apple", "preparation": "uncooked"},
+    {"query": "avocado", "preparation": "uncooked"},
+    {"query": "whole wheat bread", "preparation": null},
+    {"query": "cheddar cheese", "preparation": null},
+    {"query": "olive oil", "preparation": null},
+    {"query": "greek yogurt", "preparation": null},
+    {"query": "tofu", "preparation": null},
+    {"query": "quinoa", "preparation": "cooked"},
+    {"query": "chicken tikka masala", "preparation": null}
+  ]
+}

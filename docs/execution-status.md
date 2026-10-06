@@ -263,7 +263,13 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - `uv sync --frozen` OK. `uv run ruff check .` passed. `uv run pytest`: 283 passed, 47 skipped (no DB), matching the POC-10 baseline.
 - Done since: you ran `gh auth login` (as `tonykjin`; the token lacks the `workflow` scope, which is only needed if a PR edits `.github/workflows/`) and moved both env files here (presence checked only). Compose Postgres runs here; the local catalog/inference login for live App B is not set up in this clone.
 
-**Prompt 19:** not re-run. A is still blocked on the fatsecret `invalid_scope`; B's live smoke runs are recorded under Prompt 17/18.
+**Prompt 19: smallest real-provider check.** Status: **B passed, A blocked** (2026-10-06 ~22:10 UTC). Branch `chore/prompt-19-live-smoke` (stacked on `feat/poc-11-result-ui`), not pushed.
+- **Setup in the new workspace:** Compose DB migrated to `0002`; USDA catalog re-imported (363 Foundation, 7,793 SR Legacy, 4 Branded via 1 USDA API request; data files copied from the OneDrive copy into git-ignored `data/fdc/`).
+- **Image:** no owned photo exists yet. With your approval, a **third-party stock image** (grilled chicken plate, `assets/`, now git-ignored with `*.avif`/`*.heic`) was used for smoke tests only. The owned test image stays PENDING.
+- **App A:** 1 token request → HTTP 400 `invalid_scope` (291 ms). No image sent, no retry, nothing stored. Still blocked on the fatsecret add-on; not an adapter fault, so no fix or rerun.
+- **App B (`B_grounded`):** 2 model calls (`claude-opus-5-5`, no fallback, `end_turn`). 7 items, 4 grounded (model choice), 1 `no_match`, 2 over the 5-item limit; status `partial`, schema-valid. 14.9 s + 8.1 s, ≈ $0.060. Temporary inference login created and dropped.
+- **Paid attempts this prompt:** 2 Anthropic calls (≈ $0.060). fatsecret: 1 unbilled token request.
+- **Unverified:** fatsecret image recognition (all response fields, 211, latency, quotas); App B accuracy; the 5-item limit on real meals; latency is above the 15 s p95 target.
 
 **Prompt 20: POC-11 shared result UI and heuristic confidence** ([#11](https://github.com/tonykjin/food-vision-poc/issues/11)). Status: **implemented and verified locally** (2026-10-06) on branch `feat/poc-11-result-ui`. Not pushed. Details are in `docs/result-ui.md`.
 - **UI:** `ui/result_view.py` is shared by both apps. It shows the state banners (complete/partial/abstained/failed, with HTTP errors rendered as failed) and labeled partial totals with unknown kept as unknown. Also shown: per-item portion and assumption range, source/match method, reasons, "Reference unavailable", backend time, `client_total_ms` unavailable, and provenance. The automatic result is kept in session state and never edited; corrections are stored separately, session only, and nothing is recalculated.
@@ -288,7 +294,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: push `feat/poc-11-result-ui` and open the POC-11 PR (needs your OK), then **Prompt 21: reference data and manifest** (POC-12, [#12](https://github.com/tonykjin/food-vision-poc/issues/12), needs real meals). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
+User: run the README human UI checks for #2, then close it. User: merge PR #29 (POC-11; CI passed), add a photo you own as the test image, and add a `DATABASE_URL` inference login to `.env.agent.local` for the live App B UI. Claude: publish the Prompt 19 records once #29 is merged, then **Prompt 21: reference data and manifest** (POC-12, [#12](https://github.com/tonykjin/food-vision-poc/issues/12), needs real meals). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

@@ -101,14 +101,19 @@ See [`docs/catalog.md`](docs/catalog.md) for the documented FDC subset, the impo
 
 1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
 2. Upload a JPG/PNG/WebP you own and press **Analyze**. You should see:
-   - "MOCK result (synthetic)"
+   - "MOCK result (synthetic)" and the **Partial** banner
    - Status `partial`
    - The MOCK warnings
-   - Every total showing **unknown** (never 0)
+   - "Totals unavailable", and every item nutrient showing **unknown** (never 0)
+   - "Confidence: not assessed" and "Reference unavailable"
    - An item named "MOCK item (synthetic, not a recognized food)"
-   - `client_total_ms: unavailable`
+   - "Click-to-render (client_total_ms): unavailable"
+   - No "User corrections" form (MOCK has nothing to correct)
 3. Stop the API and reload the page. It should show "API not reachable".
-4. Restart the API without `MOCK_MODE`, then analyze. It should show `not_implemented` with HTTP 501.
+4. Restart the API without `MOCK_MODE` and without credentials, then analyze. It should show the **Failed** banner with `authentication` and HTTP 503.
+5. With a live result (App B with `DATABASE_URL`): confidence shows Low/Medium/High per identity, portion and nutrition match, labeled "heuristic, uncalibrated", with no percentage. Record a correction: it appears under "User corrections", and the automatic result above is unchanged.
+
+The result screen and confidence rules are described in [`docs/result-ui.md`](docs/result-ui.md).
 
 ### Checks
 

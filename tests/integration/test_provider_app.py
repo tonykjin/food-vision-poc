@@ -91,3 +91,14 @@ def test_provider_auth_failure_is_typed_and_hides_provider_text():
     assert body["status"] == "failed" and body["error"]["code"] == "authentication"
     assert "fatsecret code 21" in body["error"]["message"]
     assert "SENTINEL" not in json.dumps(body)
+
+
+def test_api_applies_shared_heuristic_confidence():
+    client, _ = app_with([fixture("two_items.json")])
+    result = AnalysisResult.model_validate(post(client).json())
+    c = result.confidence
+    assert c.type == "heuristic_uncalibrated" and c.probability is None
+    assert c.rules_version == "confidence-rules-v1"
+    assert all(i.match_method == "provider" for i in result.items if i.resolved)
+    assert c.nutrition_match in ("medium", "low")  # a provider match is never rated high
+    assert c.portion != "high"  # image-only portions are never high

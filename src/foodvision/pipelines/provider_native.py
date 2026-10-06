@@ -21,6 +21,7 @@ from foodvision.contracts.requests import AnalysisContext
 from foodvision.contracts.results import (
     AnalysisResult,
     FoodSource,
+    MatchMethod,
     Nutrients,
     PortionMethod,
     ResultItem,
@@ -130,6 +131,7 @@ def normalize_item(item: dict[str, Any]) -> ResultItem:
         portion_method=PortionMethod.PROVIDER_SUGGESTED if grams else PortionMethod.UNKNOWN,
         food_source=FoodSource.FATSECRET,
         food_id=str(food_id) if food_id is not None else None,
+        match_method=MatchMethod.PROVIDER if food_id is not None else None,
         serving_id=str(suggested["serving_id"]) if suggested.get("serving_id") else None,
         nutrients=nutrients,
         uncertainty_reasons=reasons,

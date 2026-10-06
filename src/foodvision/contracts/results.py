@@ -58,6 +58,15 @@ class FoodSource(StrEnum):
     NONE = "none"
 
 
+class MatchMethod(StrEnum):
+    """How a resolved item's food record was chosen. Structural input to confidence rules."""
+
+    PROVIDER = "provider"  # the provider matched it (App A); no provider score is implied
+    DETERMINISTIC_RANKING = "deterministic_ranking"  # clear winner among retrieved candidates
+    MODEL_SELECTION = "model_selection"  # model chose among ambiguous retrieved candidates
+    FALLBACK_TOP_CANDIDATE = "fallback_top_candidate"  # selection unavailable; top rank used
+
+
 class ConfidenceType(StrEnum):
     HEURISTIC_UNCALIBRATED = "heuristic_uncalibrated"
     EMPIRICAL_CALIBRATED = "empirical_calibrated"
@@ -98,6 +107,7 @@ class ResultItem(Strict):
     food_source: FoodSource = FoodSource.NONE
     food_id: str | None = None
     serving_id: str | None = None
+    match_method: MatchMethod | None = None
     nutrients: Nutrients = Field(default_factory=Nutrients)
     uncertainty_reasons: list[str] = Field(default_factory=list)
     portion_scenarios: PortionScenarios | None = None
@@ -140,11 +150,16 @@ class Confidence(Strict):
     portion: ConfidenceLevel | None = None
     nutrition_match: ConfidenceLevel | None = None
     reasons: list[str] = Field(default_factory=list)
+    rules_version: str | None = None
     probability: Annotated[float, Field(ge=0, le=1, allow_inf_nan=False)] | None = None
     calibration_version: str | None = None
 
     @model_validator(mode="after")
     def _probability_requires_calibration(self) -> Self:
+        if self.type is ConfidenceType.UNAVAILABLE and any(
+            (self.label, self.identity, self.portion, self.nutrition_match)
+        ):
+            raise ValueError("unavailable confidence must not carry levels")
         calibrated = self.type is ConfidenceType.EMPIRICAL_CALIBRATED
         if self.probability is not None and not (calibrated and self.calibration_version):
             raise ValueError("probability requires empirical calibration and calibration_version")

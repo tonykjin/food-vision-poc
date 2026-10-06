@@ -1,6 +1,7 @@
 """Shared Streamlit upload/analyze page. The UI holds no secrets: it only calls its own API.
 
-POC-11 (#11) replaces the result display with the shared result cards and confidence.
+The automatic result is stored once per Analyze press and only replaced by the next press, so
+reruns (for example recording a correction) never alter it. Result cards: `ui.result_view`.
 """
 
 import os
@@ -10,7 +11,7 @@ import httpx
 import streamlit as st
 
 from foodvision.config import AppKind
-from foodvision.nutrition.display import format_nutrient
+from foodvision.ui.result_view import outcome_from_response, render_outcome
 
 TITLES = {
     AppKind.PROVIDER: "App A: Provider POC (fatsecret)",
@@ -24,16 +25,30 @@ DEFAULT_API_URLS = {
 FATSECRET_ATTRIBUTION = (
     '<a href="https://platform.fatsecret.com">Powered by fatsecret Platform API</a>'
 )
-NUTRIENT_LABELS = {
-    "energy_kcal": "Energy",
-    "protein_g": "Protein",
-    "carbohydrate_g": "Carbohydrate",
-    "fat_g": "Fat",
-}
+RESULT_KEY = "fv_automatic_result"  # {"http_status", "body", "wait_ms"}; replaced per press
+CORRECTIONS_KEY = "fv_corrections"  # scan_id -> list of corrections; never merged into results
 
 
-def _fmt(value: float | None) -> str:
-    return "unknown" if value is None else f"{value:.1f}"
+def _analyze(api_url: str, upload) -> dict:
+    started = time.perf_counter()
+    try:
+        response = httpx.post(
+            f"{api_url}/v1/analyze",
+            files={"image": (upload.name, upload.getvalue(), upload.type)},
+            timeout=60,
+        )
+    except httpx.HTTPError as exc:
+        return {
+            "http_status": None,
+            "body": {"code": "request_failed", "message": type(exc).__name__},
+            "wait_ms": None,
+        }
+    wait_ms = (time.perf_counter() - started) * 1000
+    try:
+        body = response.json()
+    except ValueError:
+        body = {"code": "error", "message": "The API returned a non-JSON response."}
+    return {"http_status": response.status_code, "body": body, "wait_ms": wait_ms}
 
 
 def render_page(kind: AppKind) -> None:
@@ -58,61 +73,18 @@ def render_page(kind: AppKind) -> None:
         st.markdown(FATSECRET_ATTRIBUTION, unsafe_allow_html=True)
 
     upload = st.file_uploader("Food photo", type=["jpg", "jpeg", "png", "webp"])
-    if upload is None or not st.button("Analyze", type="primary"):
+    if upload is not None and st.button("Analyze", type="primary"):
+        with st.spinner("Analyzing..."):
+            st.session_state[RESULT_KEY] = _analyze(api_url, upload)
+
+    stored = st.session_state.get(RESULT_KEY)
+    if stored is None:
+        st.caption("Upload a food photo and press Analyze.")
         return
-
-    started = time.perf_counter()
-    try:
-        response = httpx.post(
-            f"{api_url}/v1/analyze",
-            files={"image": (upload.name, upload.getvalue(), upload.type)},
-            timeout=60,
-        )
-    except httpx.HTTPError as exc:
-        st.error(f"Request failed: {type(exc).__name__}")
-        return
-    wait_ms = (time.perf_counter() - started) * 1000
-    body = response.json()
-
-    if response.status_code != 200:
-        st.error(f"{body.get('code', 'error')}: {body.get('message', response.text)}")
-        st.caption(f"HTTP {response.status_code} · scan {body.get('scan_id')}")
-        return
-
-    if body.get("is_mock"):
-        st.warning("MOCK result (synthetic). Do not interpret as nutrition data.")
-    st.subheader(f"Status: {body['status']}")
-    for warning in body.get("warnings", []):
-        st.info(warning)
-
-    totals = body["totals"]
-    st.markdown(f"**Totals ({totals['status']})**")
-    if totals["status"] != "complete":
-        st.warning(
-            f"Totals are {totals['status']}: {totals['excluded_items']} item(s) excluded; "
-            "unknown nutrients are not counted as zero."
-        )
-    st.table(
-        {
-            NUTRIENT_LABELS[k]: [format_nutrient(k, totals["nutrients"].get(k))]
-            for k in NUTRIENT_LABELS
-        }
-    )
-
-    st.markdown("**Items**")
-    for item in body.get("items", []):
-        portion = item.get("portion_g")
-        state = "resolved" if item.get("resolved") else "unresolved"
-        st.write(
-            f"- {item['name']} · {state} · source: {item.get('food_source')} · "
-            f"portion: {'unknown' if portion is None else f'{portion:.0f} g'} "
-            f"({item.get('portion_method')})"
-        )
-        for reason in item.get("uncertainty_reasons", []):
-            st.caption(f"  {reason}")
-
-    server_ms = body.get("metrics", {}).get("server_total_ms")
-    st.caption(
-        f"server_total_ms: {_fmt(server_ms)} · UI-to-API wait: {wait_ms:.0f} ms "
-        "(not click-to-render) · client_total_ms: unavailable"
+    corrections = st.session_state.setdefault(CORRECTIONS_KEY, {})
+    render_outcome(
+        st,
+        outcome_from_response(stored["http_status"], stored["body"]),
+        stored["wait_ms"],
+        corrections,
     )

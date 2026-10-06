@@ -14,7 +14,7 @@ from tests.unit.test_claude_vision import ITEM, message, provider
 
 from foodvision.contracts.errors import ErrorCode
 from foodvision.contracts.requests import AnalysisContext
-from foodvision.contracts.results import ResultStatus, TotalsStatus
+from foodvision.contracts.results import MatchMethod, ResultStatus, TotalsStatus
 from foodvision.measurement.budget import BudgetPolicy
 from foodvision.measurement.clock import ManualClock
 from foodvision.measurement.events import ScanStatus
@@ -94,6 +94,7 @@ def test_ambiguous_item_uses_second_call_and_nutrients_come_from_code(catalog_lo
     assert model_calls(fake) == 2
     (item,) = result.items
     assert item.resolved and item.food_id == "fdc:168878" and item.food_source == "USDA"
+    assert item.match_method is MatchMethod.MODEL_SELECTION
     assert item.nutrients.energy_kcal == pytest.approx(195.0)  # 130 × 1.5, computed in code
     assert item.nutrients.protein_g == pytest.approx(4.035)  # 2.69 × 1.5
     assert result.status is ResultStatus.COMPLETE
@@ -109,7 +110,7 @@ def test_invented_id_is_rejected_and_item_left_unresolved(catalog_loaded, login_
         login_as,
     )
     (item,) = result.items
-    assert not item.resolved and item.food_id is None
+    assert not item.resolved and item.food_id is None and item.match_method is None
     assert any("not among the retrieved candidates" in r for r in item.uncertainty_reasons)
     assert result.status is ResultStatus.PARTIAL
     assert result.totals.status is TotalsStatus.UNAVAILABLE
@@ -137,6 +138,7 @@ def test_clear_winner_skips_the_second_call(catalog_loaded, login_as):
     assert model_calls(fake) == 1
     (item,) = result.items
     assert item.food_id == "fdc:2397108"
+    assert item.match_method is MatchMethod.DETERMINISTIC_RANKING
     assert item.nutrients.energy_kcal == pytest.approx(170.2)  # 370 × 0.46
 
 
@@ -187,6 +189,7 @@ def test_call_budget_blocks_selection_and_falls_back_to_top_candidate(catalog_lo
     assert any("Selection call unavailable (max_model_calls)" in w for w in result.warnings)
     (item,) = result.items
     assert item.resolved and any("top-ranked candidate used" in r for r in item.uncertainty_reasons)
+    assert item.match_method is MatchMethod.FALLBACK_TOP_CANDIDATE
     record = rec.finish(ScanStatus(result.status.value))
     assert record.model_calls == 2 and record.blocked_attempts == 1
 

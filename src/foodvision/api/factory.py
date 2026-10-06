@@ -9,10 +9,16 @@ from foodvision import __version__
 from foodvision.config import AppKind, AppSettings, load_settings
 from foodvision.contracts.errors import ErrorCode, ErrorResponse
 from foodvision.contracts.requests import AnalysisContext
-from foodvision.contracts.results import SCHEMA_VERSION, AnalysisResult, InputProvenance
+from foodvision.contracts.results import (
+    SCHEMA_VERSION,
+    AnalysisResult,
+    ConfidenceType,
+    InputProvenance,
+)
 from foodvision.imaging.prepare import ImagePreparationError, prepare_image
 from foodvision.imaging.profiles import BASELINE
 from foodvision.measurement.budget import BudgetPolicy
+from foodvision.measurement.confidence import assess_confidence
 from foodvision.measurement.events import ScanStatus, Stage
 from foodvision.measurement.sinks import InMemorySink
 from foodvision.measurement.spans import ScanRecorder
@@ -177,6 +183,9 @@ def create_app(
             language=settings.language,
         )
         result = pipeline.analyze(prepared, context, recorder)
+        if result.confidence.type is ConfidenceType.UNAVAILABLE:
+            # Same structural rules for both apps; never from model or provider self-ratings.
+            result.confidence = assess_confidence(result)
         result.input = InputProvenance(
             original_sha256=prepared.original_sha256,
             processed_sha256=prepared.processed_sha256,

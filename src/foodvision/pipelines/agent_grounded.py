@@ -22,6 +22,7 @@ from foodvision.contracts.requests import AnalysisContext
 from foodvision.contracts.results import (
     AnalysisResult,
     FoodSource,
+    MatchMethod,
     ModelProvenance,
     ResultItem,
     ResultStatus,
@@ -62,6 +63,7 @@ class _Item:
     hypothesis: FoodHypothesis
     candidates: list[Candidate] = field(default_factory=list)
     chosen: str | None = None
+    method: MatchMethod | None = None
     reasons: list[str] = field(default_factory=list)
 
 
@@ -130,6 +132,7 @@ class GroundedPipeline:
                 continue
             if is_clear_winner(item.candidates):
                 item.chosen = item.candidates[0].food_id
+                item.method = MatchMethod.DETERMINISTIC_RANKING
                 item.reasons.append("catalog record chosen by deterministic ranking")
             else:
                 ambiguous[index] = (item.hypothesis, item.candidates)
@@ -155,6 +158,7 @@ class GroundedPipeline:
             )
             for index in ambiguous:
                 items[index].chosen = items[index].candidates[0].food_id
+                items[index].method = MatchMethod.FALLBACK_TOP_CANDIDATE
                 items[index].reasons.append(
                     "ambiguous match: selection call unavailable, top-ranked candidate used"
                 )
@@ -176,6 +180,7 @@ class GroundedPipeline:
                 item.reasons.append("selection: no candidate fits (no_match)")
             else:
                 item.chosen = chosen
+                item.method = MatchMethod.MODEL_SELECTION
                 item.reasons.append("catalog record chosen among candidates by the model")
         return warnings
 
@@ -203,6 +208,7 @@ class GroundedPipeline:
                 "resolved": True,
                 "food_source": FoodSource.USDA,
                 "food_id": item.chosen,
+                "match_method": item.method,
                 "nutrients": nutrients,
                 "uncertainty_reasons": reasons,
             }

@@ -2,10 +2,10 @@
 
 Handoff record for Claude Code sessions. GitHub Issues stay the source of truth for engineering status once they exist (Prompt 09). No secrets or restricted provider payloads belong in this file.
 
-**Last updated:** 2026-10-02
+**Last updated:** 2026-10-06
 **Baseline:** `docs/project-plan.md` (Section 12), executed via `docs/claude-code-prompt-playbook.md`
 **Repository:** https://github.com/tonykjin/food-vision-poc (private, default branch `main`)
-**Local workspace:** `C:\Users\tonyj\OneDrive\Desktop\food-vision-poc`
+**Local workspace:** `C:\Users\tonyj\Desktop\food-vision-poc` (fresh clone, 2026-10-06; outside OneDrive). The old OneDrive copy still exists and holds the env files.
 
 ## Current step
 
@@ -241,7 +241,7 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - **One live call** (user-authorized smoke): `end_turn`, `claude-opus-5-5`, no fallback, 5 items valid, 12.9 s, 1,871/1,038 tokens, ≈ $0.028.
 - **Not measured:** recognition quality (needs reference meals). Refusal, fallback and truncation weren't triggered live. Latency (12.9 s for the recognition call alone) is close to the provisional 15 s p95 target.
 
-**Prompt 18: POC-10 bounded matching and grounded calculation** ([#10](https://github.com/tonykjin/food-vision-poc/issues/10)). Status: **implemented, verified, live smoke passed** (2026-10-03) on branch `feat/poc-10-grounded-matching`. Not committed. Details are in `docs/app-b-grounded.md`.
+**Prompt 18: POC-10 bounded matching and grounded calculation** ([#10](https://github.com/tonykjin/food-vision-poc/issues/10)). Status: **merged and closed** (2026-10-03) via [PR #28](https://github.com/tonykjin/food-vision-poc/pull/28), merge commit `0337c3b`. CI passed: 330 tests. Details are in `docs/app-b-grounded.md`.
 - **Pipeline:** `pipelines/agent_grounded.py` (`B_grounded`, the default mode): recognize (call 1) → retrieve (preparation filter before ranking, brand pool, ≤5 items) → deterministic clear winner or one batched selection call (call 2, candidate IDs or `no_match` only) → calculate in code.
 - **Fallback:** if the call budget is exhausted, ambiguous items use the top candidate, labeled.
 - **Safety:** runtime isolation check on the database login; no tools offered to the model.
@@ -258,6 +258,24 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Run-to-run variation needs repeatability measurement.
   - The user needs to create an `fv_inference` login and add `DATABASE_URL` to `.env.agent.local` for the live App B UI.
 
+**Workspace move (2026-10-06):** work continues in a fresh clone at `C:\Users\tonyj\Desktop\food-vision-poc` (`main` = `origin/main` = `0337c3b`, clean).
+- uv, gh and the system Python 3.12 were missing on this machine. With your approval, Claude reinstalled uv 0.12.23 and gh 2.102.0 via winget. uv provides Python 3.12.15 for the project.
+- `uv sync --frozen` OK. `uv run ruff check .` passed. `uv run pytest`: 283 passed, 47 skipped (no DB), matching the POC-10 baseline.
+- Done since: you ran `gh auth login` (as `tonykjin`; the token lacks the `workflow` scope, which is only needed if a PR edits `.github/workflows/`) and moved both env files here (presence checked only). Compose Postgres runs here; the local catalog/inference login for live App B is not set up in this clone.
+
+**Prompt 19:** not re-run. A is still blocked on the fatsecret `invalid_scope`; B's live smoke runs are recorded under Prompt 17/18.
+
+**Prompt 20: POC-11 shared result UI and heuristic confidence** ([#11](https://github.com/tonykjin/food-vision-poc/issues/11)). Status: **implemented and verified locally** (2026-10-06) on branch `feat/poc-11-result-ui`. Not pushed. Details are in `docs/result-ui.md`.
+- **UI:** `ui/result_view.py` is shared by both apps. It shows the state banners (complete/partial/abstained/failed, with HTTP errors rendered as failed) and labeled partial totals with unknown kept as unknown. Also shown: per-item portion and assumption range, source/match method, reasons, "Reference unavailable", backend time, `client_total_ms` unavailable, and provenance. The automatic result is kept in session state and never edited; corrections are stored separately, session only, and nothing is recalculated.
+- **Confidence:** `measurement/confidence.py` (`confidence-rules-v1`) is applied by the shared API factory. It uses structural fields only, with no probability. Image-only portions are never High, so no image-only scan is High overall. MOCK, failed and abstained results are "not assessed".
+- **Contract (additive, schema 1.0):** `ResultItem.match_method`, `Confidence.rules_version`; unavailable confidence can't carry levels. Both pipelines set `match_method`.
+- **Verified:**
+  - `ruff check` passed. `pytest` with DB (Compose Postgres): 370 passed, 0 skipped. Without DB: 323 passed, 47 skipped.
+  - Mutation spot-check: image portion rated High, unknown shown as 0, a percentage shown, and fallback not lowered were each caught.
+  - Browser (Claude in Chrome, MOCK mode, synthetic image): both apps rendered the partial MOCK result with unknown nutrients, "Confidence: not assessed", "Reference unavailable" and `client_total_ms` unavailable.
+  - Complete/partial/abstained/failed and correction screens were checked headlessly (AppTest) with synthetic results.
+- **Not verified:** a live result in the browser; browser click-to-render timing (not implemented).
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -270,7 +288,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. Claude: **Prompt 18: POC-10 bounded matching and grounded calculation** ([#10](https://github.com/tonykjin/food-vision-poc/issues/10)). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
+User: run the README human UI checks for #2, then close it. Claude: push `feat/poc-11-result-ui` and open the POC-11 PR (needs your OK), then **Prompt 21: reference data and manifest** (POC-12, [#12](https://github.com/tonykjin/food-vision-poc/issues/12), needs real meals). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

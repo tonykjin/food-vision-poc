@@ -46,6 +46,8 @@ def test_mock_result_is_labeled_and_has_no_invented_nutrients(kind, pipeline_id)
         assert item["resolved"] is False
         assert item["food_source"] == "mock"
         assert all(value is None for value in item["nutrients"].values())
+    assert body["confidence"]["type"] == "unavailable"  # MOCK is never assessed
+    assert body["confidence"]["label"] is None
     assert body["metrics"]["server_total_ms"] >= 0
 
 

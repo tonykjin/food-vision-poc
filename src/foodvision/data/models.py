@@ -330,10 +330,13 @@ samples = Table(
     Column("group_id", Text, nullable=False, index=True),
     Column("category", Text, nullable=False),
     Column("split", Text, nullable=False),
+    # 'abstain' marks inputs where abstaining is the correct answer (plan §11 difficult inputs).
+    Column("expected_outcome", Text, nullable=False, server_default="estimate"),
     Column("reference_version", Text, nullable=False),
     synthetic(),
     created_at(),
     CheckConstraint("split IN ('development', 'calibration', 'test')", name="split"),
+    CheckConstraint("expected_outcome IN ('estimate', 'abstain')", name="expected_outcome"),
     schema=BENCHMARK,
 )
 

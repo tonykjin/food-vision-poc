@@ -93,6 +93,24 @@ class AgentSettings(CommonSettings):
 
 AppSettings = ProviderSettings | AgentSettings
 
+EVALUATOR_ENV_FILE = ".env.evaluator.local"
+
+
+class EvaluatorSettings(BaseSettings):
+    """Evaluator-only settings: never loaded by either app (plan §5 separate credentials)."""
+
+    model_config = SettingsConfigDict(
+        env_file=EVALUATOR_ENV_FILE,
+        extra="ignore",
+        env_ignore_empty=True,
+        env_file_encoding="utf-8",
+    )
+
+    # An fv_evaluator login (reads everything, writes benchmark). Never an app's DATABASE_URL.
+    evaluator_database_url: SecretStr | None = None
+    # Private directory outside Git: photos, group JSON files and the image object store.
+    benchmark_data_dir: Path | None = None
+
 
 def load_settings(kind: AppKind, env_file: Path | str | None = None) -> AppSettings:
     """Load one app's settings from the process environment and its own env file."""

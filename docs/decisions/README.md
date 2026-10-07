@@ -9,6 +9,7 @@ Name files `NNNN-short-title.md`, numbered in sequence. Don't rewrite an accepte
 | ADR | Title | Status |
 |---|---|---|
 | [0001](0001-adopt-plan-baseline.md) | Adopt the project plan as the baseline | Accepted |
+| [0002](0002-evaluator-registers-benchmark-images.md) | Evaluator registers benchmark images; manifests are group files outside Git | Proposed |
 
 ## Template
 

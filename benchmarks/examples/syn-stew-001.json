@@ -1,0 +1,95 @@
+{
+  "manifest_version": "benchmark-manifest-v1",
+  "is_synthetic": true,
+  "region": "US",
+  "collected_on": "2026-10-07",
+  "split": null,
+  "group_id": "syn-stew-001",
+  "family_id": "syn-stew-recipe",
+  "category": "composite_dish",
+  "quality_grade": "A",
+  "photos": [
+    {
+      "photo_id": "syn-stew-001-top",
+      "file": "photos/syn-stew-001-top.jpg",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "rights": "owned",
+      "consent_reference": "SYNTHETIC: no real photo",
+      "retain_until": "2027-10-07"
+    }
+  ],
+  "recipe": {
+    "dish_identity": "SYNTHETIC stew",
+    "cooked_yield_grams": 1000,
+    "served_grams": 250,
+    "ingredients": [
+      {
+        "identity": "SYNTHETIC beef, raw",
+        "preparation": "raw",
+        "edible_grams": 400,
+        "measurement": "weighed",
+        "values": {
+          "source": "usda_fdc",
+          "source_ref": "SYNTHETIC-not-a-real-record-3",
+          "source_version": "SYNTHETIC",
+          "basis": "per_100g",
+          "energy": {
+            "amount": 200,
+            "unit": "kcal"
+          },
+          "protein": {
+            "amount": 20,
+            "unit": "g"
+          },
+          "carbohydrate": {
+            "amount": 0,
+            "unit": "g"
+          },
+          "fat": {
+            "amount": 12,
+            "unit": "g"
+          }
+        }
+      },
+      {
+        "identity": "SYNTHETIC potato, raw",
+        "preparation": "raw",
+        "edible_grams": 500,
+        "measurement": "weighed",
+        "values": {
+          "source": "usda_fdc",
+          "source_ref": "SYNTHETIC-not-a-real-record-4",
+          "source_version": "SYNTHETIC",
+          "basis": "per_100g",
+          "energy": {
+            "amount": 80,
+            "unit": "kcal"
+          },
+          "protein": {
+            "amount": 2,
+            "unit": "g"
+          },
+          "carbohydrate": {
+            "amount": 18,
+            "unit": "g"
+          },
+          "fat": {
+            "amount": 0,
+            "unit": "g"
+          }
+        }
+      }
+    ]
+  },
+  "review": {
+    "status": "reviewed",
+    "reviewers": [
+      {
+        "reviewer": "SYNTHETIC reviewer",
+        "reviewed_on": "2026-10-07"
+      }
+    ],
+    "disagreements_resolved": true,
+    "notes": "SYNTHETIC example, not a collected meal"
+  }
+}

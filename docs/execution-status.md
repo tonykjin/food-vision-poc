@@ -290,6 +290,17 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Found and fixed on `test/poc-11-browser-checks`: a stale result stayed visible after a different photo was uploaded, and identical confidence reasons repeated per item.
 - **Vision fix (`fix/vision-schema-limits`):** `recognize-food-v2` states every server-side limit (a test keeps the prompt and the constants in sync), and validation failures now record field paths and error types only. Live smoke with v2: `partial`, 7 items (4 grounded), 18.6 s + 8.8 s, about $0.066. Paid today: 3 Anthropic calls (≈ $0.10), 1 fatsecret image request.
 
+- Both merged 2026-10-07 (PR #31 UI fixes, PR #32 vision prompt v2).
+
+**Prompt 21: POC-12 reference collection workflow and manifest validator** ([#12](https://github.com/tonykjin/food-vision-poc/issues/12)). Status: **tooling implemented and verified locally** (2026-10-07) on branch `feat/poc-12-reference-data`; **0 real reference groups collected**. Details: `benchmarks/protocol.md`, `benchmarks/dataset-card.md`, ADR 0002.
+- **Manifest** (`benchmark/manifest.py`, `benchmark-manifest-v1`): one JSON file per meal/product group (or JSONL), kept in a private folder outside Git. Covers group/family IDs, category, region, split, consent and rights per photo (owned/consented only; stock can't be recorded), edible grams with measurement method, source values with an explicit basis, recipe with cooked yield and served grams, grade A/B/C, expected outcome (estimate/abstain) and reviewers. Reference nutrients are **calculated** with the shared calculator; unknown stays unknown.
+- **`validate-manifest`:** schema, duplicate IDs, the same photo in two groups, a family spanning splits (leakage), photo file presence and hash, unit-basis errors (e.g. grams against an ml basis without density), grade claims vs evidence, missing references, unreviewed or unassigned groups, single reviewers, and real data in a tracked part of the repo. Prints progress (real vs synthetic, the development milestone 0/30, per-split category counts) and the human work left.
+- **`assign-splits`:** deterministic, seeded, family-safe; development fills to 30 first, existing splits never change.
+- **`load-manifest`:** evaluator login only (refuses superuser, inference and non-evaluator logins; checks that `fv_inference` still can't read benchmark tables). Loads reviewed groups with a split as `<version>@<manifest hash>`; versioned sample IDs keep earlier versions. Migration `0003`: `samples.expected_outcome`, plus `GRANT INSERT ON telemetry.images TO fv_evaluator` (ADR 0002). The local dev DB is at `0003`.
+- **Docs:** `benchmarks/protocol.md` (exact weighing, photo and review steps), `collection-form.md`, `dataset-card.md`, 4 synthetic examples in `benchmarks/examples/` (never counted).
+- **Verified:** `ruff check` passed. `pytest` with DB: 407 passed, 0 skipped. Mutation spot-check: family leakage ignored, evaluator membership not checked, estimated grams allowed for grade A, and synthetic counted as real were each caught.
+- **Not done (human work):** collect and review 30 real development groups. #12 stays open and blocked until then. No accuracy study is ready.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -302,7 +313,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: run the README human UI checks for #2, then close it. User: add a photo you own as the test image, and add a `DATABASE_URL` inference login to `.env.agent.local` for the live App B UI. Claude: **Prompt 21: reference data and manifest** (POC-12, [#12](https://github.com/tonykjin/food-vision-poc/issues/12), needs real meals). User: register IP / confirm the fatsecret add-on, then decide whether to run `foodvision smoke-fatsecret`; send the vendor rights questions.
+User: (1) start collecting the 30 development meals (`benchmarks/protocol.md`); create `.env.evaluator.local` and an `fv_evaluator` login when ready to load. (2) Send the fatsecret storage-rights questions (`docs/vendor-questions-fatsecret.md`); App A works live but nothing durable can be stored until they're answered. (3) Run the README UI checks for #2 and close it. (4) Optional: a photo you own as the test image; a `DATABASE_URL` inference login in `.env.agent.local` for the live App B UI. Claude: merge-ready POC-12 tooling PR; then **Prompt 22: benchmark runner** (POC-13, [#13](https://github.com/tonykjin/food-vision-poc/issues/13)), built and tested on synthetic fixtures until real meals exist.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

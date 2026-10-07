@@ -319,6 +319,12 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Verified:** `ruff check` passed. `pytest` with DB: 431 passed. Synthetic predictions give the hand-computed metrics, including failures in the denominator, a zero fat target and a reference below the floor. Mutation spot-check: failures dropped from the denominator, relative error below the floor, fatsecret derived metrics saved, a bootstrap over repeats instead of groups, and no order rotation were each caught.
 - **Not done:** `apps/compare_ui.py` (README lists it under POC-13; Prompt 22 doesn't ask for it); concurrency above 1 (refused); real runs (need reviewed meals).
 
+**Prompt 23: development run (pipeline smoke version)** (2026-10-07). With your direction ("make up something", PoC), it ran on a **synthetic** manifest: an invented reference plus the user-approved stock photo. **Not an accuracy result.** Report: `docs/dev-runs/2026-10-07-pipeline-smoke.md`.
+- Baseline batch: A_native and B_grounded, 1 photo × 3 repeats, caps $10 and 200 scans. A: complete 3/3, p50 4.7 s. B: partial 3/3 (2 items over the 5-item cap, the sauce `no_match`), p50 22.8 s, $0.184.
+- Fix (PR #37, stacked on #36): the B item cap went from 5 to 8 (config `max-items-8`). B-only rerun: still partial 3/3, now only the sauce; coverage 60% → 86%; $0.197; latency unchanged.
+- Backlog: sauce/condiment retrieval and B latency, both needing real-meal evidence.
+- Total spend: $0.38 Anthropic plus 3 fatsecret image requests.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

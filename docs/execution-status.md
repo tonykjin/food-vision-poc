@@ -284,6 +284,11 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
   - Browser (Claude in Chrome, MOCK mode, synthetic image): both apps rendered the partial MOCK result with unknown nutrients, "Confidence: not assessed", "Reference unavailable" and `client_total_ms` unavailable.
   - Complete/partial/abstained/failed and correction screens were checked headlessly (AppTest) with synthetic results.
 - **Not verified:** a live result in the browser; browser click-to-render timing (not implemented).
+- **Live browser checks (2026-10-07, Chrome, stock smoke image, each app run alone):**
+  - App A alone (B not running): idle, upload, the bad-file failure (400 `invalid_image`, no fatsecret call), the "Analyzing..." loading state, a live **complete** result (Medium confidence across all three, "Reference unavailable", 7.9 s backend) and API-down all rendered correctly. fatsecret values were only displayed, never written down.
+  - App B alone (A stopped): a live run **failed** with `invalid_schema` (24 s, about $0.037). The failed state rendered correctly. Root cause: structured outputs can't enforce length or bound constraints, and `recognize-food-v1` didn't state several of ours. Fixed on `fix/vision-schema-limits` (below).
+  - Found and fixed on `test/poc-11-browser-checks`: a stale result stayed visible after a different photo was uploaded, and identical confidence reasons repeated per item.
+- **Vision fix (`fix/vision-schema-limits`):** `recognize-food-v2` states every server-side limit (a test keeps the prompt and the constants in sync), and validation failures now record field paths and error types only. Live smoke with v2: `partial`, 7 items (4 grounded), 18.6 s + 8.8 s, about $0.066. Paid today: 3 Anthropic calls (≈ $0.10), 1 fatsecret image request.
 
 ## Blockers
 

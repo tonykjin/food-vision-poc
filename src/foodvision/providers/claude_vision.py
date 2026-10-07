@@ -93,6 +93,17 @@ class RecognitionResponse:
     request_id: str | None
 
 
+def validation_summary(exc: ValidationError, limit: int = 3) -> str:
+    """Field paths and error types only (e.g. `items.3.evidence string_too_long`).
+
+    Never includes the rejected values or pydantic's messages, which can echo model output.
+    """
+    errors = exc.errors(include_input=False, include_url=False, include_context=False)
+    parts = [f"{'.'.join(str(p) for p in e['loc']) or '<root>'} {e['type']}" for e in errors]
+    more = f"; +{len(parts) - limit} more" if len(parts) > limit else ""
+    return "; ".join(parts[:limit]) + more
+
+
 def _usage(response: Any) -> ProviderUsage | None:
     usage = getattr(response, "usage", None)
     if usage is None:
@@ -233,6 +244,8 @@ class ClaudeVisionProvider:
                 output = validate(json.loads(text or ""))
             except (json.JSONDecodeError, ValidationError, ValueError) as exc:
                 kind = "not JSON" if isinstance(exc, json.JSONDecodeError) else "failed validation"
+                if isinstance(exc, ValidationError):
+                    kind += f": {validation_summary(exc)}"
                 raise VisionAttemptError(
                     AttemptOutcome.CLIENT_ERROR,
                     code=ErrorCode.INVALID_SCHEMA,

@@ -280,3 +280,33 @@ def test_prompt_hash_ignores_line_endings_and_configuration_id_is_versioned():
     vision, _ = provider([])
     assert vision.configuration_id.startswith("B:anthropic:claude-opus-5-5:effort-medium:")
     assert digest[:12] in vision.configuration_id
+
+
+def test_validation_failure_names_the_field_and_rule_but_no_content():
+    long_text = "SENTINEL model text " * 20  # 400 characters
+    bad = {**GOOD, "items": [{**ITEM, "evidence": long_text, "uncertainty": ["x"] * 7}]}
+    vision, _ = provider([message(payload=bad)])
+    with pytest.raises(VisionAttemptError) as info:
+        vision.recognize(IMAGE, recorder())
+    detail = info.value.detail
+    assert "items.0.evidence string_too_long" in detail
+    assert "items.0.uncertainty too_long" in detail
+    assert "SENTINEL" not in detail  # rejected values never reach errors or telemetry
+
+
+def test_prompt_states_every_server_side_limit():
+    # Structured outputs can't enforce lengths or bounds, so the prompt must state them all.
+    from foodvision.recognition import hypotheses as h
+
+    prompt = load_prompt()[0]
+    assert h.PROMPT_VERSION == "recognize-food-v2"
+    for phrase in (
+        f"at most {h.MAX_TEXT_CHARS} characters",
+        f"`visible_brand` is at most {h.MAX_BRAND_CHARS} characters",
+        f"`image_assessment.notes` is at most {h.MAX_NOTES_CHARS} characters",
+        f"`alternatives` has at most {h.MAX_ALTERNATIVES} entries",
+        f"`uncertainty` at most {h.MAX_UNCERTAINTY}",
+        f"at most {h.MAX_PORTION_G:.0f}, with low ≤ base ≤ high",
+        f"At most {h.MAX_ITEMS} items",
+    ):
+        assert phrase in prompt, phrase

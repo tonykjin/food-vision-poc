@@ -17,7 +17,7 @@ Docs checked 2026-10-02:
 | Effort | `medium` (set explicitly) | `VISION_EFFORT` |
 | `max_tokens` | 16000 | `VISION_MAX_TOKENS` |
 | Output | `output_config.format` JSON schema (`recognition/hypotheses.py`) | n/a |
-| Prompt | `prompts/recognize-food-v1.md`, SHA-256 over LF-normalized text | `PROMPT_VERSION` in code |
+| Prompt | `prompts/recognize-food-v2.md` (since 2026-10-07; v1 kept for provenance), SHA-256 over LF-normalized text | `PROMPT_VERSION` in code |
 | Refusal fallback | server-side `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`) | `VISION_REFUSAL_FALLBACK` |
 | Image | base64 JPEG, placed before the text | n/a |
 
@@ -41,8 +41,13 @@ Each food the model reports includes:
 - grams > 0, at most 3000, and low ≤ base ≤ high
 - known preparation values only
 - no extra fields
-- at most 8 items and 3 alternatives
+- at most 8 items, 3 alternatives and 6 uncertainty reasons
+- text fields non-empty and at most 200 characters (brand 100, notes 300)
 - no items when the model says the image shows no food
+
+Claude's structured outputs don't support length, numeric-bound or complex array constraints, so the model learns these limits **only from the prompt**. `recognize-food-v1` left several unstated, and a live App B run on 2026-10-07 failed with `invalid_schema` (about $0.037). `recognize-food-v2` states every limit, and a test keeps the prompt and the code constants in sync.
+
+A validation failure now records the failing field paths and error types (for example `items.3.evidence string_too_long`), never the rejected values.
 
 ## Failures (typed, never fabricated)
 

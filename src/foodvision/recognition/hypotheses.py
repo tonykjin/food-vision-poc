@@ -16,12 +16,16 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from foodvision.catalog.preparation import PreparationState
 
 PROMPTS_DIR = Path(__file__).resolve().parents[3] / "prompts"
-PROMPT_VERSION = "recognize-food-v1"
+PROMPT_VERSION = "recognize-food-v2"  # v2 states every limit below; v1 kept for provenance
 MAX_ITEMS = 8
 MAX_ALTERNATIVES = 3
 MAX_PORTION_G = 3000.0
+MAX_UNCERTAINTY = 6
+MAX_TEXT_CHARS = 200
+MAX_BRAND_CHARS = 100
+MAX_NOTES_CHARS = 300
 
-ShortText = Annotated[str, Field(min_length=1, max_length=200)]
+ShortText = Annotated[str, Field(min_length=1, max_length=MAX_TEXT_CHARS)]
 
 
 class Preparation(StrEnum):
@@ -49,14 +53,14 @@ class FoodHypothesis(BaseModel):
     display_name: ShortText
     search_description: ShortText
     preparation: Preparation
-    visible_brand: Annotated[str, Field(max_length=100)] | None
+    visible_brand: Annotated[str, Field(max_length=MAX_BRAND_CHARS)] | None
     portion_grams_low: Annotated[float, Field(gt=0, le=MAX_PORTION_G, allow_inf_nan=False)]
     portion_grams_base: Annotated[float, Field(gt=0, le=MAX_PORTION_G, allow_inf_nan=False)]
     portion_grams_high: Annotated[float, Field(gt=0, le=MAX_PORTION_G, allow_inf_nan=False)]
     portion_assumptions: ShortText
     alternatives: list[ShortText] = Field(max_length=MAX_ALTERNATIVES)
     evidence: ShortText
-    uncertainty: list[ShortText] = Field(max_length=6)
+    uncertainty: list[ShortText] = Field(max_length=MAX_UNCERTAINTY)
     is_composite: bool
 
     @model_validator(mode="after")
@@ -71,7 +75,7 @@ class ImageAssessment(BaseModel):
 
     is_food_image: bool
     multiple_foods: bool
-    notes: Annotated[str, Field(max_length=300)]
+    notes: Annotated[str, Field(max_length=MAX_NOTES_CHARS)]
 
 
 class RecognitionOutput(BaseModel):

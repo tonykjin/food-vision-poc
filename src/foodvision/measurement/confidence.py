@@ -39,39 +39,37 @@ def _lowest(levels: list[ConfidenceLevel]) -> ConfidenceLevel:
 def _identity(item: ResultItem) -> tuple[ConfidenceLevel, list[str]]:
     reasons = []
     if item.alternatives:
-        reasons.append(f"{item.name}: alternative identities possible")
+        reasons.append("alternative identities possible")
     if item.preparation is None:
-        reasons.append(f"{item.name}: preparation not established")
+        reasons.append("preparation not established")
     return (ConfidenceLevel.MEDIUM if reasons else ConfidenceLevel.HIGH), reasons
 
 
 def _portion(item: ResultItem) -> tuple[ConfidenceLevel, list[str]]:
     if item.portion_g is None or item.portion_method is PortionMethod.UNKNOWN:
-        return ConfidenceLevel.LOW, [f"{item.name}: portion weight unknown"]
+        return ConfidenceLevel.LOW, ["portion weight unknown"]
     if item.portion_method is PortionMethod.MEASURED_WEIGHT:
         return ConfidenceLevel.HIGH, []
     s = item.portion_scenarios
     if s is not None and s.high_g / s.low_g >= WIDE_PORTION_RATIO:
         return ConfidenceLevel.LOW, [
-            f"{item.name}: wide portion assumption range ({s.low_g:.0f}-{s.high_g:.0f} g)"
+            f"wide portion assumption range ({s.low_g:.0f}-{s.high_g:.0f} g)"
         ]
     return ConfidenceLevel.MEDIUM, []  # estimated from the image, not measured
 
 
 def _nutrition_match(item: ResultItem) -> tuple[ConfidenceLevel, list[str]]:
     if not item.resolved:
-        return ConfidenceLevel.LOW, [f"{item.name}: no nutrition record used (unresolved)"]
+        return ConfidenceLevel.LOW, ["no nutrition record used (unresolved)"]
     if item.nutrients.missing():
-        return ConfidenceLevel.LOW, [
-            f"{item.name}: record lacks {', '.join(item.nutrients.missing())}"
-        ]
+        return ConfidenceLevel.LOW, [f"record lacks {', '.join(item.nutrients.missing())}"]
     if item.match_method is MatchMethod.FALLBACK_TOP_CANDIDATE:
-        return ConfidenceLevel.LOW, [f"{item.name}: ambiguous match, top-ranked record used"]
+        return ConfidenceLevel.LOW, ["ambiguous match, top-ranked record used"]
     if item.match_method is MatchMethod.DETERMINISTIC_RANKING:
         return ConfidenceLevel.HIGH, []
     if item.match_method is MatchMethod.MODEL_SELECTION:
-        return ConfidenceLevel.MEDIUM, [f"{item.name}: record chosen among ambiguous candidates"]
-    return ConfidenceLevel.MEDIUM, [f"{item.name}: record matched by provider; basis not checked"]
+        return ConfidenceLevel.MEDIUM, ["record chosen among ambiguous candidates"]
+    return ConfidenceLevel.MEDIUM, ["record matched by provider; basis not checked"]
 
 
 def _unavailable(reason: str) -> Confidence:
@@ -93,9 +91,14 @@ def assess_confidence(result: AnalysisResult) -> Confidence:
     levels: dict[str, ConfidenceLevel] = {}
     reasons: list[str] = []
     for key, rule in dimensions.items():
-        per_item = [rule(item) for item in result.items]
-        levels[key] = _lowest([level for level, _ in per_item])
-        reasons += [f"{key.replace('_', ' ')}: {r}" for _, rs in per_item for r in rs]
+        per_item = [(item.name, *rule(item)) for item in result.items]
+        levels[key] = _lowest([level for _, level, _ in per_item])
+        grouped: dict[str, list[str]] = {}  # same reason for several items -> one line
+        for name, _, item_reasons in per_item:
+            for r in item_reasons:
+                grouped.setdefault(r, []).append(name)
+        label = key.replace("_", " ")
+        reasons += [f"{label}: {r} ({', '.join(names)})" for r, names in grouped.items()]
     if len(result.items) >= MANY_ITEMS:
         levels["identity"] = _lowest([levels["identity"], ConfidenceLevel.MEDIUM])
         reasons.append(f"identity: {len(result.items)} items in one image")

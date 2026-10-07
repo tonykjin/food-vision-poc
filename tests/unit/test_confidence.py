@@ -169,3 +169,10 @@ def test_rules_ignore_model_self_ratings_and_free_text():
 def test_unavailable_confidence_cannot_carry_levels():
     with pytest.raises(ValueError, match="must not carry levels"):
         Confidence(type=ConfidenceType.UNAVAILABLE, label=LOW)
+
+
+def test_same_reason_for_several_items_is_one_grouped_line():
+    a, b = item(name="SYNTHETIC a", preparation=None), item(name="SYNTHETIC b", preparation=None)
+    c = assess_confidence(result(a, b))
+    lines = [r for r in c.reasons if "preparation not established" in r]
+    assert lines == ["identity: preparation not established (SYNTHETIC a, SYNTHETIC b)"]

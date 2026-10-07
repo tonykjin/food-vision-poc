@@ -40,5 +40,20 @@ The automatic result is stored in session state once per Analyze press and is ne
 ## Not done
 
 - **Browser click-to-render timing** isn't measured; `client_total_ms` stays unavailable (needs a browser-side component).
-- **Live results not seen in the browser:** App A is blocked on the fatsecret `invalid_scope` and App B needs a local `DATABASE_URL`. Complete/partial/abstained/failed screens were checked headlessly with synthetic results.
+- **Abstained and live partial screens** were checked headlessly only (synthetic results); a live App B partial result hasn't been viewed in the browser yet.
 - Correction persistence (the `corrections` table) is out of scope.
+
+## Browser verification (2026-10-07, Chrome, stock smoke image)
+
+Each app was run with the other one stopped.
+
+| State | App A (live fatsecret) | App B (live grounded) |
+|---|---|---|
+| Idle / upload | correct (attribution shown, no MOCK banner) | correct |
+| Loading | "Analyzing..." spinner | not captured |
+| Success | **complete** result: totals complete, Medium confidence on all three, "Reference unavailable", 5.9-7.9 s backend | not reached: the run failed (below) |
+| Failure | bad file → Failed, `invalid_image`, HTTP 400, no provider call | live `invalid_schema` → Failed banner, "not assessed", cost shown. Fixed separately (prompt v2) |
+| API down | "API not reachable" | not repeated |
+| Photo changed | old result hidden: "The photo changed..." (after the fix) | same code |
+
+Fixed after these checks: a stale result stayed next to a newly uploaded photo, and identical confidence reasons repeated per item (now one line listing the items). fatsecret values were only displayed, never recorded.

@@ -36,16 +36,42 @@ jobs:
         with:
           version: "0.12.22"
 
+      - name: Lockfile matches pyproject
+        run: uv lock --check
+
       - name: Install (locked)
         run: uv sync --frozen
 
-      - name: Lint
-        run: uv run ruff check .
+      - name: Lint and format
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
 
       - name: Migrate empty database (plan command)
         env:
           MIGRATION_DATABASE_URL: postgresql+psycopg://ci:ci-dummy-password@localhost:5432/ci
         run: uv run alembic upgrade head
 
-      - name: Test (includes disposable-database migration and access tests)
-        run: uv run pytest
+      # Plan §12 Step 7, one visible step per area. The full suite below runs everything again.
+      - name: Contracts and nutrition arithmetic
+        run: uv run pytest -q tests/contracts tests/unit/test_calculator.py
+
+      - name: Storage policy
+        run: uv run pytest -q tests/unit/test_storage_policy.py
+
+      - name: Migrations and inference-role access (disposable Postgres)
+        run: uv run pytest -q tests/db/test_migrations.py tests/db/test_access.py tests/db/test_benchmark_load.py
+
+      - name: Mock integration, both apps in process
+        run: uv run pytest -q tests/integration tests/unit/test_app_independence.py
+
+      - name: Mock integration, both apps as real HTTP processes
+        env:
+          MOCK_MODE: "true"
+        run: |
+          uv run uvicorn foodvision.api.provider_app:app --port 8001 &
+          uv run uvicorn foodvision.api.agent_app:app --port 8002 &
+          uv run python scripts/ci_mock_flow.py
+
+      - name: Full test suite (database tests required, none skipped)
+        run: uv run pytest -ra

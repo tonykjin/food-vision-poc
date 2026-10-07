@@ -65,6 +65,10 @@ def live_pipeline(kind: AppKind, settings: AppSettings):
             refusal_fallback=settings.vision_refusal_fallback,
         ),
     )
+    if settings.pipeline_mode == "direct":
+        from foodvision.pipelines.agent_direct import DirectPipeline
+
+        return DirectPipeline(provider), None
     if settings.pipeline_mode == "recognition_only":
         return RecognitionOnlyPipeline(provider), None
     if settings.database_url is None:
@@ -97,6 +101,8 @@ def create_app(
             pipeline = MockPipeline(pipeline_id)
         else:
             pipeline, unavailable_reason = live_pipeline(kind, settings)
+    if pipeline is not None:
+        pipeline_id = pipeline.pipeline_id  # the pipeline actually serving (e.g. B_direct)
 
     app = FastAPI(title=f"Food Vision {kind.value} API", version=__version__)
     app.state.telemetry = InMemorySink()

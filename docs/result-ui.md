@@ -17,7 +17,7 @@ Issue [#11](https://github.com/tonykjin/food-vision-poc/issues/11). Plan §11 "C
 | Provenance | Scan, pipeline, configuration, confidence rules version, input prep version and hash, model served. |
 | User corrections | A form beside the result (not shown for MOCK or results with no items). |
 
-## Confidence rules (`confidence-rules-v1`)
+## Confidence rules (`confidence-rules-v2`)
 
 `measurement/confidence.py` is applied by the shared API factory to every result, so both apps use identical rules. It reads only structural result fields. It never uses model self-ratings, provider scores, A/B agreement or reference labels, and never produces a probability.
 
@@ -25,7 +25,7 @@ Issue [#11](https://github.com/tonykjin/food-vision-poc/issues/11). Plan §11 "C
 |---|---|---|---|
 | Identity | none | alternatives listed, preparation unknown, or 4+ items in the image | otherwise |
 | Portion | weight unknown, or high/low assumption ratio ≥ 2 | estimated from the image or suggested by the provider | measured weight only (diagnostic mode) |
-| Nutrition match | unresolved item, missing nutrient, or fallback top candidate | provider match (App A) or model choice among ambiguous candidates | deterministic clear winner among retrieved USDA candidates |
+| Nutrition match | unresolved item, missing nutrient, fallback top candidate, or **model-estimated nutrients (B_direct, no database record; added in v2)** | provider match (App A) or model choice among ambiguous candidates | deterministic clear winner among retrieved USDA candidates |
 
 The overall label is the lowest of the three; each dimension takes the worst item. Image-only portions are never High, so no image-only scan can be High overall. MOCK, failed and abstained results are "not assessed".
 

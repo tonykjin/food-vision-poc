@@ -11,6 +11,7 @@ from tests.conftest import synthetic_image
 from foodvision.api.factory import create_app
 from foodvision.config import AppKind, ProviderSettings
 from foodvision.contracts.results import AnalysisResult
+from foodvision.measurement.confidence import RULES_VERSION
 from foodvision.measurement.storage_policy import DataSource, Purpose, StoragePolicy, filter_result
 from foodvision.pipelines.provider_native import ProviderNativePipeline
 from foodvision.providers.fatsecret_client import IMAGE_URL, FatsecretClient
@@ -98,7 +99,7 @@ def test_api_applies_shared_heuristic_confidence():
     result = AnalysisResult.model_validate(post(client).json())
     c = result.confidence
     assert c.type == "heuristic_uncalibrated" and c.probability is None
-    assert c.rules_version == "confidence-rules-v1"
+    assert c.rules_version == RULES_VERSION
     assert all(i.match_method == "provider" for i in result.items if i.resolved)
     assert c.nutrition_match in ("medium", "low")  # a provider match is never rated high
     assert c.portion != "high"  # image-only portions are never high

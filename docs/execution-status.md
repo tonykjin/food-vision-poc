@@ -319,6 +319,10 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Verified:** `ruff check` passed. `pytest` with DB: 431 passed. Synthetic predictions give the hand-computed metrics, including failures in the denominator, a zero fat target and a reference below the floor. Mutation spot-check: failures dropped from the denominator, relative error below the floor, fatsecret derived metrics saved, a bootstrap over repeats instead of groups, and no order rotation were each caught.
 - **Not done:** `apps/compare_ui.py` (README lists it under POC-13; Prompt 22 doesn't ask for it); concurrency above 1 (refused); real runs (need reviewed meals).
 
+**Prompt 24, part 1: Section 12 CI** (PR #38). Adds `uv lock --check`, a format check, named steps (contracts and arithmetic 55, storage policy 16, migrations and access on disposable Postgres 17, in-process mock 29) and a process-level mock flow (both apps as real uvicorn processes in MOCK mode). The full suite passed 432 in CI. No secrets, `pull_request` only; no live-test workflow needed.
+
+**Prompt 24, part 2a: `B_direct`** (POC-14, branch `feat/poc-14-b-direct`). Diagnostic, model-estimated nutrients with no database grounding, selected by `PIPELINE_MODE=direct`. Prompt `estimate-nutrition-direct-v1`; confidence rules v2 (model estimates are Low). The benchmark can run `B_grounded,B_direct` in one batch. `/health` now reports the actual pipeline. Verified: 440 tests with DB; mutations (estimates labeled USDA, not Low, no grounding label) caught. Live smoke: `complete`, 6 items, 14.5 s, $0.040. Details: `docs/app-b-direct.md`.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

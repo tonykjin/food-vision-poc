@@ -19,13 +19,14 @@ from foodvision.contracts.results import (
     Confidence,
     ConfidenceLevel,
     ConfidenceType,
+    FoodSource,
     MatchMethod,
     PortionMethod,
     ResultItem,
     ResultStatus,
 )
 
-RULES_VERSION = "confidence-rules-v1"
+RULES_VERSION = "confidence-rules-v2"  # v2: model-estimated nutrients are Low
 WIDE_PORTION_RATIO = 2.0  # high_g / low_g at or above this is a wide assumption range
 MANY_ITEMS = 4  # this many items or more caps identity at medium (multi-item complexity)
 
@@ -63,6 +64,8 @@ def _nutrition_match(item: ResultItem) -> tuple[ConfidenceLevel, list[str]]:
         return ConfidenceLevel.LOW, ["no nutrition record used (unresolved)"]
     if item.nutrients.missing():
         return ConfidenceLevel.LOW, [f"record lacks {', '.join(item.nutrients.missing())}"]
+    if item.food_source is FoodSource.MODEL_ESTIMATE:
+        return ConfidenceLevel.LOW, ["nutrients estimated by the model; no database record"]
     if item.match_method is MatchMethod.FALLBACK_TOP_CANDIDATE:
         return ConfidenceLevel.LOW, ["ambiguous match, top-ranked record used"]
     if item.match_method is MatchMethod.DETERMINISTIC_RANKING:

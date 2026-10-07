@@ -23,6 +23,7 @@ from foodvision.contracts.results import (
     Confidence,
     ConfidenceLevel,
     ConfidenceType,
+    FoodSource,
     Metrics,
     ResultItem,
     ResultStatus,
@@ -143,6 +144,8 @@ def portion_text(item: ResultItem) -> str:
 def source_text(item: ResultItem) -> str:
     if not item.resolved:
         return f"unresolved (source: {item.food_source.value})"
+    if item.food_source is FoodSource.MODEL_ESTIMATE:
+        return "model estimate (no database grounding)"
     text = f"{item.food_source.value} {item.food_id}"
     if item.serving_id:
         text += f", serving {item.serving_id}"

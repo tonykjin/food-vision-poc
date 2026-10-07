@@ -68,3 +68,8 @@ desktop.ini
 
 # Deliberately tracked: .env.example, docs/, migrations/, pyproject.toml, uv.lock,
 # benchmarks/manifest.example.jsonl
+
+# Test/stock images (POC-19 smoke): never committed
+assets/
+*.avif
+*.heic

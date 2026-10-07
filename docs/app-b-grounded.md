@@ -63,7 +63,21 @@ The steak photo, real imported catalog. Each run used a temporary `fv_inference`
 - **Output varies run to run** (2 vs 3 grounded). Repeatability needs measuring (plan §11).
 - **Latency of about 17–19 s exceeds the provisional 15 s p95 target.**
 
-**Not shown:** accuracy. Two runs on one photo aren't evidence of recognition or nutrient accuracy; that requires reference meals (POC-12/13).
+### Prompt 19 smoke (2026-10-06 22:10 UTC, user-authorized)
+
+Third-party stock image (grilled chicken, rice, mixed vegetables; not owned, smoke only), the catalog re-imported in the new workspace (363 Foundation, 7,793 SR Legacy, 4 Branded), and a temporary `fv_inference` login with a random password, dropped afterwards. Budget: 2 model calls, 2 attempts, no retries.
+
+| Run | Items | Grounded | Unresolved reason | Calls | Latency (recognize + select) | Est. cost |
+|---|---|---|---|---|---|---|
+| 3 | 7 | 4 (all chosen by model) | 1 × model `no_match`; 2 × over the 5-item limit | 2 | 14.9 s + 8.1 s | $0.060 |
+
+- `claude-opus-5-5` served (no fallback), `end_turn`, prompt `recognize-food-v1` (sha256 `8172d1deb0e5…`), SDK `anthropic` 1.11.0. Tokens 1,985/1,382 and 3,356/555.
+- The result passed the schema-1.0 contract and the candidate-ID check (status `partial`, totals partial: 4/7 items with all four nutrients).
+- **New finding: one plate produced 7 items, and the 5-item limit left 2 unmatched.** The limit (plan §10) should be reviewed against real meals before it's frozen.
+- **Latency was about 23 s**, again above the provisional 15 s p95 target.
+- Nutrition values weren't displayed: the smoke command prints payload-free counts only, and stock-image numbers aren't evidence of anything.
+
+**Not shown:** accuracy. Three runs on two photos aren't evidence of recognition or nutrient accuracy; that requires reference meals (POC-12/13).
 
 ## Smoke command
 

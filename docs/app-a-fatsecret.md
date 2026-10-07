@@ -60,13 +60,15 @@ Docs checked 2026-10-02:
 | Error codes 11/12/13/14/20/21/22/211, HTTP 429/5xx, transport, timeout, non-JSON | **Adapter-verified** |
 | Payload-free telemetry; policy filter; no provider text in errors | **Adapter-verified** |
 | App A starts live with only fatsecret credentials, no model key, no B code | **Verified** locally 2026-10-02 (`/health` only, no request made) |
-| Real token issuance for our client ID, from this machine's IP | **Live: rejected.** Token endpoint returned HTTP 400 `invalid_scope` (2026-10-03 UTC) |
-| `image-recognition` scope and add-on enabled on our account | **Live: apparently not.** `invalid_scope` for `image-recognition`; enable the add-on, then re-run the smoke test |
-| Real response field presence and value types | **Live-unverified** |
+| Real token issuance for our client ID, from this machine's IP | **Live-verified 2026-10-07** (after `invalid_scope` on 2026-10-03/06, then image-request code 21 until the IP was registered) |
+| `image-recognition` scope and add-on enabled on our account | **Live-verified 2026-10-07** (add-on enabled by you; scope granted) |
+| Real response field presence and value types | **Live-verified on one image** (2026-10-07): 7 items, all with `food_id`, `serving_id`, gram portions and all four nutrients; normalized to a schema-valid `complete` result. Other images may differ. |
 | Whether label-only images return 211 in practice | **Live-unverified** |
-| Latency, quotas, real HTTP status for errors | **Live-unverified** |
+| Latency, quotas, real HTTP status for errors | **One sample:** image request 5.5 s, token 232 ms (2026-10-07). Code 21 arrived as HTTP 200 with an error body, as the adapter expects. Quotas unverified. |
 
-## Live smoke test (opt-in, authorized as needed, not yet run)
+## Live smoke test (opt-in, authorized as needed)
+
+**Passed 2026-10-07 20:29 UTC** with a third-party stock image (smoke only, not owned): `complete`, 7/7 items resolved, totals complete, 1 token + 1 image request, 5.8 s total. Nothing stored; rights are still pending, so no fatsecret result or derived metric may be persisted.
 
 Opt in once by adding `ENABLE_LIVE_API_TESTS=true` to `.env.provider.local`, or set it in the shell. The user authorized live checks "as needed" on 2026-10-02. `foodvision doctor --app provider` shows `live API tests enabled`.
 

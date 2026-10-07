@@ -82,7 +82,7 @@ Details are in `docs/provider-readiness.md` (Prompt 07, docs accessed 2026-10-02
 | Hosted database/storage | Supabase (proposed) | PENDING confirmation at hosted-pilot stage |
 | Deployment destination | PENDING | Chosen after the local apps work |
 | Hosting region | PENDING | Verify provider outbound/IP requirements first |
-| Owned test image path (Prompt 19) | PENDING | Private path outside Git |
+| Owned test image path (Prompt 19) | PENDING | Private path outside Git. Prompt 19 (2026-10-06) instead used a **third-party stock image** (`assets/grilled-chicken-…_84443-65934.avif`, Freepik-style, git-ignored), converted to PNG outside Git, with your approval. It's for smoke tests only: not owned, never stored, never in benchmarks or exports. |
 
 ## Development tools
 

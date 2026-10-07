@@ -53,6 +53,8 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 | Setting | Value | Status |
 |---|---|---|
 | Runtime smoke-test cap (Prompt 19) | No dollar cap | User decision 2026-10-02. Paid runs still need the explicit `ENABLE_LIVE_API_TESTS=true` opt-in. Real spend is limited only by the Console credit balance. |
+| fatsecret photo-request quota | 25,000 photo-based requests, flat (user-reported 2026-10-07) | A development batch of ~180 image requests uses <1%. |
+| Development manifest path (Prompt 23) | PENDING | Private folder of reviewed real groups; 0 collected so far. |
 | Development batch cap (Prompt 23) | No dollar cap | User decision 2026-10-02. Estimate and report cost before each batch. |
 | Per-scan cost cap | No dollar cap | User decision 2026-10-02. Per-scan call limits still apply: `MAX_MODEL_CALLS_PER_SCAN=2`, `MAX_EXTERNAL_ATTEMPTS_PER_SCAN=8`, `MAX_SCAN_SECONDS=45`. |
 | Spending alerts configured | PENDING | Plan Step 1 |

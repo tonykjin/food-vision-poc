@@ -239,3 +239,13 @@ def test_cli_assign_splits_writes_group_files(tmp_path, capsys):
     assert written["split"] == "development"
     assert main(["validate-manifest", "--manifest", str(tmp_path)]) == 0
     assert "Result: valid" in capsys.readouterr().out
+
+
+def test_third_party_smoke_photos_only_in_synthetic_groups():
+    data = example("syn-plate-001")
+    for photo in data["photos"]:
+        photo["rights"] = "third_party_smoke_only"
+    assert Group.model_validate(data).is_synthetic  # allowed: synthetic smoke test
+    data["is_synthetic"] = False
+    with pytest.raises(ValidationError, match="synthetic groups only"):
+        Group.model_validate(data)

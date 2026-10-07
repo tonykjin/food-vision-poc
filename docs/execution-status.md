@@ -267,8 +267,9 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Setup in the new workspace:** Compose DB migrated to `0002`; USDA catalog re-imported (363 Foundation, 7,793 SR Legacy, 4 Branded via 1 USDA API request; data files copied from the OneDrive copy into git-ignored `data/fdc/`).
 - **Image:** no owned photo exists yet. With your approval, a **third-party stock image** (grilled chicken plate, `assets/`, now git-ignored with `*.avif`/`*.heic`) was used for smoke tests only. The owned test image stays PENDING.
 - **App A:** 1 token request → HTTP 400 `invalid_scope` (291 ms). No image sent, no retry, nothing stored. Still blocked on the fatsecret add-on; not an adapter fault, so no fix or rerun.
+- **App A rerun (2026-10-07 20:27 UTC, after you enabled the add-on):** token **succeeded** (257 ms; scope granted). The image request returned **fatsecret code 21, "Invalid IP address detected"** (411 ms; typed `authentication`, no retry, nothing stored). Next: register this machine's public IP in fatsecret key management, then rerun.
 - **App B (`B_grounded`):** 2 model calls (`claude-opus-5-5`, no fallback, `end_turn`). 7 items, 4 grounded (model choice), 1 `no_match`, 2 over the 5-item limit; status `partial`, schema-valid. 14.9 s + 8.1 s, ≈ $0.060. Temporary inference login created and dropped.
-- **Paid attempts this prompt:** 2 Anthropic calls (≈ $0.060). fatsecret: 1 unbilled token request.
+- **Paid attempts this prompt:** 2 Anthropic calls (≈ $0.060). fatsecret: 2 token requests and 1 rejected image request (billing of a rejected request unknown).
 - **Unverified:** fatsecret image recognition (all response fields, 211, latency, quotas); App B accuracy; the 5-item limit on real meals; latency is above the 15 s p95 target.
 
 **Prompt 20: POC-11 shared result UI and heuristic confidence** ([#11](https://github.com/tonykjin/food-vision-poc/issues/11)). Status: **merged and closed** (2026-10-06) via [PR #29](https://github.com/tonykjin/food-vision-poc/pull/29), merge commit `cab9856`. CI passed. Details are in `docs/result-ui.md`.

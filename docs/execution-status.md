@@ -301,6 +301,24 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - **Verified:** `ruff check` passed. `pytest` with DB: 407 passed, 0 skipped. Mutation spot-check: family leakage ignored, evaluator membership not checked, estimated grams allowed for grade A, and synthetic counted as real were each caught.
 - **Not done (human work):** collect and review 30 real development groups. #12 stays open and blocked until then. No accuracy study is ready.
 
+**Prompt 22: POC-13 benchmark runner and paired reports** ([#13](https://github.com/tonykjin/food-vision-poc/issues/13)). Status: **implemented and verified on synthetic data** (2026-10-07) on branch `feat/poc-13-benchmark-runner`. **No paid batch run.** Definitions: `benchmarks/metrics.md`.
+- **Metrics (`metrics-v1`, frozen):**
+  - absolute and signed errors; relative error only when the reference is at or above the floor (50 kcal, 3 g)
+  - the useful-result event `useful-v1`, marked PROPOSED; pass rate over **all** attempts with scorable references, and scorable-output error as a separate statistic
+  - status and abstention rates, item precision, recall, preparation and portion via the `lexical-v1` mapping (unreviewed)
+  - p50/p95 latency, repeatability, costs (unknown never 0)
+  - A/B agreement, labeled not accuracy; paired pass-rate difference
+  - 95% intervals from a bootstrap resampling whole groups
+- **Runner:**
+  - checks the manifest, with the photo files verified; the test split needs `--allow-test-split` and a clean working tree
+  - each photo is prepared once and both configs get identical bytes and context; order rotates per photo and repeat; 3 repeats
+  - per-scan budgets come from each app's settings, plus batch caps; exceptions are recorded as failed attempts (type only), and runs stopped by a cap are listed as not run and the batch flagged incomplete
+  - records configuration IDs, git commit and dirty flag, model, prompt and SDK, catalog versions, preprocessing version, manifest hash and cache notes
+- **Rights:** saved `runs.jsonl` passes `filter_result`, so App A keeps only payload-free fields and storable IDs. Saved reports show App A derived metrics and the comparison as UNAVAILABLE. The full report prints only to the terminal.
+- **CLI:** `foodvision benchmark` (a paid run needs `--confirm-paid-run`, `--max-total-cost-usd`, `--max-scans`) and `foodvision report --batch <dir>`. `api.factory.live_pipeline` is now public so the runner builds the same pipelines as the apps.
+- **Verified:** `ruff check` passed. `pytest` with DB: 431 passed. Synthetic predictions give the hand-computed metrics, including failures in the denominator, a zero fat target and a reference below the floor. Mutation spot-check: failures dropped from the denominator, relative error below the floor, fatsecret derived metrics saved, a bootstrap over repeats instead of groups, and no order rotation were each caught.
+- **Not done:** `apps/compare_ui.py` (README lists it under POC-13; Prompt 22 doesn't ask for it); concurrency above 1 (refused); real runs (need reviewed meals).
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.
@@ -313,7 +331,7 @@ Known future blockers, recorded in `docs/project-settings.md`:
 
 ## Next task
 
-User: (1) start collecting the 30 development meals (`benchmarks/protocol.md`); create `.env.evaluator.local` and an `fv_evaluator` login when ready to load. (2) Send the fatsecret storage-rights questions (`docs/vendor-questions-fatsecret.md`); App A works live but nothing durable can be stored until they're answered. (3) Run the README UI checks for #2 and close it. (4) Optional: a photo you own as the test image; a `DATABASE_URL` inference login in `.env.agent.local` for the live App B UI. Claude: merge-ready POC-12 tooling PR; then **Prompt 22: benchmark runner** (POC-13, [#13](https://github.com/tonykjin/food-vision-poc/issues/13)), built and tested on synthetic fixtures until real meals exist.
+User: (1) start collecting the 30 development meals (`benchmarks/protocol.md`); create `.env.evaluator.local` and an `fv_evaluator` login when ready to load. (2) Send the fatsecret storage-rights questions (`docs/vendor-questions-fatsecret.md`); App A works live but nothing durable can be stored until they're answered. (3) Run the README UI checks for #2 and close it. (4) Optional: a photo you own as the test image; a `DATABASE_URL` inference login in `.env.agent.local` for the live App B UI. Claude: POC-13 PR; then Prompt 23 (development comparisons) once reviewed meals exist, or Prompt 24 (direct-model mode, more adapters) meanwhile.
 
 **Also still open: finish Prompt 06.** `main` is already pushed to the private `origin` (`tonykjin/food-vision-poc`). Still to do: branch protection on `main` and secret scanning/push protection (as far as the GitHub plan allows), plus collaborator invites. Each of these changes the GitHub account, so confirm with the user before applying it.
 

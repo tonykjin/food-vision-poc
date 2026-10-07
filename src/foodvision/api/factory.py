@@ -38,7 +38,7 @@ LIVE_ISSUE: dict[AppKind, str] = {
 }
 
 
-def _live_pipeline(kind: AppKind, settings: AppSettings):
+def live_pipeline(kind: AppKind, settings: AppSettings):
     """Return (pipeline, reason it is unavailable). Imports stay app-specific."""
     if kind is AppKind.PROVIDER:
         if settings.fatsecret_client_id is None or settings.fatsecret_client_secret is None:
@@ -96,7 +96,7 @@ def create_app(
         if settings.mock_mode:
             pipeline = MockPipeline(pipeline_id)
         else:
-            pipeline, unavailable_reason = _live_pipeline(kind, settings)
+            pipeline, unavailable_reason = live_pipeline(kind, settings)
 
     app = FastAPI(title=f"Food Vision {kind.value} API", version=__version__)
     app.state.telemetry = InMemorySink()

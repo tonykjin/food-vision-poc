@@ -1,8 +1,9 @@
 """`foodvision` command-line entry point.
 
 Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`,
-`smoke-fatsecret`, `smoke-vision`, `validate-manifest`, `assign-splits`, `load-manifest`.
-Other plan §6/§14 commands (benchmark, report, calibrate) arrive with their issues.
+`smoke-fatsecret`, `smoke-vision`, `validate-manifest`, `assign-splits`, `load-manifest`,
+`benchmark`, `report`.
+`calibrate` (POC-15) arrives with its issue.
 """
 
 import argparse
@@ -56,7 +57,30 @@ def main(argv: list[str] | None = None) -> int:
         if name == "load-manifest":
             cmd.add_argument("--reference-version", required=True)
 
+    bench = sub.add_parser("benchmark", help="Paired benchmark runs over one manifest split")
+    bench.add_argument("--manifest", required=True)
+    bench.add_argument("--split", required=True, choices=["development", "calibration", "test"])
+    bench.add_argument("--configs", required=True, help="e.g. A_native,B_grounded")
+    bench.add_argument("--repeats", type=int, default=3)
+    bench.add_argument("--concurrency", type=int, default=1)
+    bench.add_argument("--output", required=True, help="Batch directory parent (e.g. work/)")
+    bench.add_argument("--data-dir", default=None)
+    bench.add_argument("--max-total-cost-usd", type=float, default=None)
+    bench.add_argument("--max-scans", type=int, default=None)
+    bench.add_argument("--confirm-paid-run", action="store_true")
+    bench.add_argument("--allow-test-split", action="store_true")
+
+    rep = sub.add_parser("report", help="Rebuild the saved report of a benchmark batch")
+    rep.add_argument("--batch", required=True, help="Batch directory written by benchmark")
+    rep.add_argument("--output", required=True)
+
     args = parser.parse_args(argv)
+    if args.command in ("benchmark", "report"):
+        from foodvision.cli import benchmark_run
+
+        return (
+            benchmark_run.run_benchmark if args.command == "benchmark" else benchmark_run.run_report
+        )(args)
     if args.command in ("validate-manifest", "assign-splits", "load-manifest"):
         from foodvision.cli import benchmark
 

@@ -1,0 +1,97 @@
+{
+  "manifest_version": "benchmark-manifest-v1",
+  "is_synthetic": true,
+  "region": "US",
+  "collected_on": "2026-10-07",
+  "split": null,
+  "group_id": "syn-plate-001",
+  "category": "separated_plate",
+  "quality_grade": "A",
+  "photos": [
+    {
+      "photo_id": "syn-plate-001-top",
+      "file": "photos/syn-plate-001-top.jpg",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "rights": "owned",
+      "consent_reference": "SYNTHETIC: no real photo",
+      "retain_until": "2027-10-07"
+    },
+    {
+      "photo_id": "syn-plate-001-angle",
+      "file": "photos/syn-plate-001-angle.jpg",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "rights": "owned",
+      "consent_reference": "SYNTHETIC: no real photo",
+      "retain_until": "2027-10-07"
+    }
+  ],
+  "components": [
+    {
+      "identity": "SYNTHETIC grilled chicken",
+      "preparation": "grilled",
+      "edible_grams": 150,
+      "measurement": "weighed",
+      "values": {
+        "source": "usda_fdc",
+        "source_ref": "SYNTHETIC-not-a-real-record-1",
+        "source_version": "SYNTHETIC",
+        "basis": "per_100g",
+        "energy": {
+          "amount": 100,
+          "unit": "kcal"
+        },
+        "protein": {
+          "amount": 20,
+          "unit": "g"
+        },
+        "carbohydrate": {
+          "amount": 0,
+          "unit": "g"
+        },
+        "fat": {
+          "amount": 2,
+          "unit": "g"
+        }
+      }
+    },
+    {
+      "identity": "SYNTHETIC boiled rice",
+      "preparation": "boiled",
+      "edible_grams": 200,
+      "measurement": "weighed",
+      "values": {
+        "source": "usda_fdc",
+        "source_ref": "SYNTHETIC-not-a-real-record-2",
+        "source_version": "SYNTHETIC",
+        "basis": "per_100g",
+        "energy": {
+          "amount": 100,
+          "unit": "kcal"
+        },
+        "protein": {
+          "amount": 2,
+          "unit": "g"
+        },
+        "carbohydrate": {
+          "amount": 20,
+          "unit": "g"
+        },
+        "fat": {
+          "amount": 1,
+          "unit": "g"
+        }
+      }
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewers": [
+      {
+        "reviewer": "SYNTHETIC reviewer",
+        "reviewed_on": "2026-10-07"
+      }
+    ],
+    "disagreements_resolved": true,
+    "notes": "SYNTHETIC example, not a collected meal"
+  }
+}

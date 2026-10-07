@@ -1,0 +1,63 @@
+{
+  "manifest_version": "benchmark-manifest-v1",
+  "is_synthetic": true,
+  "region": "US",
+  "collected_on": "2026-10-07",
+  "split": null,
+  "group_id": "syn-bar-001",
+  "category": "branded_packaged",
+  "quality_grade": "B",
+  "photos": [
+    {
+      "photo_id": "syn-bar-001-front",
+      "file": "photos/syn-bar-001-front.jpg",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "rights": "owned",
+      "consent_reference": "SYNTHETIC: no real photo",
+      "retain_until": "2027-10-07"
+    }
+  ],
+  "components": [
+    {
+      "identity": "SYNTHETIC snack bar",
+      "preparation": "unknown",
+      "edible_grams": 40,
+      "measurement": "label_declared",
+      "values": {
+        "source": "label",
+        "source_ref": "SYNTHETIC label photo",
+        "source_version": "SYNTHETIC print 2026",
+        "basis": "per_serving",
+        "serving_quantity": 40,
+        "serving_unit": "g",
+        "energy": {
+          "amount": 190,
+          "unit": "kcal"
+        },
+        "protein": {
+          "amount": 3,
+          "unit": "g"
+        },
+        "carbohydrate": {
+          "amount": 25,
+          "unit": "g"
+        },
+        "fat": {
+          "amount": null,
+          "unit": "g"
+        }
+      }
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewers": [
+      {
+        "reviewer": "SYNTHETIC reviewer",
+        "reviewed_on": "2026-10-07"
+      }
+    ],
+    "disagreements_resolved": true,
+    "notes": "SYNTHETIC example, not a collected meal"
+  }
+}

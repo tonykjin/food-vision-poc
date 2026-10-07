@@ -1,8 +1,8 @@
 """`foodvision` command-line entry point.
 
 Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`,
-`smoke-fatsecret`, `smoke-vision`. Other plan §6/§14 commands (validate-manifest, benchmark, report,
-calibrate) arrive with their issues.
+`smoke-fatsecret`, `smoke-vision`, `validate-manifest`, `assign-splits`, `load-manifest`.
+Other plan §6/§14 commands (benchmark, report, calibrate) arrive with their issues.
 """
 
 import argparse
@@ -41,7 +41,26 @@ def main(argv: list[str] | None = None) -> int:
     vision.add_argument("--image", required=True, help="Path to an owned test image")
     vision.add_argument("--confirm-one-request", action="store_true")
 
+    for name, text in (
+        ("validate-manifest", "Validate a reference manifest; show collection progress"),
+        ("assign-splits", "Assign family-safe splits to groups that have none"),
+        ("load-manifest", "Load reviewed groups into the evaluator-only benchmark schema"),
+    ):
+        cmd = sub.add_parser(name, help=text)
+        cmd.add_argument("--manifest", required=True, help="Group JSON directory or .jsonl file")
+        if name != "assign-splits":
+            cmd.add_argument("--data-dir", default=None, help="Private benchmark data directory")
+        if name == "assign-splits":
+            cmd.add_argument("--seed", default=None)
+            cmd.add_argument("--dry-run", action="store_true")
+        if name == "load-manifest":
+            cmd.add_argument("--reference-version", required=True)
+
     args = parser.parse_args(argv)
+    if args.command in ("validate-manifest", "assign-splits", "load-manifest"):
+        from foodvision.cli import benchmark
+
+        return benchmark.run(args)
     if args.command == "doctor":
         from foodvision.cli.doctor import run_doctor
 

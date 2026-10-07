@@ -97,6 +97,10 @@ With `ANTHROPIC_API_KEY` and `DATABASE_URL` (an `fv_inference` login) in `.env.a
 
 See [`docs/catalog.md`](docs/catalog.md) for the documented FDC subset, the import commands (`foodvision import-usda`, `import-usda-api`, `catalog-report`), retrieval rules and known gaps.
 
+### Benchmark reference data (POC-12)
+
+Real reference meals live in a private folder outside Git. See [`benchmarks/protocol.md`](benchmarks/protocol.md) for weighing, photographing and review, [`benchmarks/collection-form.md`](benchmarks/collection-form.md) for the kitchen form, and [`benchmarks/dataset-card.md`](benchmarks/dataset-card.md). Commands: `foodvision validate-manifest`, `assign-splits`, `load-manifest` (evaluator login only). `benchmarks/examples/` holds synthetic groups that are never counted.
+
 ### Human UI checks (each app)
 
 1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
@@ -129,7 +133,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
 | `apps/compare_ui.py` | POC-13 (#13) |
-| `foodvision validate-manifest` | POC-12 (#12) |
 | `foodvision benchmark`, `foodvision report` | POC-13 (#13) |
 | `foodvision calibrate` | POC-15 (#15) |
 | `infra/Dockerfile` | POC-16 (#16) |

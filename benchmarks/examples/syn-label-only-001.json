@@ -1,0 +1,32 @@
+{
+  "manifest_version": "benchmark-manifest-v1",
+  "is_synthetic": true,
+  "region": "US",
+  "collected_on": "2026-10-07",
+  "split": null,
+  "group_id": "syn-label-only-001",
+  "category": "difficult_unsupported",
+  "quality_grade": "B",
+  "expected_outcome": "abstain",
+  "photos": [
+    {
+      "photo_id": "syn-label-only-001",
+      "file": "photos/syn-label-only-001.jpg",
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "rights": "owned",
+      "consent_reference": "SYNTHETIC: no real photo",
+      "retain_until": "2027-10-07"
+    }
+  ],
+  "review": {
+    "status": "reviewed",
+    "reviewers": [
+      {
+        "reviewer": "SYNTHETIC reviewer",
+        "reviewed_on": "2026-10-07"
+      }
+    ],
+    "disagreements_resolved": true,
+    "notes": "SYNTHETIC example, not a collected meal"
+  }
+}

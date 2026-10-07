@@ -323,6 +323,8 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 
 **Prompt 24, part 2a: `B_direct`** (POC-14, branch `feat/poc-14-b-direct`). Diagnostic, model-estimated nutrients with no database grounding, selected by `PIPELINE_MODE=direct`. Prompt `estimate-nutrition-direct-v1`; confidence rules v2 (model estimates are Low). The benchmark can run `B_grounded,B_direct` in one batch. `/health` now reports the actual pipeline. Verified: 440 tests with DB; mutations (estimates labeled USDA, not Low, no grounding label) caught. Live smoke: `complete`, 6 items, 14.5 s, $0.040. Details: `docs/app-b-direct.md`.
 
+**Prompt 24, part 2b: OpenAI adapter** (POC-14, branch `feat/poc-14-openai-adapter`, stacked on B_direct). Docs checked 2026-10-07 (Responses API, image input, strict structured outputs, reasoning, models, pricing). `providers/openai_vision.py` plus `providers/registry.py`; `VISION_PROVIDER=openai`, default `gpt-6-astra` (an alias), effort medium, `detail: original`, no fallback. Benchmark labels such as `B_grounded@openai[:model]`. 18 contract tests. **Not live-verified: `OPENAI_API_KEY` is missing from `.env.agent.local`.** DeepSeek: not built (no key; JSON-schema output with images undocumented on its vision page); `VISION_PROVIDER=deepseek` is rejected. Details: `docs/app-b-openai.md`.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

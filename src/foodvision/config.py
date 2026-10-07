@@ -76,9 +76,12 @@ class AgentSettings(CommonSettings):
     model_config = SettingsConfigDict(env_file=ENV_FILES[AppKind.AGENT])
 
     anthropic_api_key: SecretStr | None = None
-    vision_provider: str = "anthropic"
+    openai_api_key: SecretStr | None = None
+    # Adapter for the vision model (providers/registry.py). DeepSeek: unavailable (no access).
+    vision_provider: Literal["anthropic", "openai"] = "anthropic"
     # Default model per the official models overview (2026-10-02); configurable.
-    vision_model: str = "claude-opus-5-5"
+    # Empty: the provider default (claude-opus-5-5 / gpt-6-astra). Model IDs stay configurable.
+    vision_model: str | None = None
     vision_effort: str = "medium"
     vision_max_tokens: int = Field(default=16000, gt=0)
     # Server-side refusal fallback; a fallback-served answer is recorded in provenance.

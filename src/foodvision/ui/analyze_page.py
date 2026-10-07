@@ -73,13 +73,18 @@ def render_page(kind: AppKind) -> None:
         st.markdown(FATSECRET_ATTRIBUTION, unsafe_allow_html=True)
 
     upload = st.file_uploader("Food photo", type=["jpg", "jpeg", "png", "webp"])
+    upload_id = getattr(upload, "file_id", None)
     if upload is not None and st.button("Analyze", type="primary"):
         with st.spinner("Analyzing..."):
-            st.session_state[RESULT_KEY] = _analyze(api_url, upload)
+            st.session_state[RESULT_KEY] = {**_analyze(api_url, upload), "upload_id": upload_id}
 
     stored = st.session_state.get(RESULT_KEY)
     if stored is None:
         st.caption("Upload a food photo and press Analyze.")
+        return
+    if stored.get("upload_id") != upload_id:
+        # Never show a result next to a photo it wasn't computed from.
+        st.caption("The photo changed. Press Analyze to analyze this photo.")
         return
     corrections = st.session_state.setdefault(CORRECTIONS_KEY, {})
     render_outcome(

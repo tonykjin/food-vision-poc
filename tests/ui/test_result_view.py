@@ -271,3 +271,11 @@ def test_mock_result_offers_no_corrections(monkeypatch):
     )
     out = texts(page(monkeypatch, "agent_ui.py", "agent", "B_mock", stored(mock)))
     assert "MOCK result (synthetic)" in out and "User corrections" not in out
+
+
+def test_result_is_hidden_when_the_photo_changed(monkeypatch):
+    # The stored result belongs to another upload than the one now in the uploader (none here).
+    old = {**stored(COMPLETE), "upload_id": "previous-upload"}
+    out = texts(page(monkeypatch, "agent_ui.py", "agent", "B_grounded", old))
+    assert "The photo changed. Press Analyze to analyze this photo." in out
+    assert "Status:" not in out and "SYNTHETIC rice" not in out

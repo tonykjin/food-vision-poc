@@ -69,7 +69,9 @@ class Grade(StrEnum):
 class Rights(StrEnum):
     OWNED = "owned"  # photographed by the team
     CONSENTED = "consented"  # photographed by a participant who signed consent
-    # Stock, web or other third-party images are deliberately not representable.
+    # A third-party (e.g. stock) image approved only for pipeline smoke tests. Allowed in
+    # synthetic groups only; real benchmark groups must be owned or consented.
+    THIRD_PARTY_SMOKE_ONLY = "third_party_smoke_only"
 
 
 class Measurement(StrEnum):
@@ -214,6 +216,14 @@ class Group(Strict):
     components: list[Component] = Field(default_factory=list)
     recipe: Recipe | None = None
     review: Review
+
+    @model_validator(mode="after")
+    def _real_groups_use_owned_or_consented_photos(self) -> Self:
+        if not self.is_synthetic and any(
+            p.rights is Rights.THIRD_PARTY_SMOKE_ONLY for p in self.photos
+        ):
+            raise ValueError("third-party smoke-test photos are allowed in synthetic groups only")
+        return self
 
     @model_validator(mode="after")
     def _one_reference_method(self) -> Self:

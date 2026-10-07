@@ -15,7 +15,10 @@ from PIL import Image
 
 from foodvision.contracts.results import AnalysisResult
 
-APPS = {"provider": ("http://127.0.0.1:8001", "A_mock"), "agent": ("http://127.0.0.1:8002", "B_mock")}
+APPS = {
+    "provider": ("http://127.0.0.1:8001", "A_mock"),
+    "agent": ("http://127.0.0.1:8002", "B_mock"),
+}
 
 
 def synthetic_jpeg() -> bytes:

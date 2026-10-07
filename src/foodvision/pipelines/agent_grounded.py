@@ -51,10 +51,12 @@ from foodvision.nutrition.calculator import sum_totals
 from foodvision.nutrition.units import NutritionError
 from foodvision.pipelines.agent_recognition import hypothesis_item
 from foodvision.providers.claude_vision import ClaudeVisionProvider
-from foodvision.recognition.hypotheses import FoodHypothesis
+from foodvision.recognition.hypotheses import MAX_ITEMS, FoodHypothesis
 
 PIPELINE_ID = "B_grounded"
-MAX_ITEMS_PER_SCAN = 5  # plan §10: bound item count per scan
+# Plan §10 started at 5. Raised to the recognition limit (8) on 2026-10-07: at 5, every plate
+# with 6+ foods could never be complete (dev smoke batch: 2 of 7 items skipped in 3/3 runs).
+MAX_ITEMS_PER_SCAN = MAX_ITEMS
 MAX_ALTERNATIVE_QUERIES = 2
 
 

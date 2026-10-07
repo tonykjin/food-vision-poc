@@ -211,3 +211,12 @@ def test_evaluator_or_owner_login_is_refused(catalog_loaded, login_as, owner):
     assert result.status is ResultStatus.FAILED
     assert result.error.code is ErrorCode.AUTHENTICATION
     assert "benchmark labels" in result.error.message
+
+
+def test_default_item_cap_matches_recognition_limit(catalog_loaded, login_as):
+    # 7 foods on one plate: none may be skipped for the item cap (it was 5 before 2026-10-07).
+    items = [hypothesis(f"SYNTHETIC item {i}", "zzqnothing") for i in range(7)]
+    result, _, _ = run([recognized(*items)], login_as)
+    assert len(result.items) == 7
+    assert not any("item limit" in r for item in result.items for r in item.uncertainty_reasons)
+    assert result.configuration_id.endswith("max-items-8")

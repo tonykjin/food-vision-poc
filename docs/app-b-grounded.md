@@ -24,7 +24,7 @@ Pipeline `B_grounded` (the default `PIPELINE_MODE`): **recognize â†’ retrieve â†
 - **Calculated in code**, never taken from model prose.
 - **A per-100 ml record without a density** stays unresolved (`not calculated`).
 - **A nutrient the record lacks** stays unknown. Totals exclude unresolved items and unknown nutrients (never zero) and are marked partial.
-- **Item cap:** items beyond 5 per scan are listed, unresolved, with an "over the item limit" reason, not dropped.
+- **Item cap:** 8 per scan, the same as the recognition limit (raised from 5 on 2026-10-07: at 5, plates with 6+ foods could never be complete). Items beyond the cap are listed, unresolved, with an "over the item limit" reason, not dropped. The cap is part of the configuration ID (`max-items-8`).
 
 **Isolation**
 - **No tools:** the model gets no tools at all (structured output only): no shell, no web.

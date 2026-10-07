@@ -322,6 +322,11 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 **Prompt 24, part 1: Section 12 CI** (PR #38). Adds `uv lock --check`, a format check, named steps (contracts and arithmetic 55, storage policy 16, migrations and access on disposable Postgres 17, in-process mock 29) and a process-level mock flow (both apps as real uvicorn processes in MOCK mode). The full suite passed 432 in CI. No secrets, `pull_request` only; no live-test workflow needed.
 
 **Prompt 24, part 2a: `B_direct`** (POC-14, branch `feat/poc-14-b-direct`). Diagnostic, model-estimated nutrients with no database grounding, selected by `PIPELINE_MODE=direct`. Prompt `estimate-nutrition-direct-v1`; confidence rules v2 (model estimates are Low). The benchmark can run `B_grounded,B_direct` in one batch. `/health` now reports the actual pipeline. Verified: 440 tests with DB; mutations (estimates labeled USDA, not Low, no grounding label) caught. Live smoke: `complete`, 6 items, 14.5 s, $0.040. Details: `docs/app-b-direct.md`.
+**Prompt 23: development run (pipeline smoke version)** (2026-10-07). With your direction ("make up something", PoC), it ran on a **synthetic** manifest: an invented reference plus the user-approved stock photo. **Not an accuracy result.** Report: `docs/dev-runs/2026-10-07-pipeline-smoke.md`.
+- Baseline batch: A_native and B_grounded, 1 photo × 3 repeats, caps $10 and 200 scans. A: complete 3/3, p50 4.7 s. B: partial 3/3 (2 items over the 5-item cap, the sauce `no_match`), p50 22.8 s, $0.184.
+- Fix (PR #37, stacked on #36): the B item cap went from 5 to 8 (config `max-items-8`). B-only rerun: still partial 3/3, now only the sauce; coverage 60% → 86%; $0.197; latency unchanged.
+- Backlog: sauce/condiment retrieval and B latency, both needing real-meal evidence.
+- Total spend: $0.38 Anthropic plus 3 fatsecret image requests.
 
 ## Blockers
 

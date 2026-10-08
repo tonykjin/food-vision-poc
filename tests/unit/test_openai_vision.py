@@ -267,3 +267,33 @@ def test_benchmark_config_labels_carry_provider_and_model():
     assert split_config("B_grounded@openai:gpt-6.1-sol") == ("B_grounded", "openai", "gpt-6.1-sol")
     assert split_config("B_direct@openai") == ("B_direct", "openai", None)
     assert split_config("A_native") == ("A_native", None, None)
+
+
+def test_rate_limit_detail_keeps_identifiers_but_never_free_text():
+    error = status_error(
+        openai.RateLimitError, 429, "rate_limit_exceeded", headers={"retry-after": "7"}
+    )
+    error.type = "tokens"
+    vision, _ = provider([error, error])
+    with pytest.raises(VisionAttemptError) as info:
+        vision.recognize(IMAGE, recorder())
+    assert (
+        info.value.detail == "rate limited (code rate_limit_exceeded, type tokens, retry-after 7)"
+    )
+    sneaky = status_error(openai.RateLimitError, 429, "SENTINEL provider text with spaces")
+    vision, _ = provider([sneaky, sneaky])
+    with pytest.raises(VisionAttemptError) as info:
+        vision.recognize(IMAGE, recorder())
+    assert "SENTINEL" not in info.value.detail and "code other" in info.value.detail
+
+
+def test_credit_exhaustion_is_billing_and_never_retried():
+    # Observed live 2026-10-08: the code is credit_balance_exhausted, the type insufficient_quota.
+    error = status_error(openai.RateLimitError, 429, "credit_balance_exhausted")
+    error.type = "insufficient_quota"
+    vision, fake = provider([error, error])
+    rec = recorder()
+    with pytest.raises(VisionAttemptError) as info:
+        vision.recognize(IMAGE, rec)
+    assert info.value.code is ErrorCode.QUOTA and len(fake.calls) == 1
+    assert rec.attempts[0].outcome is AttemptOutcome.CLIENT_ERROR

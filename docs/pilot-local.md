@@ -41,16 +41,19 @@ Check it yourself first at **http://localhost:8080**: log in, then open App A an
 ## Share the link
 
 ```powershell
-docker compose -f infra/compose.yml --profile pilot --profile tunnel up -d tunnel
-docker compose -f infra/compose.yml logs tunnel | Select-String "trycloudflare.com"
+docker compose -f infra/compose.yml --profile pilot --profile tunnel up -d --no-deps tunnel
+docker compose -f infra/compose.yml --profile pilot --profile tunnel logs tunnel | Select-String "trycloudflare.com"
 ```
 
 Send each person the `https://….trycloudflare.com` link plus **their own** username. Send passwords separately, for example through a password manager or a different channel.
 
 ## Stop sharing / stop everything
 
+Commands that mention `tunnel` need both `--profile pilot` and `--profile tunnel` (the tunnel depends on the proxy).
+
+
 ```powershell
-docker compose -f infra/compose.yml stop tunnel     # the public link stops working immediately
+docker compose -f infra/compose.yml --profile pilot --profile tunnel stop tunnel   # the public link stops working immediately
 docker compose -f infra/compose.yml --profile app-a --profile app-b --profile pilot --profile tunnel stop
 ```
 
@@ -60,4 +63,4 @@ docker compose -f infra/compose.yml --profile app-a --profile app-b --profile pi
 - Streamlit's live connection (WebSocket) passes through the login (101), and is refused without it (401).
 - The APIs aren't reachable through the proxy (404). Request bodies are capped at 11 MB. Uploads over 10 MB are rejected by the app.
 - Script: adds, replaces and removes logins; rejects short passwords and bad usernames. The stored hash was checked independently against the password.
-- **Not yet verified:** the public quick tunnel (never started), the browser's own password prompt (a human check), and live (non-MOCK) scans through the proxy.
+- **Live (2026-10-08):** you confirmed login and live scans in both apps locally. The public quick tunnel was then started: every path, including `/v1/analyze`, returns 401 without a valid login over HTTPS.

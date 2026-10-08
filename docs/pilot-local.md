@@ -49,6 +49,15 @@ docker compose -f infra/compose.yml --profile pilot --profile tunnel logs tunnel
 
 Send each person the `https://….trycloudflare.com` link plus **their own** username. Send passwords separately, for example through a password manager or a different channel.
 
+## Permanent address (nutrition-demo.loamlabs.io)
+
+Uses a Cloudflare **named tunnel** instead of the quick tunnel. It requires loamlabs.io's DNS on Cloudflare (moved from Porkbun with the email and website records checked). The tunnel token goes only in the git-ignored `.env.tunnel.local` (`TUNNEL_TOKEN=...`), and the dashboard route is `nutrition-demo.loamlabs.io` → `http://proxy:8080`. Switch:
+
+```powershell
+docker compose -f infra/compose.yml --profile pilot --profile tunnel stop tunnel
+docker compose -f infra/compose.yml --profile pilot --profile named-tunnel up -d --no-deps named-tunnel
+```
+
 ## Stop sharing / stop everything
 
 Commands that mention `tunnel` need both `--profile pilot` and `--profile tunnel` (the tunnel depends on the proxy).

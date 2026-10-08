@@ -135,6 +135,21 @@ services:
     networks: [edge]
     depends_on: [proxy]
 
+  # Permanent address (e.g. https://nutrition-demo.loamlabs.io) through a Cloudflare named tunnel.
+  # The tunnel token lives only in the git-ignored .env.tunnel.local (TUNNEL_TOKEN=...); the
+  # hostname -> http://proxy:8080 route is set in the Cloudflare dashboard. Use this instead of
+  # the quick tunnel, not alongside it.
+  named-tunnel:
+    image: cloudflare/cloudflared:2026.10.0
+    profiles: [named-tunnel]
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    env_file:
+      - path: ../.env.tunnel.local  # TUNNEL_TOKEN only
+        required: true
+    networks: [edge]
+    depends_on: [proxy]
+
 # Separate networks: App A's containers can't reach App B's API or the database, and the
 # reverse. Each UI reaches only its own API. The tunnel reaches only the proxy (`edge`).
 networks:

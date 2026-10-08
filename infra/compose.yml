@@ -1,7 +1,28 @@
-# Local development PostgreSQL only. Bound to 127.0.0.1; never expose publicly.
-# The default password is a local-only development value, not a deployment secret.
-# Override with POSTGRES_PASSWORD in your shell if you prefer.
+# Local PostgreSQL plus the four packaged services (POC-16). Every published port is bound to
+# 127.0.0.1; never expose these publicly. The hosted pilot puts an authenticated reverse proxy
+# in front of the two UIs only (docs/deployment-plan.md). The default Postgres password is a
+# local-only development value, not a deployment secret.
+#
+#   docker compose -f infra/compose.yml up -d postgres                 # local dev database
+#   docker compose -f infra/compose.yml --profile app-a up -d --build  # App A only
+#   docker compose -f infra/compose.yml --profile app-b up -d --build  # App B only (+ postgres)
+#
+# App independence: each profile starts only its own services; each API container reads only its
+# own env file; the UIs receive no secrets, only their own API's internal URL. The APIs have no
+# published ports: only their own UI reaches them, server-side, on that app's own network.
 name: foodvision
+
+x-app: &app
+  build:
+    context: ..
+    dockerfile: infra/Dockerfile
+  image: foodvision:${FOODVISION_TAG:-local}
+  restart: unless-stopped
+
+x-api-health: &api-health
+  interval: 10s
+  timeout: 5s
+  retries: 6
 
 services:
   postgres:
@@ -14,11 +35,88 @@ services:
       - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks: [default, b_data]  # only b-api reaches the database; never App A or a UI
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U foodvision -d foodvision"]
       interval: 5s
       timeout: 3s
       retries: 10
+
+  a-api:
+    <<: *app
+    profiles: [app-a]
+    networks: [app_a]
+    command: ["uvicorn", "foodvision.api.provider_app:app", "--host", "0.0.0.0", "--port", "8001"]
+    env_file:
+      - path: ../.env.provider.local  # App A's secrets only (fatsecret)
+        required: false
+    environment:
+      MOCK_MODE: ${FOODVISION_MOCK_MODE:-false}
+    healthcheck:
+      <<: *api-health
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=4).status != 200)"]
+
+  a-ui:
+    <<: *app
+    profiles: [app-a]
+    networks: [app_a]
+    command: ["streamlit", "run", "apps/provider_ui.py", "--server.port", "8501", "--server.address", "0.0.0.0",
+              "--server.headless", "true", "--server.maxUploadSize", "10", "--browser.gatherUsageStats", "false"]
+    environment:
+      PROVIDER_API_URL: http://a-api:8001  # no secrets in the UI
+    ports:
+      - "127.0.0.1:8501:8501"
+    depends_on:
+      a-api:
+        condition: service_healthy
+    healthcheck:
+      <<: *api-health
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=4).status != 200)"]
+
+  b-api:
+    <<: *app
+    profiles: [app-b]
+    networks: [app_b, b_data]
+    command: ["uvicorn", "foodvision.api.agent_app:app", "--host", "0.0.0.0", "--port", "8002"]
+    env_file:
+      - path: ../.env.agent.local  # App B's secrets only (model key, inference DB login)
+        required: false
+    environment:
+      MOCK_MODE: ${FOODVISION_MOCK_MODE:-false}
+      # Inside the compose network the database host is `postgres`, not 127.0.0.1. Set
+      # B_DATABASE_URL in the shell (an fv_inference login); it is never written to a file here.
+      DATABASE_URL: ${B_DATABASE_URL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      <<: *api-health
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8002/health', timeout=4).status != 200)"]
+
+  b-ui:
+    <<: *app
+    profiles: [app-b]
+    networks: [app_b]
+    command: ["streamlit", "run", "apps/agent_ui.py", "--server.port", "8502", "--server.address", "0.0.0.0",
+              "--server.headless", "true", "--server.maxUploadSize", "10", "--browser.gatherUsageStats", "false"]
+    environment:
+      AGENT_API_URL: http://b-api:8002  # no secrets in the UI
+    ports:
+      - "127.0.0.1:8502:8502"
+    depends_on:
+      b-api:
+        condition: service_healthy
+    healthcheck:
+      <<: *api-health
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8502/_stcore/health', timeout=4).status != 200)"]
+
+# Separate networks: App A's containers can't reach App B's API or the database, and the
+# reverse. Each UI reaches only its own API.
+networks:
+  default:
+  app_a:
+  app_b:
+  b_data:
 
 volumes:
   pgdata:

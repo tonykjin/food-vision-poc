@@ -105,6 +105,10 @@ Real reference meals live in a private folder outside Git. See [`benchmarks/prot
 
 `foodvision benchmark --manifest <private groups> --split development --configs A_native,B_grounded --repeats 3 --concurrency 1 --output work/eval-dev` runs paired, order-rotated scans on identical processed images. A paid run needs `--confirm-paid-run`, `--max-total-cost-usd` and `--max-scans`. `foodvision report --batch <batch dir> --output work/report-dev` rebuilds the saved report. Metric definitions are frozen in [`benchmarks/metrics.md`](benchmarks/metrics.md). Calibration and held-out runs use `foodvision freeze` (then `--frozen`), `foodvision calibrate` and `foodvision gates`; the procedure is in the same file. While fatsecret rights are pending, App A accuracy metrics are shown only in the terminal and saved as unavailable.
 
+### Containers (POC-16 packaging)
+
+`docker compose -f infra/compose.yml --profile app-a up -d --build` starts App A (API + UI) and `--profile app-b` starts App B (API + UI + Postgres). Each API gets only its own env file, the UIs get no secrets, and the two apps sit on separate networks. Set `FOODVISION_MOCK_MODE=true` for a no-cost check. The hosted pilot plan is in [`docs/deployment-plan.md`](docs/deployment-plan.md).
+
 ### Human UI checks (each app)
 
 1. Open http://localhost:8501 (A) or http://localhost:8502 (B). The title names the right app, and a red **MOCK MODE** banner appears.
@@ -137,7 +141,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
 | `apps/compare_ui.py` | POC-13 (#13) |
-| `infra/Dockerfile` | POC-16 (#16) |
 
 ## Documents
 

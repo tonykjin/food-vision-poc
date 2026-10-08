@@ -342,6 +342,14 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 
 **Prompt 25 proof-of-concept run (2026-10-08, synthetic references at your direction).** 8 Wikimedia Commons meal photos (permissive licenses, attribution recorded), invented grams, real USDA values, all `is_synthetic`. Ran freeze → calibration batch → `calibrate` → test batch (once) → `gates` with live APIs: **48/48 scans returned typed results (0 failed, 0 not run).** A: all complete, p50 about 3.9 s. B: 12/24 complete and 12 partial, p50 about 12.8 s, p95 up to 20.5 s, $0.94. Calibration: all buckets "insufficient data" (4 groups); A calibration and A-dependent gates not saved (rights). **Not an accuracy result or a decision.** Details: `docs/dev-runs/2026-10-08-poc25-synthetic.md`.
 
+**Prompt 26: Claude GitHub integration** is waiting on you running `/install-github-app` (choices are explained in chat). Ordinary CI is healthy.
+
+**Prompt 27: POC-16 deployment plan and packaging** (2026-10-08, branch `feat/poc-16-deploy-packaging`). The destination is PENDING, so nothing was provisioned.
+- `infra/Dockerfile` (one locked, non-root image; `.dockerignore` keeps secrets and data out).
+- `infra/compose.yml`: four services in profiles `app-a` / `app-b`, each API with only its own env file, UIs with no secrets, separate networks (only `b-api` reaches Postgres), health checks, a 10 MB upload cap.
+- Verified locally in MOCK mode: all healthy; secret names per container correct; cross-app and UI → DB traffic unreachable; 11 MB → 413. Found and fixed: with one shared network, each UI could reach the other app's API.
+- Plan: `docs/deployment-plan.md`. **Needs from you: destination account and region (VM with a static IP for fatsecret), pilot users, a hosting budget.**
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

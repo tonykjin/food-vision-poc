@@ -1,0 +1,24 @@
+# Never send secrets, private data or local state into an image build.
+.env
+.env.*
+*.env
+secrets/
+.secrets/
+*.pem
+*.key
+data/
+work/
+assets/
+reports/
+.venv/
+.git/
+.github/
+.claude/
+tests/
+benchmarks/
+docs/
+scripts/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/

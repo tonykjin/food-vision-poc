@@ -162,7 +162,7 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
         print(f"  model served       {prov.model_served} (fallback: {prov.fallback_served})")
         print(f"  stop_reason        {prov.stop_reason}")
         print(f"  prompt             {prov.prompt_version} sha256 {prov.prompt_sha256[:12]}")
-        print(f"  sdk                anthropic {prov.sdk_version}")
+        print(f"  sdk                {prov.provider} {prov.sdk_version}")
     kind = "model-estimated, NOT grounded" if result.pipeline_id == "B_direct" else "grounded"
     print(f"  items              {len(items)} ({sum(i.resolved for i in items)} {kind})")
     print(f"  totals status      {result.totals.status.value}")

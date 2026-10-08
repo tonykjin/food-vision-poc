@@ -20,9 +20,11 @@ from foodvision.benchmark.manifest import Group, Split, reference_totals
 from foodvision.benchmark.metrics import Attempt, Reference
 from foodvision.contracts.errors import ErrorCode
 from foodvision.contracts.requests import AnalysisContext
+from foodvision.contracts.results import ConfidenceType
 from foodvision.imaging.prepare import PreparedImage, prepare_image
 from foodvision.imaging.profiles import BASELINE
 from foodvision.measurement.budget import BudgetPolicy
+from foodvision.measurement.confidence import assess_confidence
 from foodvision.measurement.events import ScanStatus
 from foodvision.measurement.spans import ScanRecorder
 from foodvision.pipelines.base import Pipeline
@@ -158,6 +160,10 @@ def run_batch(
         exception = None
         try:
             result = pipeline.analyze(image, context, recorder)
+            if result.confidence.type is ConfidenceType.UNAVAILABLE:
+                # Same shared rules the API applies; without this, every benchmark result
+                # would be "not assessed" and calibration buckets would stay empty.
+                result.confidence = assess_confidence(result)
             status, code = result.status.value, result.error.code if result.error else None
         except Exception as exc:  # never drop a run: record it as a failure
             result, status, code = None, "failed", ErrorCode.PROVIDER_ERROR

@@ -114,3 +114,30 @@ def test_a_new_reference_version_keeps_the_old_one(login_as, data_dir):
     load(evaluator, root, groups, new)
     q = "SELECT count(*) FROM benchmark.samples WHERE reference_version = :v"
     assert count(evaluator, q, v=old) == count(evaluator, q, v=new) == 4
+
+
+def test_calibration_version_is_saved_by_evaluator_and_never_fits_on_test(login_as):
+    from sqlalchemy.exc import IntegrityError
+
+    from foodvision.benchmark.calibration import save_calibration
+
+    evaluator = login_as("fv_evaluator")
+    record = {
+        "version": f"cal-{secrets.token_hex(4)}",
+        "fitting_split": "calibration",
+        "success_definition": "useful-v1 (synthetic test)",
+        "bin_counts": {"high": {"attempts": 3, "groups": 1, "useful": 3}},
+        "rates": {"high": None},
+        "uncertainty": {"high": None},
+        "status": {"high": "insufficient data (1 < 30 groups)"},
+    }
+    with evaluator.begin() as conn:
+        save_calibration(conn, record)
+    q = "SELECT fitting_split FROM benchmark.calibration_versions WHERE version = :v"
+    assert count(evaluator, q, v=record["version"]) == "calibration"
+    with pytest.raises(IntegrityError), evaluator.begin() as conn:
+        save_calibration(
+            conn, {**record, "version": record["version"] + "-t", "fitting_split": "test"}
+        )
+    with pytest.raises(EvaluatorAuthorizationError), login_as("fv_inference").begin() as conn:
+        save_calibration(conn, {**record, "version": record["version"] + "-i"})

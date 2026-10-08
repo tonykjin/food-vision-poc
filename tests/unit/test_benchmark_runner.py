@@ -242,3 +242,15 @@ def test_prepare_samples_rejects_changed_photo(private_manifest):
     (data / group.photos[0].file).write_bytes(synthetic_image(size=(10, 10)))
     with pytest.raises(ValueError, match="does not match"):
         prepare_samples([group], data)
+
+
+def test_runner_applies_the_same_confidence_rules_as_the_api():
+    plan = plan_runs(samples(1), ["B_grounded"], repeats=1)
+    batch = run_batch(
+        plan,
+        {"B_grounded": FakePipeline("B_grounded")},
+        {"B_grounded": BudgetPolicy()},
+        BatchCaps(),
+    )
+    confidence = batch.attempts[0].result.confidence
+    assert confidence.type == "heuristic_uncalibrated" and confidence.label is not None

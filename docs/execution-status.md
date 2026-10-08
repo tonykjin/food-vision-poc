@@ -332,6 +332,14 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 
 **OpenAI live smoke (2026-10-08):** the key is present and authenticates; 2 single-call smokes → HTTP 429 `credit_balance_exhausted` / `insufficient_quota` (no credit; no output, no cost). Fixed: billing was misclassified as a retryable rate limit; diagnostics now record the code, type and retry-after (branch `fix/openai-rate-limit-diagnostics`). You then added credit. **Live-verified 2026-10-08:** recognition-only 7 items, 28.4 s, $0.080; `B_direct` complete, 7/7 nutrients, 32.3 s, $0.0995 (served `gpt-6-astra`). Fixed: the smoke summary printed `sdk anthropic` for OpenAI.
 
+**Prompt 25: POC-15 calibration and locked evaluation** (2026-10-08, branch `feat/poc-15-calibration-gates`). **Not executed: there is no reviewed calibration or test data** (0 real groups in any split; the plan targets about 100 per split). Development meals weren't repurposed, and nothing was measured. **Go/no-go: INCONCLUSIVE (no evidence).** Tooling built and verified on synthetic data only:
+- `foodvision freeze`: a hashed, committed spec (commit, config IDs, rules / metrics / tolerance versions, preprocessing, manifest hash). Calibration and test benchmark runs refuse to start unless the run matches it. The test split runs once per spec.
+- `foodvision calibrate`: calibration split only (the DB also rejects `test`). Bucket rates with group-bootstrap intervals only at ≥ 30 groups, otherwise "insufficient data". A false-high review list. Optional save to `benchmark.calibration_versions` (evaluator login).
+- `foodvision gates`: plan §15 gates as GO / NO-GO / INCONCLUSIVE from interval evidence, labeled provisional; human gates flagged; fatsecret-dependent gates saved as unavailable.
+- **Bug found and fixed:** the benchmark runner never applied the confidence rules (the API does), so every benchmark result was "not assessed" and calibration buckets would have been empty.
+- Verified: `pytest` with DB 473 passed; mutations (counting attempts instead of groups, fitting on test, running the test split twice, a lenient verdict, the runner skipping confidence) were each caught.
+- **To execute:** collect and review real calibration and test groups (`benchmarks/protocol.md`), record spend caps, approve the useful-result tolerance and the §15 thresholds, then follow `benchmarks/metrics.md` "Frozen evaluation".
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

@@ -103,7 +103,7 @@ Real reference meals live in a private folder outside Git. See [`benchmarks/prot
 
 ### Benchmark runner (POC-13)
 
-`foodvision benchmark --manifest <private groups> --split development --configs A_native,B_grounded --repeats 3 --concurrency 1 --output work/eval-dev` runs paired, order-rotated scans on identical processed images. A paid run needs `--confirm-paid-run`, `--max-total-cost-usd` and `--max-scans`. `foodvision report --batch <batch dir> --output work/report-dev` rebuilds the saved report. Metric definitions are frozen in [`benchmarks/metrics.md`](benchmarks/metrics.md). While fatsecret rights are pending, App A accuracy metrics are shown only in the terminal and saved as unavailable.
+`foodvision benchmark --manifest <private groups> --split development --configs A_native,B_grounded --repeats 3 --concurrency 1 --output work/eval-dev` runs paired, order-rotated scans on identical processed images. A paid run needs `--confirm-paid-run`, `--max-total-cost-usd` and `--max-scans`. `foodvision report --batch <batch dir> --output work/report-dev` rebuilds the saved report. Metric definitions are frozen in [`benchmarks/metrics.md`](benchmarks/metrics.md). Calibration and held-out runs use `foodvision freeze` (then `--frozen`), `foodvision calibrate` and `foodvision gates`; the procedure is in the same file. While fatsecret rights are pending, App A accuracy metrics are shown only in the terminal and saved as unavailable.
 
 ### Human UI checks (each app)
 
@@ -137,7 +137,6 @@ CI (`.github/workflows/ci.yml`) runs the frozen install, Ruff and pytest on ever
 | Command / entry point (plan §6, §14) | Arrives with |
 |---|---|
 | `apps/compare_ui.py` | POC-13 (#13) |
-| `foodvision calibrate` | POC-15 (#15) |
 | `infra/Dockerfile` | POC-16 (#16) |
 
 ## Documents

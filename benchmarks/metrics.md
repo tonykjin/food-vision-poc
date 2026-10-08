@@ -56,3 +56,27 @@ Status counts, latency and cost are payload-free and always saved. Accuracy, ite
 - While fatsecret rights are pending, App A's derived metrics and the A/B comparison are printed during the run but **never written**.
 - Saved reports show them as `UNAVAILABLE`, never as empty or zero.
 - Saved App A run records keep only payload-free fields and the storable `food_id`/`serving_id`.
+
+## Frozen evaluation, calibration and decision gates (POC-15)
+
+**Procedure** (calibration and test splits refuse to run otherwise):
+1. Commit everything, then `foodvision freeze --manifest <groups> --configs A_native,B_grounded --name <name>`. This writes `benchmarks/frozen/<name>.json`: commit, configuration IDs (model, effort, prompt hashes, item cap), confidence-rules / metrics / useful-result versions and tolerance, preprocessing version and manifest hash. It holds no labels, and it's hashed: an edited spec is rejected. Commit it.
+2. `foodvision benchmark --split calibration --frozen <spec> ...` runs only if the code, configs, rules, tolerance and manifest all match the spec. Only `benchmarks/frozen/` and `docs/` may change after the freeze.
+3. `foodvision calibrate --batch <calibration batch> --config B_grounded --version <name> --output <dir> [--save-db]` fits on the **calibration split only** (the DB table also rejects `test`). Per heuristic label (low/medium/high/not assessed) it reports attempts, **groups** and useful attempts:
+   - The pass rate and a group-bootstrap 95% interval are shown **only with ≥ 30 groups** in the bucket; otherwise "insufficient data", and the label stays uncalibrated.
+   - High-confidence attempts that weren't useful are listed for human review.
+4. `foodvision benchmark --split test --frozen <spec> --allow-test-split ...` runs **once** per spec (a second test batch for the same spec is refused). If the held-out results motivate a change, freeze a **new** spec and collect new confirmatory data; never tune on the test set.
+5. `foodvision gates --batch <test batch> --output <dir>` gives evidence for each plan §15 gate (`gates-v1`, **provisional**: the thresholds aren't approved yet).
+
+**Gate verdicts** use the whole group-level 95% interval: GO if it meets the threshold, NO-GO if it misses it entirely, INCONCLUSIVE otherwise (including too few groups for an interval). The overall verdict is NO-GO if any automated gate is NO-GO, INCONCLUSIVE if any is inconclusive, else GO (provisional).
+
+| Gate (plan §15) | Measure | Threshold |
+|---|---|---|
+| Typed result within deadline | attempts with complete/partial/abstained (or `empty_recognition`) within the per-scan deadline | ≥ 95% |
+| No hidden exclusions | batch complete, nothing not run | yes |
+| p95 server time | 95th percentile of `server_total_ms` per config | ≤ 15 s |
+| B vs A useful rate | paired difference B − A over groups scorable for both | B no more than 5 points below A |
+| Cost materiality | known cost per useful attempt per config | human decision |
+| False-high confidence | review list from calibration | human review |
+
+While fatsecret rights are pending, App A's calibration and the A-dependent gates (B vs A, A's cost per useful attempt, the overall verdict) are printed but saved as unavailable.

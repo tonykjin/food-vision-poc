@@ -73,3 +73,6 @@ desktop.ini
 assets/
 *.avif
 *.heic
+
+# Frozen specs for synthetic proof-of-concept runs are throwaway, never committed
+benchmarks/frozen/synthetic-*.json

@@ -132,7 +132,11 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
         refusal_fallback=settings.vision_refusal_fallback,
     )
     vision = ClaudeVisionProvider(settings.anthropic_api_key, config)
-    if grounded:
+    if settings.pipeline_mode == "direct":
+        from foodvision.pipelines.agent_direct import DirectPipeline
+
+        pipeline = DirectPipeline(vision)
+    elif grounded:
         from sqlalchemy import create_engine
 
         from foodvision.pipelines.agent_grounded import GroundedPipeline
@@ -164,7 +168,8 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
         print(f"  stop_reason        {prov.stop_reason}")
         print(f"  prompt             {prov.prompt_version} sha256 {prov.prompt_sha256[:12]}")
         print(f"  sdk                anthropic {prov.sdk_version}")
-    print(f"  items              {len(items)} ({sum(i.resolved for i in items)} grounded)")
+    kind = "model-estimated, NOT grounded" if result.pipeline_id == "B_direct" else "grounded"
+    print(f"  items              {len(items)} ({sum(i.resolved for i in items)} {kind})")
     print(f"  totals status      {result.totals.status.value}")
     for key in ("energy_kcal", "protein_g", "carbohydrate_g", "fat_g"):
         known = sum(getattr(i.nutrients, key) is not None for i in items)

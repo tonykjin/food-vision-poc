@@ -24,6 +24,7 @@ from foodvision.measurement.storage_policy import DataClass, DataSource, Purpose
 CONFIG_SOURCES = {
     "A_native": DataSource.FATSECRET,
     "B_grounded": DataSource.VISION_MODEL,
+    "B_direct": DataSource.VISION_MODEL,
     "A_mock": DataSource.MOCK,
     "B_mock": DataSource.MOCK,
 }

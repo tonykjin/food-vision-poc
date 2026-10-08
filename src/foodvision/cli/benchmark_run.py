@@ -34,9 +34,11 @@ from foodvision.imaging.profiles import BASELINE
 from foodvision.measurement.budget import BudgetPolicy
 from foodvision.measurement.storage_policy import Purpose, filter_result, policy_from_settings
 
+MODES = {"B_grounded": "grounded", "B_direct": "direct"}
 CONFIG_APPS = {
     "A_native": AppKind.PROVIDER,
     "B_grounded": AppKind.AGENT,
+    "B_direct": AppKind.AGENT,
     "A_mock": AppKind.PROVIDER,
     "B_mock": AppKind.AGENT,
 }
@@ -47,6 +49,8 @@ def _pipeline(config: str):
     from foodvision.pipelines.mock import MockPipeline
 
     settings = load_settings(CONFIG_APPS[config])
+    if config in MODES:  # one batch can compare B_grounded and B_direct on identical bytes
+        settings = settings.model_copy(update={"pipeline_mode": MODES[config]})
     if config.endswith("_mock"):
         pipeline = MockPipeline(config)
     else:

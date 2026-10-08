@@ -28,6 +28,7 @@ from foodvision.measurement.costs import Price, PriceTable
 from foodvision.measurement.events import AttemptOutcome, ProviderUsage, Stage
 from foodvision.measurement.retry import AttemptError, CallResult, CallSpec, call_with_retries
 from foodvision.measurement.spans import ScanRecorder
+from foodvision.recognition.direct import DIRECT_PROMPT_VERSION, DIRECT_SCHEMA, DirectOutput
 from foodvision.recognition.hypotheses import (
     OUTPUT_SCHEMA,
     PROMPT_VERSION,
@@ -160,6 +161,7 @@ class ClaudeVisionProvider:
     ) -> None:
         self.config = config
         self.prompt, self.prompt_sha256 = load_prompt(PROMPT_VERSION)
+        self.direct_prompt, self.direct_prompt_sha256 = load_prompt(DIRECT_PROMPT_VERSION)
         self._client = client or anthropic.Anthropic(
             api_key=api_key.get_secret_value(), max_retries=0
         )
@@ -297,6 +299,22 @@ class ClaudeVisionProvider:
         return RecognitionResponse(
             output=output, **self._provenance(response, PROMPT_VERSION, self.prompt_sha256)
         )
+
+    def estimate_direct(self, image: PreparedImage, recorder: ScanRecorder) -> tuple[Any, dict]:
+        """B_direct (diagnostic): one call returning foods plus model-estimated nutrients."""
+        output, response = self._structured_call(
+            recorder,
+            system=self.direct_prompt,
+            content=[
+                self._image_block(image),
+                {"type": "text", "text": "Identify the visible foods and estimate nutrition."},
+            ],
+            schema=DIRECT_SCHEMA,
+            validate=DirectOutput.model_validate,
+            operation="messages.direct",
+            stage=Stage.RECOGNITION,
+        )
+        return output, self._provenance(response, DIRECT_PROMPT_VERSION, self.direct_prompt_sha256)
 
     def choose_matches(
         self,

@@ -84,8 +84,9 @@ class AgentSettings(CommonSettings):
     # Server-side refusal fallback; a fallback-served answer is recorded in provenance.
     vision_refusal_fallback: bool = True
     # grounded: recognize -> USDA retrieval -> selection -> calculation (needs DATABASE_URL,
-    # an fv_inference login). recognition_only: hypotheses without nutrients.
-    pipeline_mode: Literal["grounded", "recognition_only"] = "grounded"
+    # an fv_inference login). recognition_only: hypotheses without nutrients. direct:
+    # diagnostic B_direct, model-estimated nutrients with no database grounding.
+    pipeline_mode: Literal["grounded", "recognition_only", "direct"] = "grounded"
     # Optional comma-separated catalog source_versions to pin (frozen evaluations).
     catalog_source_versions: str | None = None
     max_model_calls_per_scan: int = Field(default=2, ge=0)

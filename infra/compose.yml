@@ -121,7 +121,7 @@ services:
     volumes:
       - ./pilot/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./pilot/users.caddy:/etc/caddy/users.caddy:ro  # hashes only; git-ignored
-    networks: [app_a, app_b, edge]
+    networks: [app_a, edge]  # App B isn't published, so the proxy can't reach it
     ports:
       - "127.0.0.1:8080:8080"
 

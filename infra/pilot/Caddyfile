@@ -25,23 +25,21 @@
 		reverse_proxy a-ui:8501
 	}
 
-	handle /app-b* {
-		reverse_proxy b-ui:8502
-	}
+	# App B is deliberately not published (investor demo shows App A only, 2026-10-08).
+	# It stays available on this computer at http://localhost:8502/app-b/.
 
 	handle / {
 		header Content-Type "text/html; charset=utf-8"
 		respond <<HTML
 			<!doctype html>
 			<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-			<title>Food Vision POC</title>
+			<title>Food Vision demo</title>
 			<style>body{font-family:system-ui,sans-serif;max-width:40rem;margin:3rem auto;padding:0 1rem;line-height:1.5;color:#1f2937}
 			a.app{display:block;padding:1rem;margin:.75rem 0;border:1px solid #d1d5db;border-radius:.5rem;text-decoration:none;color:inherit}
 			a.app:hover{border-color:#6b7280}.note{font-size:.9rem;color:#4b5563}</style></head>
-			<body><h1>Food Vision proof of concept</h1>
-			<p>Upload one meal photo to either app to get an estimated nutrition breakdown.</p>
-			<a class="app" href="/app-a/"><strong>App A</strong> - fatsecret image recognition</a>
-			<a class="app" href="/app-b/"><strong>App B</strong> - vision model + USDA food data</a>
+			<body><h1>Food Vision demo</h1>
+			<p>Upload one meal photo to get an estimated nutrition breakdown.</p>
+			<a class="app" href="/app-a/"><strong>Analyze a meal photo</strong> - food recognition by fatsecret</a>
 			<p class="note">Proof of concept: results are estimates, not measured accuracy. Uploaded photos are not stored.
 			Each scan calls paid third-party APIs.</p></body></html>
 			HTML 200

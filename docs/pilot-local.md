@@ -1,5 +1,7 @@
 # Local pilot: share the apps from this computer with a login
 
+**Published site shows App A only (2026-10-08).** The investor demo leaves App B out: the public link serves the landing page and App A, and `/app-b/` returns 404. App B still runs locally at http://localhost:8502/app-b/ (this computer only, no login). To publish it again, restore the `/app-b*` route in `infra/pilot/Caddyfile` and add `app_b` back to the proxy's networks.
+
 **Current hosting choice (2026-10-08):** the apps run on this computer in Docker, behind a username/password login. A Cloudflare quick tunnel gives a public HTTPS link for cofounders and investors. This replaces the VM option for now; `docs/deployment-plan.md` stays the plan for a real host later.
 
 | Pros | Cons |
@@ -36,7 +38,7 @@ $env:B_DATABASE_URL = "postgresql+psycopg://b_pilot:<the password you set>@postg
 docker compose -f infra/compose.yml --profile app-a --profile app-b --profile pilot up -d --build
 ```
 
-Check it yourself first at **http://localhost:8080**: log in, then open App A and App B and run one photo each.
+Check it yourself first at **http://localhost:8080**: log in and run one photo in App A. App B is at http://localhost:8502/app-b/ (local only).
 
 ## Share the link
 

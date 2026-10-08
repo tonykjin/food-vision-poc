@@ -121,7 +121,7 @@ services:
     volumes:
       - ./pilot/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./pilot/users.caddy:/etc/caddy/users.caddy:ro  # hashes only; git-ignored
-    networks: [app_a, app_b, edge]
+    networks: [app_a, edge]  # App B isn't published, so the proxy can't reach it
     ports:
       - "127.0.0.1:8080:8080"
 
@@ -132,6 +132,21 @@ services:
     profiles: [tunnel]
     restart: unless-stopped
     command: ["tunnel", "--no-autoupdate", "--url", "http://proxy:8080"]
+    networks: [edge]
+    depends_on: [proxy]
+
+  # Permanent address (e.g. https://nutrition-demo.loamlabs.io) through a Cloudflare named tunnel.
+  # The tunnel token lives only in the git-ignored .env.tunnel.local (TUNNEL_TOKEN=...); the
+  # hostname -> http://proxy:8080 route is set in the Cloudflare dashboard. Use this instead of
+  # the quick tunnel, not alongside it.
+  named-tunnel:
+    image: cloudflare/cloudflared:2026.10.0
+    profiles: [named-tunnel]
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    env_file:
+      - path: ../.env.tunnel.local  # TUNNEL_TOKEN only
+        required: true
     networks: [edge]
     depends_on: [proxy]
 

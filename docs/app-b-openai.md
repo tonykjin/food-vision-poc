@@ -24,7 +24,15 @@ The configuration ID names the provider, model, effort, prompt hash and image de
 
 - **Contract-tested** (fake SDK client, 18 tests): request shape, strict schema, provenance, cost, refusal, truncation, invalid JSON, field-level validation, every error mapping, registry selection, `B_direct` on OpenAI.
 - **Live attempts (2026-10-08, opt-in smoke, 1 call each, no output, no cost):** the key is present and authenticates, but both calls returned HTTP 429 with **code `credit_balance_exhausted`, type `insufficient_quota`**: the OpenAI account has no credit. This exposed a classification bug: billing arrives in `type` with a new `code`, so it had been treated as a retryable rate limit. Now it's a non-retried `quota` failure, and rate-limit details record the code, type and retry-after (identifiers only).
-- **Still not live-verified:** add credit to the OpenAI account, then rerun the smoke.
+- **Live-verified 2026-10-08 after you added credit** (opt-in smokes, stock smoke image, 1 call each):
+
+  | Mode | Status | Items | Served model | stop | Time | Tokens in/out | Cost |
+  |---|---|---|---|---|---|---|---|
+  | recognition-only | partial (as designed: no nutrients) | 7 | `gpt-6-astra` | completed | 28.4 s | 1,156 / 1,366 | $0.080 |
+  | `B_direct` | complete, 7/7 nutrients | 7 | `gpt-6-astra` | completed | 32.3 s | 1,326 / 1,725 | $0.0995 |
+
+  The served model ID equals the alias (no snapshot suffix seen), so pricing matched. Strict-schema output passed our own validation both times.
+  **Same photo, Claude (`claude-opus-5-5`, 2026-10-07):** `B_direct` 6 items, 14.5 s, $0.040. OpenAI took about 2× longer and cost 2.5× more per call here. One photo isn't a comparison of quality or accuracy.
 - Earlier (2026-10-07): `OPENAI_API_KEY` was missing from `.env.agent.local`. Real response shape, served model ID, usage fields, latency and quotas are unverified until the opt-in smoke runs: set `VISION_PROVIDER=openai` and `PIPELINE_MODE=recognition_only` or `direct`, then `foodvision smoke-vision --image <photo> --confirm-one-request`.
 
 ## DeepSeek: not built (recorded, not substituted)

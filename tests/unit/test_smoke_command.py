@@ -50,3 +50,22 @@ def test_vision_smoke_refuses_without_opt_in_and_budget_is_one_call(monkeypatch,
     assert main(["smoke-vision", "--image", "x.jpg", "--confirm-one-request"]) == 2
     assert "ENABLE_LIVE_API_TESTS" in capsys.readouterr().out
     assert VISION_SMOKE_BUDGET.max_model_calls == 1 and VISION_SMOKE_BUDGET.max_attempts == 1
+
+
+def test_vision_smoke_summary_names_the_actual_provider(tmp_path, monkeypatch, capsys):
+    from tests.conftest import synthetic_image
+    from tests.unit.test_openai_vision import provider as openai_provider
+    from tests.unit.test_openai_vision import response
+
+    from foodvision.cli.smoke import smoke_vision
+    from foodvision.providers import registry
+
+    vision, _ = openai_provider([response()])
+    monkeypatch.setattr(registry, "build_vision_provider", lambda settings: (vision, None))
+    monkeypatch.setenv("ENABLE_LIVE_API_TESTS", "true")
+    monkeypatch.setenv("PIPELINE_MODE", "recognition_only")
+    image = tmp_path / "synthetic.jpg"
+    image.write_bytes(synthetic_image())
+    assert smoke_vision(str(image), confirmed=True) == 0
+    out = capsys.readouterr().out
+    assert "sdk                openai " in out and "anthropic" not in out

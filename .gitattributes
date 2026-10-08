@@ -1,1 +1,4 @@
 *.sh text eol=lf
+# Read inside Linux containers: keep LF on every checkout
+infra/pilot/Caddyfile text eol=lf
+infra/Dockerfile text eol=lf

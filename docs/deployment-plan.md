@@ -1,6 +1,6 @@
 # Hosted pilot deployment plan (POC-16, Prompt 27)
 
-**Status (2026-10-08): packaging done and verified locally; destination PENDING.** Nothing has been provisioned. Built from the real code and `infra/compose.yml`, not a generic diagram.
+**Status (2026-10-08): packaging done and verified locally. Current choice: local hosting with a login and tunnel (`docs/pilot-local.md`).** This document stays the plan for a real host later; nothing has been provisioned. Built from the real code and `infra/compose.yml`, not a generic diagram.
 
 **Deployment readiness is not a business result.** A working deployment says nothing about accuracy: 0 real reference meals exist, and the only evaluation run used synthetic references (`docs/dev-runs/2026-10-08-poc25-synthetic.md`). The go/no-go gates remain INCONCLUSIVE.
 

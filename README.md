@@ -107,7 +107,7 @@ Real reference meals live in a private folder outside Git. See [`benchmarks/prot
 
 ### Containers (POC-16 packaging)
 
-`docker compose -f infra/compose.yml --profile app-a up -d --build` starts App A (API + UI) and `--profile app-b` starts App B (API + UI + Postgres). Each API gets only its own env file, the UIs get no secrets, and the two apps sit on separate networks. Set `FOODVISION_MOCK_MODE=true` for a no-cost check. The hosted pilot plan is in [`docs/deployment-plan.md`](docs/deployment-plan.md).
+`docker compose -f infra/compose.yml --profile app-a up -d --build` starts App A (API + UI) and `--profile app-b` starts App B (API + UI + Postgres). Each API gets only its own env file, the UIs get no secrets, and the two apps sit on separate networks. Set `FOODVISION_MOCK_MODE=true` for a no-cost check. To share the apps from this computer behind a per-person login, follow [`docs/pilot-local.md`](docs/pilot-local.md). A future hosted setup is in [`docs/deployment-plan.md`](docs/deployment-plan.md).
 
 ### Human UI checks (each app)
 

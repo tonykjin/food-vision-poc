@@ -64,6 +64,7 @@ services:
               "--server.headless", "true", "--server.maxUploadSize", "10", "--browser.gatherUsageStats", "false"]
     environment:
       PROVIDER_API_URL: http://a-api:8001  # no secrets in the UI
+      STREAMLIT_SERVER_BASE_URL_PATH: app-a  # served at /app-a/ (directly and via the proxy)
     ports:
       - "127.0.0.1:8501:8501"
     depends_on:
@@ -71,7 +72,7 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=4).status != 200)"]
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8501/app-a/_stcore/health', timeout=4).status != 200)"]
 
   b-api:
     <<: *app
@@ -101,6 +102,7 @@ services:
               "--server.headless", "true", "--server.maxUploadSize", "10", "--browser.gatherUsageStats", "false"]
     environment:
       AGENT_API_URL: http://b-api:8002  # no secrets in the UI
+      STREAMLIT_SERVER_BASE_URL_PATH: app-b
     ports:
       - "127.0.0.1:8502:8502"
     depends_on:
@@ -108,15 +110,39 @@ services:
         condition: service_healthy
     healthcheck:
       <<: *api-health
-      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8502/_stcore/health', timeout=4).status != 200)"]
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(urllib.request.urlopen('http://127.0.0.1:8502/app-b/_stcore/health', timeout=4).status != 200)"]
+
+  # --- Pilot access (opt-in) -----------------------------------------------------------------
+  # Login proxy in front of the two UIs only (never the APIs). Logins: scripts/pilot-user.ps1.
+  proxy:
+    image: caddy:2.11.7
+    profiles: [pilot]
+    restart: unless-stopped
+    volumes:
+      - ./pilot/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./pilot/users.caddy:/etc/caddy/users.caddy:ro  # hashes only; git-ignored
+    networks: [app_a, app_b, edge]
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  # Public HTTPS link to the proxy (Cloudflare quick tunnel: no account; the URL changes on
+  # each start and appears in `docker compose logs tunnel`). Start it only deliberately.
+  tunnel:
+    image: cloudflare/cloudflared:2026.10.0
+    profiles: [tunnel]
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "--url", "http://proxy:8080"]
+    networks: [edge]
+    depends_on: [proxy]
 
 # Separate networks: App A's containers can't reach App B's API or the database, and the
-# reverse. Each UI reaches only its own API.
+# reverse. Each UI reaches only its own API. The tunnel reaches only the proxy (`edge`).
 networks:
   default:
   app_a:
   app_b:
   b_data:
+  edge:
 
 volumes:
   pgdata:

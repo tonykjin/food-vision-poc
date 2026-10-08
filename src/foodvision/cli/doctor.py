@@ -19,8 +19,8 @@ REQUIRED_FOR_LIVE: dict[AppKind, tuple[str, ...]] = {
 OPTIONAL: tuple[str, ...] = ("USDA_API_KEY", "DATABASE_URL")
 
 LIVE_STATUS: dict[AppKind, str] = {
-    AppKind.PROVIDER: "fatsecret A_native (adapter-verified; live unverified)",
-    AppKind.AGENT: "Claude vision + USDA grounding (B_grounded; needs DATABASE_URL)",
+    AppKind.PROVIDER: "fatsecret A_native (live-verified 2026-10-07)",
+    AppKind.AGENT: "vision model + mode below (grounded needs DATABASE_URL)",
 }
 
 
@@ -49,11 +49,19 @@ def run_doctor(
     out(f"live pipeline       {LIVE_STATUS[kind]}")
     out(f"live API tests      {'enabled' if settings.enable_live_api_tests else 'disabled'}")
     if kind is AppKind.AGENT:
-        out(f"vision model        {settings.vision_model} (effort {settings.vision_effort})")
+        from foodvision.providers.registry import model_for
+
+        out(f"vision provider     {settings.vision_provider}")
+        out(f"vision model        {model_for(settings)} (effort {settings.vision_effort})")
         out(f"pipeline mode       {settings.pipeline_mode}")
     out("")
     out("required for live mode:")
-    for name in REQUIRED_FOR_LIVE[kind]:
+    required = REQUIRED_FOR_LIVE[kind]
+    if kind is AppKind.AGENT:
+        from foodvision.providers.registry import KEY_NAMES
+
+        required = (KEY_NAMES[settings.vision_provider],)
+    for name in required:
         out(f"  {name:<26} {'set' if present(name) else 'missing'}")
     out("optional:")
     for name in OPTIONAL:

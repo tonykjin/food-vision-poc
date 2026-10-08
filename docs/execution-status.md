@@ -328,6 +328,8 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - Backlog: sauce/condiment retrieval and B latency, both needing real-meal evidence.
 - Total spend: $0.38 Anthropic plus 3 fatsecret image requests.
 
+**Prompt 24, part 2b: OpenAI adapter** (POC-14, branch `feat/poc-14-openai-adapter`, stacked on B_direct). Docs checked 2026-10-07 (Responses API, image input, strict structured outputs, reasoning, models, pricing). `providers/openai_vision.py` plus `providers/registry.py`; `VISION_PROVIDER=openai`, default `gpt-6-astra` (an alias), effort medium, `detail: original`, no fallback. Benchmark labels such as `B_grounded@openai[:model]`. 18 contract tests. **Not live-verified: `OPENAI_API_KEY` is missing from `.env.agent.local`.** DeepSeek: not built (no key; JSON-schema output with images undocumented on its vision page); `VISION_PROVIDER=deepseek` is rejected. Details: `docs/app-b-openai.md`.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

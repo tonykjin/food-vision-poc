@@ -51,20 +51,12 @@ def live_pipeline(kind: AppKind, settings: AppSettings):
 
         client = FatsecretClient(settings.fatsecret_client_id, settings.fatsecret_client_secret)
         return ProviderNativePipeline(client), None
-    if settings.anthropic_api_key is None:
-        return None, "ANTHROPIC_API_KEY is not configured (foodvision doctor --app agent)"
     from foodvision.pipelines.agent_recognition import RecognitionOnlyPipeline
-    from foodvision.providers.claude_vision import ClaudeVisionProvider, VisionConfig
+    from foodvision.providers.registry import build_vision_provider
 
-    provider = ClaudeVisionProvider(
-        settings.anthropic_api_key,
-        VisionConfig(
-            model=settings.vision_model,
-            effort=settings.vision_effort,
-            max_tokens=settings.vision_max_tokens,
-            refusal_fallback=settings.vision_refusal_fallback,
-        ),
-    )
+    provider, reason = build_vision_provider(settings)
+    if provider is None:
+        return None, f"{reason} (foodvision doctor --app agent)"
     if settings.pipeline_mode == "direct":
         from foodvision.pipelines.agent_direct import DirectPipeline
 

@@ -44,7 +44,7 @@ UNAVAILABLE = (
 
 
 def source_of(config: str) -> DataSource:
-    return CONFIG_SOURCES[config]
+    return CONFIG_SOURCES[config.partition("@")[0]]  # 'B_grounded@openai' -> B_grounded
 
 
 def build_report(

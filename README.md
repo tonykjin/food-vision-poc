@@ -91,7 +91,7 @@ With `FATSECRET_CLIENT_ID`/`SECRET` in `.env.provider.local` and no `MOCK_MODE`,
 
 ### App B live mode (POC-09/10)
 
-With `ANTHROPIC_API_KEY` and `DATABASE_URL` (an `fv_inference` login) in `.env.agent.local`, App B runs `B_grounded`: Claude recognition, USDA retrieval, selection of a retrieved ID or `no_match`, and nutrients calculated in code. `PIPELINE_MODE=recognition_only` returns hypotheses without nutrients. `PIPELINE_MODE=direct` runs the diagnostic `B_direct` (model-estimated nutrients, no database grounding; see [`docs/app-b-direct.md`](docs/app-b-direct.md)). See [`docs/app-b-grounded.md`](docs/app-b-grounded.md) and [`docs/app-b-vision.md`](docs/app-b-vision.md).
+With `ANTHROPIC_API_KEY` and `DATABASE_URL` (an `fv_inference` login) in `.env.agent.local`, App B runs `B_grounded`: Claude recognition, USDA retrieval, selection of a retrieved ID or `no_match`, and nutrients calculated in code. `PIPELINE_MODE=recognition_only` returns hypotheses without nutrients. `PIPELINE_MODE=direct` runs the diagnostic `B_direct` (model-estimated nutrients, no database grounding; see [`docs/app-b-direct.md`](docs/app-b-direct.md)). `VISION_PROVIDER=openai` runs any B mode on OpenAI with the same prompts and limits ([`docs/app-b-openai.md`](docs/app-b-openai.md)); DeepSeek is not available. See [`docs/app-b-grounded.md`](docs/app-b-grounded.md) and [`docs/app-b-vision.md`](docs/app-b-vision.md).
 
 ### USDA catalog (POC-07)
 

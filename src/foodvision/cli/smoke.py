@@ -109,8 +109,11 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
     if not confirmed:
         print("Refusing: pass --confirm-one-request (one model request, no retries).")
         return 2
-    if settings.anthropic_api_key is None:
-        print("Refusing: ANTHROPIC_API_KEY missing (foodvision doctor --app agent).")
+    from foodvision.providers.registry import build_vision_provider
+
+    vision, reason = build_vision_provider(settings)
+    if vision is None:
+        print(f"Refusing: {reason} (foodvision doctor --app agent).")
         return 2
     try:
         prepared = prepare_image(Path(image_path).read_bytes(), BASELINE)
@@ -119,19 +122,11 @@ def smoke_vision(image_path: str, confirmed: bool) -> int:
         return 2
 
     from foodvision.pipelines.agent_recognition import RecognitionOnlyPipeline
-    from foodvision.providers.claude_vision import ClaudeVisionProvider, VisionConfig
 
     scan_id = uuid.uuid4().hex
     grounded = settings.pipeline_mode == "grounded" and settings.database_url is not None
     budget = GROUNDED_SMOKE_BUDGET if grounded else VISION_SMOKE_BUDGET
     recorder = ScanRecorder(scan_id, "B_live_smoke", budget=budget)
-    config = VisionConfig(
-        model=settings.vision_model,
-        effort=settings.vision_effort,
-        max_tokens=settings.vision_max_tokens,
-        refusal_fallback=settings.vision_refusal_fallback,
-    )
-    vision = ClaudeVisionProvider(settings.anthropic_api_key, config)
     if settings.pipeline_mode == "direct":
         from foodvision.pipelines.agent_direct import DirectPipeline
 

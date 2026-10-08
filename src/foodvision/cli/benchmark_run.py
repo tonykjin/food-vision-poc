@@ -44,13 +44,28 @@ CONFIG_APPS = {
 }
 
 
+def split_config(config: str) -> tuple[str, str | None, str | None]:
+    """'B_grounded@openai:gpt-6.1-sol' -> ('B_grounded', 'openai', 'gpt-6.1-sol')."""
+    base, _, variant = config.partition("@")
+    provider, _, model = variant.partition(":")
+    return base, provider or None, model or None
+
+
 def _pipeline(config: str):
     from foodvision.api.factory import live_pipeline
     from foodvision.pipelines.mock import MockPipeline
 
-    settings = load_settings(CONFIG_APPS[config])
-    if config in MODES:  # one batch can compare B_grounded and B_direct on identical bytes
-        settings = settings.model_copy(update={"pipeline_mode": MODES[config]})
+    base, provider, model = split_config(config)
+    settings = load_settings(CONFIG_APPS[base])
+    if base in MODES:  # one batch can compare B modes and providers on identical bytes
+        update = {"pipeline_mode": MODES[base]}
+        if provider:
+            update["vision_provider"] = provider
+            update["vision_model"] = model
+        settings = settings.model_copy(update=update)
+    elif provider:
+        raise SystemExit(f"{config}: only App B configs take @provider[:model]")
+    config = base
     if config.endswith("_mock"):
         pipeline = MockPipeline(config)
     else:
@@ -95,7 +110,7 @@ def _provenance(attempts: list[Attempt], config: str) -> list[dict]:
 
 def run_benchmark(args) -> int:
     configs = [c.strip() for c in args.configs.split(",") if c.strip()]
-    unknown = [c for c in configs if c not in CONFIG_APPS]
+    unknown = [c for c in configs if split_config(c)[0] not in CONFIG_APPS]
     if unknown or len(set(configs)) != len(configs):
         print(f"Unknown or repeated configs: {unknown or configs}. Known: {sorted(CONFIG_APPS)}")
         return 2

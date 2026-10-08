@@ -23,7 +23,9 @@ The configuration ID names the provider, model, effort, prompt hash and image de
 ## Verified vs not
 
 - **Contract-tested** (fake SDK client, 18 tests): request shape, strict schema, provenance, cost, refusal, truncation, invalid JSON, field-level validation, every error mapping, registry selection, `B_direct` on OpenAI.
-- **Not live-verified:** `OPENAI_API_KEY` is **missing** from `.env.agent.local` (`doctor`, 2026-10-07). Real response shape, served model ID, usage fields, latency and quotas are unverified until the opt-in smoke runs: set `VISION_PROVIDER=openai` and `PIPELINE_MODE=recognition_only` or `direct`, then `foodvision smoke-vision --image <photo> --confirm-one-request`.
+- **Live attempts (2026-10-08, opt-in smoke, 1 call each, no output, no cost):** the key is present and authenticates, but both calls returned HTTP 429 with **code `credit_balance_exhausted`, type `insufficient_quota`**: the OpenAI account has no credit. This exposed a classification bug: billing arrives in `type` with a new `code`, so it had been treated as a retryable rate limit. Now it's a non-retried `quota` failure, and rate-limit details record the code, type and retry-after (identifiers only).
+- **Still not live-verified:** add credit to the OpenAI account, then rerun the smoke.
+- Earlier (2026-10-07): `OPENAI_API_KEY` was missing from `.env.agent.local`. Real response shape, served model ID, usage fields, latency and quotas are unverified until the opt-in smoke runs: set `VISION_PROVIDER=openai` and `PIPELINE_MODE=recognition_only` or `direct`, then `foodvision smoke-vision --image <photo> --confirm-one-request`.
 
 ## DeepSeek: not built (recorded, not substituted)
 

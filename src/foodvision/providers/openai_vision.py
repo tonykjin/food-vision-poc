@@ -17,6 +17,7 @@ import base64
 import copy
 import dataclasses
 import json
+import re
 from collections.abc import Callable
 from typing import Any
 
@@ -46,6 +47,10 @@ from foodvision.recognition.hypotheses import (
 PROVIDER = "openai"
 DEFAULT_MODEL = "gpt-6-astra"  # models page 2026-10-07: flagship, recommended for new projects
 IMAGE_DETAIL = "original"  # send the baseline-prepared image as is (no provider resizing)
+BILLING_CODES = {
+    "insufficient_quota",
+    "credit_balance_exhausted",
+}  # account billing, not rate limits
 
 PRICES = PriceTable(
     version="openai-pricing-2026-10-07",
@@ -98,22 +103,34 @@ def _usage(response: Any) -> ProviderUsage | None:
     )
 
 
+def _token(value: object) -> str:
+    """An error code or type only if it looks like an identifier; never free provider text."""
+    text = str(value) if value is not None else "none"
+    return text if re.fullmatch(r"[A-Za-z0-9_.\-]{1,64}", text) else "other"
+
+
 def _status_error(exc: openai.APIStatusError) -> VisionAttemptError:
     status, code = exc.status_code, getattr(exc, "code", None)
     if isinstance(exc, openai.RateLimitError):
-        if code == "insufficient_quota":  # billing, not a transient limit: never retried
+        kind = getattr(exc, "type", None)
+        # Billing, not a transient limit: never retried. Observed live 2026-10-08:
+        # code credit_balance_exhausted with type insufficient_quota.
+        if "insufficient_quota" in (code, kind) or code in BILLING_CODES:
             return VisionAttemptError(
                 AttemptOutcome.CLIENT_ERROR,
                 code=ErrorCode.QUOTA,
                 http_status=status,
-                detail="insufficient quota / billing",
+                detail=f"insufficient quota / billing (code {_token(code)})",
             )
         after = exc.response.headers.get("retry-after")
         return VisionAttemptError(
             AttemptOutcome.RATE_LIMITED,
             http_status=status,
             retry_after_s=float(after) if after and after.replace(".", "", 1).isdigit() else None,
-            detail="rate limited",
+            detail=(
+                f"rate limited (code {_token(code)}, type {_token(getattr(exc, 'type', None))}, "
+                f"retry-after {_token(after)})"
+            ),
         )
     if isinstance(exc, (openai.AuthenticationError, openai.PermissionDeniedError)):
         return VisionAttemptError(

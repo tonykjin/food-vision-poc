@@ -340,6 +340,8 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - Verified: `pytest` with DB 473 passed; mutations (counting attempts instead of groups, fitting on test, running the test split twice, a lenient verdict, the runner skipping confidence) were each caught.
 - **To execute:** collect and review real calibration and test groups (`benchmarks/protocol.md`), record spend caps, approve the useful-result tolerance and the §15 thresholds, then follow `benchmarks/metrics.md` "Frozen evaluation".
 
+**Prompt 25 proof-of-concept run (2026-10-08, synthetic references at your direction).** 8 Wikimedia Commons meal photos (permissive licenses, attribution recorded), invented grams, real USDA values, all `is_synthetic`. Ran freeze → calibration batch → `calibrate` → test batch (once) → `gates` with live APIs: **48/48 scans returned typed results (0 failed, 0 not run).** A: all complete, p50 about 3.9 s. B: 12/24 complete and 12 partial, p50 about 12.8 s, p95 up to 20.5 s, $0.94. Calibration: all buckets "insufficient data" (4 groups); A calibration and A-dependent gates not saved (rights). **Not an accuracy result or a decision.** Details: `docs/dev-runs/2026-10-08-poc25-synthetic.md`.
+
 ## Blockers
 
 - ~~Docker engine~~: resolved 2026-10-02. Local Postgres (POC-02, POC-06) is no longer blocked.

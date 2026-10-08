@@ -2,8 +2,7 @@
 
 Implemented: `doctor`, `import-usda`, `import-usda-api`, `catalog-report`,
 `smoke-fatsecret`, `smoke-vision`, `validate-manifest`, `assign-splits`, `load-manifest`,
-`benchmark`, `report`.
-`calibrate` (POC-15) arrives with its issue.
+`benchmark`, `report`, `freeze`, `calibrate`, `gates`.
 """
 
 import argparse
@@ -69,18 +68,39 @@ def main(argv: list[str] | None = None) -> int:
     bench.add_argument("--max-scans", type=int, default=None)
     bench.add_argument("--confirm-paid-run", action="store_true")
     bench.add_argument("--allow-test-split", action="store_true")
+    bench.add_argument("--frozen", default=None, help="Frozen spec (required: calibration/test)")
+
+    freeze = sub.add_parser("freeze", help="Record the frozen evaluation spec (commit it)")
+    freeze.add_argument("--manifest", required=True)
+    freeze.add_argument("--configs", required=True)
+    freeze.add_argument("--name", required=True, help="e.g. pilot-v1-freeze-1")
+
+    cal = sub.add_parser("calibrate", help="Bucket pass rates on a calibration-split batch")
+    cal.add_argument("--batch", required=True)
+    cal.add_argument("--config", required=True, help="e.g. B_grounded")
+    cal.add_argument("--version", required=True, help="Calibration version name")
+    cal.add_argument("--output", required=True)
+    cal.add_argument("--save-db", action="store_true", help="Also write calibration_versions")
+
+    gates = sub.add_parser("gates", help="Go/no-go evidence from the held-out test batch")
+    gates.add_argument("--batch", required=True)
+    gates.add_argument("--output", required=True)
 
     rep = sub.add_parser("report", help="Rebuild the saved report of a benchmark batch")
     rep.add_argument("--batch", required=True, help="Batch directory written by benchmark")
     rep.add_argument("--output", required=True)
 
     args = parser.parse_args(argv)
-    if args.command in ("benchmark", "report"):
+    if args.command in ("benchmark", "report", "freeze", "calibrate", "gates"):
         from foodvision.cli import benchmark_run
 
-        return (
-            benchmark_run.run_benchmark if args.command == "benchmark" else benchmark_run.run_report
-        )(args)
+        return {
+            "benchmark": benchmark_run.run_benchmark,
+            "report": benchmark_run.run_report,
+            "freeze": benchmark_run.run_freeze,
+            "calibrate": benchmark_run.run_calibrate,
+            "gates": benchmark_run.run_gates,
+        }[args.command](args)
     if args.command in ("validate-manifest", "assign-splits", "load-manifest"):
         from foodvision.cli import benchmark
 

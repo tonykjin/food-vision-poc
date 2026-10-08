@@ -86,6 +86,17 @@ def _pipeline(config: str):
     return pipeline, budget, settings
 
 
+def _config_ids(built: dict) -> dict[str, dict]:
+    return {
+        c: {
+            "pipeline_id": p.pipeline_id,
+            "configuration_id": getattr(p, "configuration_id", None),
+            "catalog_source_versions": getattr(p, "source_versions", None),
+        }
+        for c, (p, _, _) in built.items()
+    }
+
+
 def _safe_output(path: Path) -> bool:
     resolved = path.resolve()
     return not resolved.is_relative_to(REPO_ROOT) or _git_ignored(resolved)
@@ -158,6 +169,36 @@ def run_benchmark(args) -> int:
         return 1
 
     built = {c: _pipeline(c) for c in configs}
+    frozen = None
+    if split in (Split.CALIBRATION, Split.TEST):
+        from foodvision.benchmark.freeze import (
+            FreezeViolation,
+            RunState,
+            check_matches,
+            load_spec,
+            test_already_run,
+        )
+
+        if not args.frozen:
+            print(
+                f"Refusing: the {split.value} split runs only against a frozen spec "
+                "(foodvision freeze, then --frozen benchmarks/frozen/<name>.json)."
+            )
+            return 2
+        try:
+            frozen = load_spec(Path(args.frozen))
+            check_matches(
+                frozen, RunState(_config_ids(built), manifest_sha256(groups), version["dirty"])
+            )
+        except FreezeViolation as exc:
+            print(f"Refusing: does not match the frozen spec: {exc}")
+            return 2
+        if split is Split.TEST and (done := test_already_run(output, frozen)):
+            print(
+                f"Refusing: the test split already ran for this frozen spec ({done}). "
+                "A change needs a new spec and new confirmatory data."
+            )
+            return 2
     contexts = {(s.region, s.language) for _, _, s in built.values()}
     if len(contexts) != 1:
         print(f"Refusing: configurations use different region/language settings: {contexts}")
@@ -189,6 +230,9 @@ def run_benchmark(args) -> int:
         "batch_id": batch_id,
         "created_at_utc": datetime.now(UTC).isoformat(),
         "split": split.value,
+        "frozen_spec": frozen["name"] if frozen else None,
+        "frozen_spec_sha256": frozen["spec_sha256"] if frozen else None,
+        "deadline_ms": {c: b.deadline_s * 1000 for c, (_, b, _) in built.items()},
         "repeats": args.repeats,
         "concurrency": 1,
         "metrics_version": METRICS_VERSION,
@@ -263,13 +307,16 @@ def run_benchmark(args) -> int:
     return 0
 
 
-def run_report(args) -> int:
-    batch_dir = Path(args.batch)
+class BatchError(RuntimeError):
+    pass
+
+
+def load_batch(batch_dir: Path):
+    """(meta, attempts, refs of the batch's split only, not_run). Saved results only."""
     meta = json.loads((batch_dir / "batch.json").read_text(encoding="utf-8"))
     groups, errors = load_groups(Path(meta["manifest"]))
     if errors or manifest_sha256(groups) != meta["manifest_sha256"]:
-        print("Refusing: the manifest changed since the batch ran (or no longer parses).")
-        return 1
+        raise BatchError("the manifest changed since the batch ran (or no longer parses)")
     attempts, not_run = [], 0
     for line in (batch_dir / "runs.jsonl").read_text(encoding="utf-8").splitlines():
         record = json.loads(line)
@@ -296,14 +343,25 @@ def run_report(args) -> int:
                 result=result,
             )
         )
+    selected = [g for g in groups if g.split is Split(meta["split"])]
+    return meta, attempts, references(selected), not_run
+
+
+def _policy():
     provider = ProviderSettings()
-    policy = policy_from_settings(
+    return policy_from_settings(
         provider.persist_provider_outputs, provider.provider_output_policy_version
     )
-    configs = list(meta["configs"])
-    selected = [g for g in groups if g.split is Split(meta["split"])]
+
+
+def run_report(args) -> int:
+    try:
+        meta, attempts, refs, not_run = load_batch(Path(args.batch))
+    except BatchError as exc:
+        print(f"Refusing: {exc}.")
+        return 1
     report = build_report(
-        attempts, references(selected), configs, policy, Purpose.PERSIST, meta, not_run
+        attempts, refs, list(meta["configs"]), _policy(), Purpose.PERSIST, meta, not_run
     )
     output = Path(args.output)
     if not _safe_output(output):
@@ -314,3 +372,121 @@ def run_report(args) -> int:
     (output / "report.md").write_text(to_markdown(report), encoding="utf-8")
     print(to_markdown(report))
     return 0
+
+
+def run_freeze(args) -> int:
+    from foodvision.benchmark.freeze import FROZEN_DIR, FreezeViolation, build_spec
+
+    configs = [c.strip() for c in args.configs.split(",") if c.strip()]
+    groups, errors = load_groups(Path(args.manifest))
+    if errors:
+        print("Refusing: the manifest doesn't parse; validate it first.")
+        return 1
+    target = FROZEN_DIR / f"{args.name}.json"
+    if target.exists():
+        print(f"Refusing: {target} exists; a frozen spec is never overwritten (pick a new name).")
+        return 2
+    try:
+        spec = build_spec(
+            args.name, _config_ids({c: _pipeline(c) for c in configs}), manifest_sha256(groups)
+        )
+    except FreezeViolation as exc:
+        print(f"Refusing: {exc}")
+        return 2
+    FROZEN_DIR.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps(spec, indent=2) + "\n", encoding="utf-8")
+    print(f"Frozen spec written: {target} (sha256 {spec['spec_sha256'][:12]}). Commit it.")
+    return 0
+
+
+def _save(output: Path, name: str, data: dict) -> bool:
+    if not _safe_output(output):
+        print(f"Refusing: {output} is a tracked path in the repository.")
+        return False
+    output.mkdir(parents=True, exist_ok=True)
+    (output / name).write_text(json.dumps(data, indent=2, default=list), encoding="utf-8")
+    return True
+
+
+def run_calibrate(args) -> int:
+    from foodvision.benchmark.calibration import calibrate, save_calibration
+    from foodvision.benchmark.report import UNAVAILABLE
+    from foodvision.measurement.storage_policy import DataClass
+
+    try:
+        meta, attempts, refs, _ = load_batch(Path(args.batch))
+    except BatchError as exc:
+        print(f"Refusing: {exc}.")
+        return 1
+    if meta["split"] != "calibration" or not meta.get("frozen_spec_sha256"):
+        print("Refusing: calibration needs a calibration-split batch run against a frozen spec.")
+        return 2
+    if args.config not in meta["configs"]:
+        print(f"Unknown config {args.config}; batch has {sorted(meta['configs'])}.")
+        return 2
+    mine = [a for a in attempts if a.config == args.config]
+    version = f"{args.version}@{meta['frozen_spec_sha256'][:12]}"
+    try:
+        record = calibrate(mine, refs, version, meta["split"])
+    except ValueError as exc:
+        print(f"Refusing: {exc}")
+        return 2
+    record.update(config=args.config, batch_id=meta["batch_id"], frozen_spec=meta["frozen_spec"])
+    print(json.dumps(record, indent=2, default=list))
+    if not _policy().allows(source_of(args.config), DataClass.DERIVED_METRIC, Purpose.PERSIST):
+        print(f"Not saved: {UNAVAILABLE}")
+        return 0
+    if not _save(Path(args.output), f"calibration-{args.config}.json", record):
+        return 2
+    if args.save_db:
+        from sqlalchemy import create_engine
+
+        url = EvaluatorSettings().evaluator_database_url
+        if url is None:
+            print("Not saved to the database: EVALUATOR_DATABASE_URL is not set.")
+            return 2
+        engine = create_engine(url.get_secret_value())
+        with engine.begin() as conn:
+            save_calibration(conn, record)
+        engine.dispose()
+        print(f"Calibration version {version} saved to benchmark.calibration_versions.")
+    return 0
+
+
+def run_gates(args) -> int:
+    from foodvision.benchmark.gates import evaluate_gates
+    from foodvision.benchmark.report import UNAVAILABLE
+    from foodvision.measurement.storage_policy import DataClass
+
+    try:
+        meta, attempts, refs, not_run = load_batch(Path(args.batch))
+    except BatchError as exc:
+        print(f"Refusing: {exc}.")
+        return 1
+    if meta["split"] != "test" or not meta.get("frozen_spec_sha256"):
+        print("Refusing: decision gates use the held-out test batch run against a frozen spec.")
+        return 2
+    configs = list(meta["configs"])
+    by_config = {c: [a for a in attempts if a.config == c] for c in configs}
+    provider = next((c for c in configs if c.startswith("A_native")), None)
+    agent = next((c for c in configs if c.startswith("B_")), None)
+    deadline = min(meta["deadline_ms"].values())
+    result = evaluate_gates(by_config, refs, deadline, not_run == 0, provider, agent)
+    result.update(batch_id=meta["batch_id"], frozen_spec=meta["frozen_spec"])
+    print(json.dumps(result, indent=2, default=list))
+    # Saved copy: drop gates derived from sources whose rights don't allow saved metrics.
+    policy = _policy()
+    blocked = [
+        c
+        for c in configs
+        if not policy.allows(source_of(c), DataClass.DERIVED_METRIC, Purpose.PERSIST)
+    ]
+    saved = json.loads(json.dumps(result, default=list))
+    if blocked:
+        saved["gates"]["useful_rate_B_minus_A"] = UNAVAILABLE
+        saved["gates"]["cost_materiality"]["value"] = {
+            c: (UNAVAILABLE if c in blocked else v)
+            for c, v in saved["gates"]["cost_materiality"]["value"].items()
+        }
+        saved["overall"] = f"{UNAVAILABLE} (the overall verdict depends on fatsecret metrics)"
+    return 0 if _save(Path(args.output), "gates.json", saved) else 2

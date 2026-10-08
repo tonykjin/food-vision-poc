@@ -28,7 +28,7 @@ Nonsecret project facts and decisions. **Never put API keys, tokens, passwords, 
 | Reference-data review | Tony Jin (`tonykjin`) | User decision 2026-10-02. Plan §11 asks for two reviewers on difficult identities and recipes. With one person, record those cases as single-reviewed. |
 | Vendor / access / spend | Tony Jin (`tonykjin`) | User decision 2026-10-02 |
 | PR reviewers | Tony Jin (`tonykjin`) | Sole reviewer, so review is self-review |
-| Cofounders to invite | Pilot access: **you + cofounders** (user decision 2026-10-08) | **PENDING:** their emails for the login allow-list. Don't invite guessed users. |
+| Cofounders to invite | Pilot access: **you + cofounders + investors** (user decisions 2026-10-08), one login each via `scripts/pilot-user.ps1` | **PENDING:** their emails for the login allow-list. Don't invite guessed users. |
 
 ## Scope and runtime
 
@@ -82,7 +82,7 @@ Details are in `docs/provider-readiness.md` (Prompt 07, docs accessed 2026-10-02
 | Local database | PostgreSQL in Docker Compose | Plan baseline |
 | Local image storage | Private local directory, outside Git | Plan baseline |
 | Hosted database/storage | Supabase (proposed) | PENDING confirmation at hosted-pilot stage |
-| Deployment destination | **One VM + Docker Compose** (user decision 2026-10-08) | Runs `infra/compose.yml` as verified locally; the database in a container. **PENDING:** provider/account and VM size. Needs a static egress IP (fatsecret). |
+| Deployment destination | **Local for now: this computer + Cloudflare quick tunnel + per-person login** (user decision 2026-10-08, replacing the VM choice made earlier the same day) | `docs/pilot-local.md`. A VM (`docs/deployment-plan.md`) stays the later option. |
 | Hosting region | PENDING | Verify provider outbound/IP requirements first |
 | Owned test image path (Prompt 19) | PENDING | Private path outside Git. Prompt 19 (2026-10-06) instead used a **third-party stock image** (`assets/grilled-chicken-…_84443-65934.avif`, Freepik-style, git-ignored), converted to PNG outside Git, with your approval. It's for smoke tests only: not owned, never stored, never in benchmarks or exports. |
 

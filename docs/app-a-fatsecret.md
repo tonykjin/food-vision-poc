@@ -50,6 +50,20 @@ Docs checked 2026-10-02:
 
 **Attribution:** App A's UI shows the unmodified snippet `<a href="https://platform.fatsecret.com">Powered by fatsecret Platform API</a>` whenever `A_native` is active.
 
+## Barcode lookup (`A_barcode`, #50, ADR 0003)
+
+- **Routing (App A API only, `ENABLE_BARCODE_LOOKUP`, default true):** the upload is scanned locally for UPC-A/UPC-E/EAN-13/EAN-8 with zxing-cpp (`imaging/barcode.py`; no external call; check digit verified; normalized to GTIN-13).
+  - One barcode → `A_barcode`.
+  - Several different barcodes → `failed` / `invalid_image`, with no external call.
+  - None → `A_native`, unchanged.
+  - The benchmark never routes, so `A_native` stays pure.
+- **Lookup:** `GET https://platform.fatsecret.com/rest/food/barcode/find-by-id/v2?barcode=<GTIN-13>&format=json&flag_default_serving=true`, scope `barcode` (Premier Exclusive). Separate token per scope, so a missing `barcode` scope can't affect image recognition.
+- **Result:** one serving **as labeled** (the default serving, else the first). It's never scaled and never shown as the amount eaten: `nutrition_basis=per_label_serving`, `portion_method=label_serving`, and the UI heading reads "Per labeled serving".
+  - A serving without grams (ml) stays unresolved, so the result is partial.
+  - Unknown barcode (211) → `failed` / `no_match`.
+  - Confidence: portion is Low (`confidence-rules-v3`).
+- **Rights:** identical to `A_native` (transient; only `food_id`/`serving_id` storable).
+
 ## Verification status
 
 | Behavior | Status |
@@ -63,7 +77,9 @@ Docs checked 2026-10-02:
 | Real token issuance for our client ID, from this machine's IP | **Live-verified 2026-10-07** (after `invalid_scope` on 2026-10-03/06, then image-request code 21 until the IP was registered) |
 | `image-recognition` scope and add-on enabled on our account | **Live-verified 2026-10-07** (add-on enabled by you; scope granted) |
 | Real response field presence and value types | **Live-verified on one image** (2026-10-07): 7 items, all with `food_id`, `serving_id`, gram portions and all four nutrients; normalized to a schema-valid `complete` result. Other images may differ. |
-| Whether label-only images return 211 in practice | **Live-unverified** |
+| Whether label-only images return 211 in practice | **Live-unverified** for nutrition panels. A barcode-only image returned 211 on 2026-10-13. |
+| Barcode decode, GTIN-13 normalization, routing, per-scope tokens, label-serving normalization | **Adapter-verified** (synthetic generated barcodes and fixtures; 45 tests) |
+| `barcode` scope on our key; real barcode response shape | **Live-verified 2026-10-13** (token 0.6-0.7 s; lookup about 0.6 s). A known product returned `complete`: IDs, gram serving, all four nutrients. The barcode in your test image returned `no_match` (fatsecret has no product for it). Nothing stored or printed beyond booleans. |
 | Latency, quotas, real HTTP status for errors | **One sample:** image request 5.5 s, token 232 ms (2026-10-07). Code 21 arrived as HTTP 200 with an error body, as the adapter expects. Quotas unverified. |
 
 ## Live smoke test (opt-in, authorized as needed)

@@ -25,7 +25,7 @@ Facts from the docs (2026-10-02):
 - **Endpoint:** `POST https://platform.fatsecret.com/rest/image-recognition/v2`. OAuth scope `image-recognition`.
 - **Request:** `image_b64` is required and limited to **999,982 characters**. Accepted formats are jpg, png and webp up to 1.09 MB. Recommended size is 256×256 or 512×512. Optional: `include_food_data`, `eaten_foods`, and `region`/`language` (Premier-only; region defaults to `US`).
 - **Response:** a `food_response[]` array with `food_id`, `food_entry_name`, `eaten` (portion and nutrients), `suggested_serving` (`serving_id`), and `food` when `include_food_data=true`.
-- **Error 211:** images that show only a nutrition-facts panel are rejected by design.
+- **Error 211:** images that show only a nutrition-facts panel are rejected by design. A barcode-only image also returns 211 (seen 2026-10-13). Barcodes go through the separate barcode lookup (scope `barcode`, live-verified granted 2026-10-13; see `app-a-fatsecret.md`).
 - **OAuth 2.0:** `client_credentials` only, token from `https://oauth.fatsecret.com/connect/token` using HTTP Basic auth. `expires_in` is 86400 s, so reuse the token until it's close to expiry. **Tokens can only be requested from IP addresses you register when managing your keys** (CIDR ranges on Premier). Dev machines, CI and hosting all need their egress IPs registered.
 - **Editions:** Basic is free and limited. Premier Free is for startups and nonprofits. Premier is the paid tier. Image recognition is an "Optional Add-On" priced by number of markets, not by call volume. **Attribution is required** on Basic and Premier Free and not on Premier.
 - **Terms (https://platform.fatsecret.com/terms):**

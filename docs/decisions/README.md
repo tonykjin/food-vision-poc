@@ -10,6 +10,7 @@ Name files `NNNN-short-title.md`, numbered in sequence. Don't rewrite an accepte
 |---|---|---|
 | [0001](0001-adopt-plan-baseline.md) | Adopt the project plan as the baseline | Accepted |
 | [0002](0002-evaluator-registers-benchmark-images.md) | Evaluator registers benchmark images; manifests are group files outside Git | Proposed |
+| [0003](0003-app-a-barcode-lookup.md) | App A reads product barcodes locally and looks them up with fatsecret | Proposed |
 
 ## Template
 

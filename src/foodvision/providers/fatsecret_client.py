@@ -1,4 +1,5 @@
-"""fatsecret Platform API client: OAuth 2.0 client-credentials token and image recognition v2.
+"""fatsecret Platform API client: OAuth 2.0 client-credentials tokens, image recognition v2
+and barcode lookup v2.
 
 Docs checked 2026-10-02:
 - https://platform.fatsecret.com/docs/guides/authentication/oauth2
@@ -8,6 +9,9 @@ Docs checked 2026-10-02:
 - https://platform.fatsecret.com/docs/v2/image.recognition
   POST https://platform.fatsecret.com/rest/image-recognition/v2, Authorization: Bearer,
   JSON body (built and size-checked by fatsecret_limits).
+- https://platform.fatsecret.com/docs/v2/food.find_id_for_barcode (checked 2026-10-13)
+  GET https://platform.fatsecret.com/rest/food/barcode/find-by-id/v2?barcode=<GTIN-13>,
+  scope `barcode` (Premier Exclusive). Returns the food with servings, or error 211.
 - https://platform.fatsecret.com/docs/guides/error-codes
   Errors are JSON {"error": {"code", "message"}}; they may arrive with HTTP 200.
 
@@ -31,7 +35,9 @@ from foodvision.measurement.spans import ScanRecorder
 
 TOKEN_URL = "https://oauth.fatsecret.com/connect/token"
 IMAGE_URL = "https://platform.fatsecret.com/rest/image-recognition/v2"
+BARCODE_URL = "https://platform.fatsecret.com/rest/food/barcode/find-by-id/v2"
 SCOPE = "image-recognition"
+BARCODE_SCOPE = "barcode"
 TOKEN_SAFETY_MARGIN_S = 300.0  # refresh 5 minutes before expiry
 NO_FOOD_DETECTED = 211
 
@@ -175,10 +181,11 @@ class FatsecretClient:
         self._client_secret = client_secret
         self._http = http or httpx.Client()
         self._timeout_s = request_timeout_s
-        self._token: _Token | None = None
+        # One token per scope: a key without `barcode` must never break image recognition.
+        self._tokens: dict[str, _Token] = {}
         self._lock = threading.Lock()
 
-    def _fetch_token(self, recorder: ScanRecorder) -> _Token:
+    def _fetch_token(self, recorder: ScanRecorder, scope: str) -> _Token:
         basic = base64.b64encode(
             f"{self._client_id.get_secret_value()}:{self._client_secret.get_secret_value()}".encode()
         ).decode()
@@ -188,7 +195,7 @@ class FatsecretClient:
                 response = self._http.post(
                     TOKEN_URL,
                     headers={"Authorization": f"Basic {basic}"},
-                    data={"grant_type": "client_credentials", "scope": SCOPE},
+                    data={"grant_type": "client_credentials", "scope": scope},
                     timeout=timeout_s,
                 )
             except httpx.TimeoutException:
@@ -213,19 +220,20 @@ class FatsecretClient:
         )
         return _Token(token, expires_at)
 
-    def token(self, recorder: ScanRecorder) -> str:
-        """A usable token, reused until 5 minutes before expiry."""
+    def token(self, recorder: ScanRecorder, scope: str = SCOPE) -> str:
+        """A usable token for `scope`, reused until 5 minutes before expiry."""
         with self._lock:
             now = recorder.clock.monotonic_ns()
-            if self._token is not None and now < self._token.expires_at_ns:
+            cached = self._tokens.get(scope)
+            if cached is not None and now < cached.expires_at_ns:
                 with recorder.span(Stage.AUTH, cache_state=CacheState.HIT):
-                    return self._token.value
-            self._token = self._fetch_token(recorder)
-            return self._token.value
+                    return cached.value
+            self._tokens[scope] = self._fetch_token(recorder, scope)
+            return self._tokens[scope].value
 
-    def invalidate_token(self) -> None:
+    def invalidate_token(self, scope: str = SCOPE) -> None:
         with self._lock:
-            self._token = None
+            self._tokens.pop(scope, None)
 
     def _recognize_once(self, body: bytes, recorder: ScanRecorder) -> Any:
         token = self.token(recorder)
@@ -269,3 +277,41 @@ class FatsecretClient:
                 raise
             self.invalidate_token()
             return self._recognize_once(body, recorder)
+
+    def _find_barcode_once(self, gtin13: str, recorder: ScanRecorder) -> Any:
+        token = self.token(recorder, BARCODE_SCOPE)
+
+        def send(timeout_s: float) -> CallResult:
+            try:
+                response = self._http.get(
+                    BARCODE_URL,
+                    headers={"Authorization": f"Bearer {token}"},
+                    params={"barcode": gtin13, "format": "json", "flag_default_serving": "true"},
+                    timeout=timeout_s,
+                )
+            except httpx.TimeoutException:
+                raise TimeoutError from None
+            except httpx.TransportError:
+                raise FatsecretAttemptError(AttemptOutcome.TRANSPORT_ERROR) from None
+            payload = _json_or_none(response)
+            failure = _from_body(payload, response.status_code) or _from_http(
+                response.status_code, response.headers
+            )
+            if failure is not None:
+                raise failure
+            if not isinstance(payload, dict):
+                raise _invalid_schema(response.status_code)
+            return CallResult(value=payload, http_status=response.status_code)
+
+        spec = CallSpec("fatsecret", "food.barcode.v2", False, self._timeout_s, Stage.LOOKUP)
+        return call_with_retries(recorder, spec, send).value
+
+    def find_barcode(self, gtin13: str, recorder: ScanRecorder) -> Any:
+        """Look up one GTIN-13. Error 211 (not found) comes back as the payload, like images."""
+        try:
+            return self._find_barcode_once(gtin13, recorder)
+        except FatsecretAttemptError as exc:
+            if exc.provider_code != 13:
+                raise
+            self.invalidate_token(BARCODE_SCOPE)
+            return self._find_barcode_once(gtin13, recorder)

@@ -6,15 +6,16 @@ from pathlib import Path
 import httpx
 from fastapi.testclient import TestClient
 from pydantic import SecretStr
-from tests.conftest import synthetic_image
+from tests.conftest import barcode_image, synthetic_image
 
-from foodvision.api.factory import create_app
+from foodvision.api.factory import create_app, live_pipeline
 from foodvision.config import AppKind, ProviderSettings
 from foodvision.contracts.results import AnalysisResult
 from foodvision.measurement.confidence import RULES_VERSION
 from foodvision.measurement.storage_policy import DataSource, Purpose, StoragePolicy, filter_result
+from foodvision.pipelines.provider_barcode import ProviderRoutedPipeline
 from foodvision.pipelines.provider_native import ProviderNativePipeline
-from foodvision.providers.fatsecret_client import IMAGE_URL, FatsecretClient
+from foodvision.providers.fatsecret_client import IMAGE_URL, TOKEN_URL, FatsecretClient
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures" / "fatsecret"
 IMAGE = synthetic_image(size=(1600, 900))
@@ -103,3 +104,84 @@ def test_api_applies_shared_heuristic_confidence():
     assert all(i.match_method == "provider" for i in result.items if i.resolved)
     assert c.nutrition_match in ("medium", "low")  # a provider match is never rated high
     assert c.portion != "high"  # image-only portions are never high
+
+
+# --- Barcode routing (#50) --------------------------------------------------------------
+
+
+def routed_app(responses):
+    """App A as `live_pipeline` builds it with barcode lookup on (the default)."""
+    sent: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        sent.append(request)
+        if str(request.url) == TOKEN_URL:
+            return httpx.Response(200, json={"access_token": "t", "expires_in": 86400})
+        return responses.pop(0)
+
+    client = FatsecretClient(
+        SecretStr("id"),
+        SecretStr("secret"),
+        http=httpx.Client(transport=httpx.MockTransport(handler)),
+    )
+    settings = ProviderSettings(_env_file=None, mock_mode=False)
+    app = create_app(AppKind.PROVIDER, settings, pipeline=ProviderRoutedPipeline(client))
+    return TestClient(app), sent
+
+
+def post_bytes(client, data, name="b.png"):
+    return client.post("/v1/analyze", files={"image": (name, data, "image/png")})
+
+
+def test_one_barcode_routes_to_label_serving_lookup():
+    client, sent = routed_app([fixture("barcode_found.json")])
+    response = post_bytes(client, barcode_image(("036000291452", "UPCA")))
+    result = AnalysisResult.model_validate(response.json())
+    assert result.pipeline_id == "A_barcode" and result.status == "complete"
+    assert result.nutrition_basis == "per_label_serving"
+    lookup = sent[-1]
+    assert lookup.url.path.endswith("/food/barcode/find-by-id/v2")
+    assert lookup.url.params["barcode"] == "0036000291452"
+    assert not any(str(r.url) == IMAGE_URL for r in sent)  # no image recognition call
+    (record,) = client.app.state.telemetry.records
+    assert record.pipeline_id == "A_barcode" and record.attempts == 2 and record.model_calls == 0
+    assert result.confidence.portion == "low"
+
+
+def test_no_barcode_runs_unchanged_image_recognition():
+    client, sent = routed_app([fixture("two_items.json")])
+    result = AnalysisResult.model_validate(post(client).json())
+    assert result.pipeline_id == "A_native"
+    assert str(sent[-1].url) == IMAGE_URL
+    assert client.app.state.telemetry.records[0].pipeline_id == "A_native"
+
+
+def test_two_different_barcodes_fail_without_any_external_call():
+    client, sent = routed_app([])
+    data = barcode_image(("4006381333931", "EAN13"), ("96385074", "EAN8"))
+    body = post_bytes(client, data).json()
+    assert body["status"] == "failed" and body["error"]["code"] == "invalid_image"
+    assert (
+        body["pipeline_id"] == "A_barcode"
+        and "2 different product barcodes" in body["error"]["message"]
+    )
+    assert sent == []
+
+
+def test_barcode_result_persists_only_permitted_ids():
+    client, _ = routed_app([fixture("barcode_found.json")])
+    result = AnalysisResult.model_validate(
+        post_bytes(client, barcode_image(("036000291452", "UPCA"))).json()
+    )
+    stored = filter_result(result, DataSource.FATSECRET, StoragePolicy(), Purpose.PERSIST)
+    assert "SYNTHETIC" not in json.dumps(stored)
+    (item,) = stored["items"]
+    assert set(item) == {"resolved", "portion_method", "food_source", "food_id", "serving_id"}
+    assert (item["food_id"], item["serving_id"]) == ("9100001", "911")
+
+
+def test_live_pipeline_uses_routing_unless_disabled():
+    on = ProviderSettings(_env_file=None, fatsecret_client_id="i", fatsecret_client_secret="s")
+    off = on.model_copy(update={"enable_barcode_lookup": False})
+    assert isinstance(live_pipeline(AppKind.PROVIDER, on)[0], ProviderRoutedPipeline)
+    assert type(live_pipeline(AppKind.PROVIDER, off)[0]) is ProviderNativePipeline

@@ -68,6 +68,9 @@ class ProviderSettings(CommonSettings):
     fatsecret_client_secret: SecretStr | None = None
     persist_provider_outputs: bool = False
     provider_output_policy_version: str = "pending"
+    # The App A API reads product barcodes and looks them up (A_barcode, #50); needs the
+    # fatsecret `barcode` scope. The benchmark's A_native is never routed.
+    enable_barcode_lookup: bool = True
     # App A has no LLM fallback (plan §8 A3): zero model calls.
     max_model_calls_per_scan: int = Field(default=0, ge=0, le=0)
 

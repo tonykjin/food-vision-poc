@@ -14,6 +14,8 @@ from foodvision.measurement.clock import ManualClock
 from foodvision.measurement.events import AttemptOutcome, CacheState, ScanStatus, Stage
 from foodvision.measurement.spans import ScanRecorder
 from foodvision.providers.fatsecret_client import (
+    BARCODE_SCOPE,
+    BARCODE_URL,
     IMAGE_URL,
     TOKEN_URL,
     FatsecretAttemptError,
@@ -197,3 +199,100 @@ def test_secrets_tokens_and_provider_text_never_reach_records_or_errors():
     dumped = rec.finish(ScanStatus.FAILED, info.value.code).model_dump_json() + repr(info.value)
     for secret in (ID, SECRET, "SENTINEL-TOKEN", "SENTINEL provider detail"):
         assert secret not in dumped
+
+
+# --- Barcode lookup (#50) ---------------------------------------------------------------
+
+
+class FakeWithBarcode(FakeFatsecret):
+    """Routes token requests by scope so each scope's token can be scripted separately."""
+
+    def __init__(self, images, barcodes, tokens_by_scope):
+        super().__init__(images)
+        self.barcodes, self.tokens_by_scope = list(barcodes), tokens_by_scope
+
+    def __call__(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        if str(request.url) == TOKEN_URL:
+            scope = parse_qs(request.content.decode())["scope"][0]
+            return self.tokens_by_scope[scope].pop(0)
+        queue = self.barcodes if request.url.path.endswith("/find-by-id/v2") else self.images
+        return queue.pop(0)
+
+
+def make_barcode(barcodes, images=(), tokens_by_scope=None):
+    fake = FakeWithBarcode(
+        images,
+        barcodes,
+        tokens_by_scope
+        or {"barcode": [token_response(10)], "image-recognition": [token_response(20)]},
+    )
+    client = FatsecretClient(
+        SecretStr(ID), SecretStr(SECRET), http=httpx.Client(transport=httpx.MockTransport(fake))
+    )
+    return client, fake, ManualClock()
+
+
+BARCODE_BODY = json.loads((FIXTURES / "barcode_found.json").read_text(encoding="utf-8"))
+
+
+def test_barcode_lookup_request_shape_and_own_scope():
+    client, fake, clock = make_barcode([httpx.Response(200, json=BARCODE_BODY)])
+    rec = recorder(clock)
+    assert client.find_barcode("0027182729840", rec) == BARCODE_BODY
+    (token_req,) = fake.calls(TOKEN_URL)
+    assert parse_qs(token_req.content.decode())["scope"] == [BARCODE_SCOPE]
+    (lookup,) = [r for r in fake.requests if r.url.path.endswith("/find-by-id/v2")]
+    assert lookup.method == "GET"
+    assert str(lookup.url).startswith(BARCODE_URL)
+    assert dict(lookup.url.params) == {
+        "barcode": "0027182729840",
+        "format": "json",
+        "flag_default_serving": "true",
+    }
+    assert lookup.headers["Authorization"] == "Bearer SENTINEL-TOKEN-10"
+    stage_of = {s.span_id: s.stage for s in rec.spans}
+    assert [(a.operation, stage_of[a.span_id]) for a in rec.attempts] == [
+        ("oauth.token", Stage.AUTH),
+        ("food.barcode.v2", Stage.LOOKUP),
+    ]
+
+
+def test_missing_barcode_scope_never_breaks_image_recognition():
+    denied = httpx.Response(400, json={"error": "invalid_scope"})
+    client, fake, clock = make_barcode(
+        [],
+        images=[httpx.Response(200, json=OK_BODY)],
+        tokens_by_scope={"barcode": [denied], "image-recognition": [token_response(20)]},
+    )
+    with pytest.raises(FatsecretAttemptError) as info:
+        client.find_barcode("0027182729840", recorder(clock))
+    assert info.value.code is ErrorCode.AUTHENTICATION and info.value.oauth_error == "invalid_scope"
+    assert client.recognize(b"{}", recorder(clock)) == OK_BODY  # image token is separate
+    assert fake.calls(IMAGE_URL)[0].headers["Authorization"] == "Bearer SENTINEL-TOKEN-20"
+
+
+def test_each_scope_token_is_cached_separately():
+    ok_barcode, ok_image = httpx.Response(200, json=BARCODE_BODY), httpx.Response(200, json=OK_BODY)
+    client, fake, clock = make_barcode([ok_barcode, ok_barcode], images=[ok_image, ok_image])
+    for _ in range(2):
+        client.find_barcode("0027182729840", recorder(clock))
+        client.recognize(b"{}", recorder(clock))
+    assert len(fake.calls(TOKEN_URL)) == 2  # one per scope, each reused
+
+
+def test_barcode_not_found_211_is_returned_and_invalid_token_refreshes_once():
+    not_found = {"error": {"code": "211", "message": "No food item detected"}}
+    client, fake, clock = make_barcode(
+        [provider_error(13), httpx.Response(200, json=not_found)],
+        tokens_by_scope={"barcode": [token_response(1), token_response(2)]},
+    )
+    assert client.find_barcode("0027182729840", recorder(clock)) == not_found
+    assert len(fake.calls(TOKEN_URL)) == 2
+
+
+def test_barcode_missing_scope_error_14_is_typed_authentication():
+    client, _, clock = make_barcode([provider_error(14)])
+    with pytest.raises(FatsecretAttemptError) as info:
+        client.find_barcode("0027182729840", recorder(clock))
+    assert info.value.code is ErrorCode.AUTHENTICATION and info.value.provider_code == 14

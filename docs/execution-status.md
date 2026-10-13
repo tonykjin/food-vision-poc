@@ -2,7 +2,7 @@
 
 Handoff record for Claude Code sessions. GitHub Issues stay the source of truth for engineering status once they exist (Prompt 09). No secrets or restricted provider payloads belong in this file.
 
-**Last updated:** 2026-10-06
+**Last updated:** 2026-10-13
 **Baseline:** `docs/project-plan.md` (Section 12), executed via `docs/claude-code-prompt-playbook.md`
 **Repository:** https://github.com/tonykjin/food-vision-poc (private, default branch `main`)
 **Local workspace:** `C:\Users\tonyj\Desktop\food-vision-poc` (fresh clone, 2026-10-06; outside OneDrive). The old OneDrive copy still exists and holds the env files.
@@ -349,6 +349,8 @@ Audit caveat: this Prompt 02 run happened in the session started from `C:\Users\
 - `infra/compose.yml`: four services in profiles `app-a` / `app-b`, each API with only its own env file, UIs with no secrets, separate networks (only `b-api` reaches Postgres), health checks, a 10 MB upload cap.
 - Verified locally in MOCK mode: all healthy; secret names per container correct; cross-app and UI → DB traffic unreachable; 11 MB → 413. Found and fixed: with one shared network, each UI could reach the other app's API.
 - Plan: `docs/deployment-plan.md`. **Needs from you: destination account and region (VM with a static IP for fatsecret), pilot users, a hosting budget.**
+
+**App A barcode lookup** ([#50](https://github.com/tonykjin/food-vision-poc/issues/50), 2026-10-13, branch `feat/app-a-barcode`, ADR 0003). A barcode-only photo failed with 211; App A now reads product barcodes locally and looks them up (`A_barcode`, one labeled serving, never the amount eaten). `A_native` and the benchmark are unchanged. Clearer 211 message. Verified: ruff; pytest 463 passed, 55 skipped (no DB); 2 mutations caught (shared token across scopes, no check-digit validation). Live: `barcode` scope granted; a known product returned `complete`; your test barcode returned `no_match`. The running pilot containers still run the old code until rebuilt.
 
 ## Blockers
 

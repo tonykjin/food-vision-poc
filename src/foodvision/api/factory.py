@@ -46,10 +46,13 @@ def live_pipeline(kind: AppKind, settings: AppSettings):
                 None,
                 "fatsecret credentials are not configured (foodvision doctor --app provider)",
             )
+        from foodvision.pipelines.provider_barcode import ProviderRoutedPipeline
         from foodvision.pipelines.provider_native import ProviderNativePipeline
         from foodvision.providers.fatsecret_client import FatsecretClient
 
         client = FatsecretClient(settings.fatsecret_client_id, settings.fatsecret_client_secret)
+        if settings.enable_barcode_lookup:
+            return ProviderRoutedPipeline(client), None
         return ProviderNativePipeline(client), None
     from foodvision.pipelines.agent_recognition import RecognitionOnlyPipeline
     from foodvision.providers.registry import build_vision_provider
@@ -180,7 +183,16 @@ def create_app(
             region=settings.region,
             language=settings.language,
         )
-        result = pipeline.analyze(prepared, context, recorder)
+        if getattr(pipeline, "reads_barcodes", False):
+            from foodvision.imaging.barcode import find_product_barcodes  # App A only
+
+            # Local decode of the full-resolution upload (no external call); counted as input
+            # preparation. The pipeline routes to the barcode lookup only if one is read.
+            with recorder.span(Stage.IMAGE_PREPARE):
+                barcodes = find_product_barcodes(data)
+            result = pipeline.analyze(prepared, context, recorder, barcodes=barcodes)
+        else:
+            result = pipeline.analyze(prepared, context, recorder)
         if result.confidence.type is ConfidenceType.UNAVAILABLE:
             # Same structural rules for both apps; never from model or provider self-ratings.
             result.confidence = assess_confidence(result)

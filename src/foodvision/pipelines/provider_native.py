@@ -156,8 +156,9 @@ def normalize_response(payload: dict[str, Any], context: AnalysisContext) -> Ana
         return _failed(
             context,
             ErrorCode.EMPTY_RECOGNITION,
-            "No food item detected (fatsecret 211). Nutrition-label-only images are rejected "
-            "by design.",
+            "No food item detected (fatsecret 211). Photograph the food itself: nutrition "
+            "labels aren't supported, and a barcode is used only when it is sharp and fully "
+            "in frame.",
         )
     raw_items = payload.get("food_response")
     if raw_items is None:

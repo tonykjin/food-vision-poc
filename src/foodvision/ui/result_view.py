@@ -25,6 +25,7 @@ from foodvision.contracts.results import (
     ConfidenceType,
     FoodSource,
     Metrics,
+    NutritionBasis,
     ResultItem,
     ResultStatus,
     TotalsStatus,
@@ -118,11 +119,17 @@ def confidence_summary(confidence: Confidence) -> str:
 
 def totals_heading(result: AnalysisResult) -> str:
     status = result.totals.status
+    # A barcode result is one labeled serving, not an estimate of what was eaten.
+    what = (
+        "Per labeled serving"
+        if result.nutrition_basis is NutritionBasis.PER_LABEL_SERVING
+        else "Estimated totals"
+    )
     if status is TotalsStatus.COMPLETE:
-        return "Estimated totals (complete)"
+        return f"{what} (complete)"
     if status is TotalsStatus.PARTIAL:
         return (
-            f"Estimated totals: PARTIAL ({result.totals.included_items} item(s) counted, "
+            f"{what}: PARTIAL ({result.totals.included_items} item(s) counted, "
             f"{result.totals.excluded_items} excluded)"
         )
     return "Totals unavailable"

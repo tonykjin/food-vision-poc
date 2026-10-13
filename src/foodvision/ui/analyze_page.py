@@ -72,7 +72,15 @@ def render_page(kind: AppKind) -> None:
         # Required by fatsecret Terms §1.3; the snippet must not be modified.
         st.markdown(FATSECRET_ATTRIBUTION, unsafe_allow_html=True)
 
-    upload = st.file_uploader("Food photo", type=["jpg", "jpeg", "png", "webp"])
+    upload = st.file_uploader(
+        "Food photo",
+        type=["jpg", "jpeg", "png", "webp"],
+        help=(
+            "App A also reads a sharp product barcode and shows one labeled serving."
+            if kind is AppKind.PROVIDER
+            else None
+        ),
+    )
     upload_id = getattr(upload, "file_id", None)
     if upload is not None and st.button("Analyze", type="primary"):
         with st.spinner("Analyzing..."):

@@ -9,6 +9,7 @@ on separate calibration data. Changing a rule means bumping RULES_VERSION.
 - identity: what the food is. Alternatives or an unknown preparation cap it at medium.
 - portion: how much. Image-only portions are capped at medium (never validated); a wide
   low/high assumption range or an unknown weight gives low. Only measured weight can be high.
+  A labeled serving (barcode lookup) gives low: it says nothing about the amount eaten.
 - nutrition_match: whether the record and nutrients support the item. Unresolved items,
   missing nutrients and fallback picks give low; a provider match or model pick gives medium.
 - label: the lowest of the three. Scan level takes the worst item per dimension.
@@ -26,7 +27,8 @@ from foodvision.contracts.results import (
     ResultStatus,
 )
 
-RULES_VERSION = "confidence-rules-v2"  # v2: model-estimated nutrients are Low
+# v2: model-estimated nutrients are Low. v3: a labeled serving (barcode) gives Low portion.
+RULES_VERSION = "confidence-rules-v3"
 WIDE_PORTION_RATIO = 2.0  # high_g / low_g at or above this is a wide assumption range
 MANY_ITEMS = 4  # this many items or more caps identity at medium (multi-item complexity)
 
@@ -51,6 +53,8 @@ def _portion(item: ResultItem) -> tuple[ConfidenceLevel, list[str]]:
         return ConfidenceLevel.LOW, ["portion weight unknown"]
     if item.portion_method is PortionMethod.MEASURED_WEIGHT:
         return ConfidenceLevel.HIGH, []
+    if item.portion_method is PortionMethod.LABEL_SERVING:
+        return ConfidenceLevel.LOW, ["one labeled serving; amount eaten unknown"]
     s = item.portion_scenarios
     if s is not None and s.high_g / s.low_g >= WIDE_PORTION_RATIO:
         return ConfidenceLevel.LOW, [
@@ -105,7 +109,8 @@ def assess_confidence(result: AnalysisResult) -> Confidence:
     if len(result.items) >= MANY_ITEMS:
         levels["identity"] = _lowest([levels["identity"], ConfidenceLevel.MEDIUM])
         reasons.append(f"identity: {len(result.items)} items in one image")
-    if all(i.portion_method is not PortionMethod.MEASURED_WEIGHT for i in result.items):
+    methods = {i.portion_method for i in result.items}
+    if PortionMethod.MEASURED_WEIGHT not in methods and methods != {PortionMethod.LABEL_SERVING}:
         reasons.append("portion: image-only estimate; no measured weight")
     return Confidence(
         type=ConfidenceType.HEURISTIC_UNCALIBRATED,

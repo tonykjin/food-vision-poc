@@ -41,12 +41,15 @@ class TotalsStatus(StrEnum):
 class NutritionBasis(StrEnum):
     ESTIMATED_VISIBLE_PORTION = "estimated_visible_portion"
     KNOWN_WEIGHT_DIAGNOSTIC = "known_weight_diagnostic"
+    # A_barcode: one serving as labeled for the product; not an estimate of the amount eaten.
+    PER_LABEL_SERVING = "per_label_serving"
 
 
 class PortionMethod(StrEnum):
     IMAGE_ESTIMATED = "image_estimated"
     PROVIDER_SUGGESTED = "provider_suggested"
     MEASURED_WEIGHT = "measured_weight"
+    LABEL_SERVING = "label_serving"  # the product's labeled serving size, not observed
     UNKNOWN = "unknown"
 
 

@@ -1,0 +1,39 @@
+{
+  "food": {
+    "food_id": "9100001",
+    "food_name": "SYNTHETIC crispy strips",
+    "brand_name": "SYNTHETIC Brand",
+    "food_type": "Brand",
+    "food_url": "https://example.invalid/synthetic",
+    "servings": {
+      "serving": [
+        {
+          "serving_id": "910",
+          "serving_description": "1 cup",
+          "metric_serving_amount": "120.000",
+          "metric_serving_unit": "g",
+          "number_of_units": "1.000",
+          "measurement_description": "cup",
+          "is_default": "0",
+          "calories": "400",
+          "carbohydrate": "30.00",
+          "protein": "26.00",
+          "fat": "20.00"
+        },
+        {
+          "serving_id": "911",
+          "serving_description": "3 oz",
+          "metric_serving_amount": "84.000",
+          "metric_serving_unit": "g",
+          "number_of_units": "3.000",
+          "measurement_description": "oz",
+          "is_default": "1",
+          "calories": "200",
+          "carbohydrate": "15.00",
+          "protein": "13.00",
+          "fat": "10.00"
+        }
+      ]
+    }
+  }
+}
